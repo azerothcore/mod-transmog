@@ -4,7 +4,7 @@
 
 This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature.
 
-# Requirements
+## Requirements
 
 Transmogrification module currently requires:
 
