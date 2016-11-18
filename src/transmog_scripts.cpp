@@ -374,6 +374,10 @@ public:
         if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
     }
+
+    void OnAfterMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update) {
+        sT->DeleteFakeFromDB(it->GetGUIDLow());
+    }
     
     void OnLogin(Player* player)
     {
