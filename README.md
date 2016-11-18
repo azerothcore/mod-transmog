@@ -4,6 +4,12 @@
 
 This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature.
 
+# Requirements
+
+Transmogrification module currently requires:
+
+AzerothCore v1.0.2+
+
 ## How to install
 
 ###1) Simply place the module under the `modules` folder of your AzerothCore source folder.
