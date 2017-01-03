@@ -293,7 +293,7 @@ public:
                 sT->presetByName[player->GetGUID()][presetID] = name; // Make sure code doesnt mess up SQL!
                 CharacterDatabase.PExecute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES (%u, %u, \"%s\", \"%s\")", player->GetGUIDLow(), uint32(presetID), name.c_str(), ss.str().c_str());
                 if (cost)
-                    player->ModifyMoney(cost);
+                    player->ModifyMoney(-cost);
                 break;
             }
         }
