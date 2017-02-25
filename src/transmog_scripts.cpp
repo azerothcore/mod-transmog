@@ -376,6 +376,7 @@ public:
     }
 
     void OnAfterMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update) {
+        if (!player->azthPlayer->hasGear()) // [AZTH] AzerothShard: avoid transmog deleting if we're in pvp set mode
         sT->DeleteFakeFromDB(it->GetGUIDLow());
     }
     
