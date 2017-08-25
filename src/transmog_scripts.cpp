@@ -417,7 +417,7 @@ public:
 
     void OnLogout(Player* player)
     {
-        uint32 pGUID = player->GetGUID();
+        uint64 pGUID = player->GetGUID();
         for (Transmogrification::transmogData::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
             sT->dataMap.erase(it->first);
         sT->entryMap.erase(pGUID);
