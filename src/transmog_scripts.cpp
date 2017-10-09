@@ -82,7 +82,7 @@ public:
                 }
                 if (removed)
                 {
-                    session->SendAreaTriggerMessage(GTS(LANG_ERR_UNTRANSMOG_OK));
+                    session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
                     CharacterDatabase.CommitTransaction(trans);
                 }
                 else
@@ -96,7 +96,7 @@ public:
                     if (sT->GetFakeEntry(newItem->GetGUID()))
                     {
                         sT->DeleteFakeEntry(player, action, newItem);
-                        session->SendAreaTriggerMessage(GTS(LANG_ERR_UNTRANSMOG_OK));
+                        session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
                     }
                     else
                         session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
@@ -222,7 +222,7 @@ public:
                 // sender = slot, action = display
                 TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
                 if (res == LANG_ERR_TRANSMOG_OK)
-                    session->SendAreaTriggerMessage(GTS(LANG_ERR_TRANSMOG_OK));
+                    session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else
                     session->SendNotification(res);
                 // OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, sender);
@@ -375,7 +375,7 @@ public:
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
     }
 
-    void OnAfterMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update) {
+    void OnAfterMoveItemFromInventory(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) {
         if (!player->azthPlayer->hasGear()) // [AZTH] AzerothShard: avoid transmog deleting if we're in pvp set mode
         sT->DeleteFakeFromDB(it->GetGUIDLow());
     }
@@ -435,13 +435,13 @@ class WS_Transmogrification : public WorldScript
 public:
     WS_Transmogrification() : WorldScript("WS_Transmogrification") { }
 
-    void OnAfterConfigLoad(bool reload)
+    void OnAfterConfigLoad(bool reload) override
     {
         if (reload)
             sT->LoadConfig(reload);
     }
 
-    void OnStartup()
+    void OnStartup() override
     {
         sT->LoadConfig(false);
         //sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Deleting non-existing transmogrification entries...");

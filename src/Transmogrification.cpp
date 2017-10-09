@@ -272,7 +272,7 @@ void Transmogrification::UpdateItem(Player* player, Item* item) const
     }
 }
 
-void Transmogrification::DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, SQLTransaction* trans)
+void Transmogrification::DeleteFakeEntry(Player* player, uint8 /*slot*/, Item* itemTransmogrified, SQLTransaction* trans)
 {
     //if (!GetFakeEntry(item))
     //    return false;
@@ -280,7 +280,7 @@ void Transmogrification::DeleteFakeEntry(Player* player, uint8 slot, Item* itemT
     UpdateItem(player, itemTransmogrified);
 }
 
-void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified)
+void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*slot*/, Item* itemTransmogrified)
 {
     uint64 itemGUID = itemTransmogrified->GetGUID();
     entryMap[player->GetGUID()][itemGUID] = newEntry;
