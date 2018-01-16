@@ -313,6 +313,17 @@ public:
             uint32 price = sT->GetSpecialPrice(oldItem->GetTemplate());
             price *= sT->GetScaledCostModifier();
             price += sT->GetCopperCost();
+
+            if (Guild* guild = player->GetGuild())
+            {
+                if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_1))
+                    price -= uint32(price * 0.1f);
+                if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_2))
+                    price -= uint32(price * 0.2f);
+                if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_3))
+                    price -= uint32(price * 0.5f);
+            }
+
             std::ostringstream ss;
             ss << std::endl;
             if (sT->GetRequireToken())
