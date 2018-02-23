@@ -364,7 +364,6 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
 
                     if (!player->HasEnoughMoney(cost))
                         return LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY;
-                    player->ModifyMoney(-cost, false);
                 }
             }
         }
