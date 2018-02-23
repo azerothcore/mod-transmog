@@ -352,9 +352,18 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
                     sLog->outDebug(LOG_FILTER_MODULES,  "Transmogrification::Transmogrify - %s (%u) transmogrification invalid cost (non negative, amount %i). Transmogrified %u with %u", player->GetName().c_str(), player->GetGUIDLow(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
                 else
                 {
+                    if (Guild* guild = player->GetGuild())
+                    {
+                        if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_1))
+                            cost -= uint32(cost * 0.1f);
+                        if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_2))
+                            cost -= uint32(cost * 0.2f);
+                        if (guild->HasLevelBonusGuildLeveling(GUILD_LEVELING_BONUS_LOW_COST_TRANSMOG_RANK_3))
+                            cost -= uint32(cost * 0.5f);
+                    }
+
                     if (!player->HasEnoughMoney(cost))
                         return LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY;
-                    player->ModifyMoney(-cost, false);
                 }
             }
         }
