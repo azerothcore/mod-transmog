@@ -376,11 +376,6 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
         itemTransmogrifier->ClearSoulboundTradeable(player);
     }
 
-    // trusting the client, if it got here it has to have enough money
-    // ... unless client was modified
-    if (cost) // 0 cost if reverting look
-        player->ModifyMoney(-1 * cost, false);
-
     return LANG_ERR_TRANSMOG_OK;
 }
 
