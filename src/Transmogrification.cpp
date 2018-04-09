@@ -272,7 +272,7 @@ void Transmogrification::UpdateItem(Player* player, Item* item) const
     }
 }
 
-void Transmogrification::DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, SQLTransaction* trans)
+void Transmogrification::DeleteFakeEntry(Player* player, uint8 /*slot*/, Item* itemTransmogrified, SQLTransaction* trans)
 {
     //if (!GetFakeEntry(item))
     //    return false;
@@ -280,7 +280,7 @@ void Transmogrification::DeleteFakeEntry(Player* player, uint8 slot, Item* itemT
     UpdateItem(player, itemTransmogrified);
 }
 
-void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified)
+void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*slot*/, Item* itemTransmogrified)
 {
     uint64 itemGUID = itemTransmogrified->GetGUID();
     entryMap[player->GetGUID()][itemGUID] = newEntry;
@@ -375,11 +375,6 @@ TransmogTrinityStrings Transmogrification::Transmogrify(Player* player, uint64 i
         itemTransmogrifier->SetNotRefundable(player);
         itemTransmogrifier->ClearSoulboundTradeable(player);
     }
-
-    // trusting the client, if it got here it has to have enough money
-    // ... unless client was modified
-    if (cost) // 0 cost if reverting look
-        player->ModifyMoney(-1 * cost, false);
 
     return LANG_ERR_TRANSMOG_OK;
 }

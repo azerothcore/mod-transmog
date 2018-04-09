@@ -82,7 +82,7 @@ public:
                 }
                 if (removed)
                 {
-                    session->SendAreaTriggerMessage(GTS(LANG_ERR_UNTRANSMOG_OK));
+                    session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
                     CharacterDatabase.CommitTransaction(trans);
                 }
                 else
@@ -96,7 +96,7 @@ public:
                     if (sT->GetFakeEntry(newItem->GetGUID()))
                     {
                         sT->DeleteFakeEntry(player, action, newItem);
-                        session->SendAreaTriggerMessage(GTS(LANG_ERR_UNTRANSMOG_OK));
+                        session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
                     }
                     else
                         session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
@@ -222,7 +222,7 @@ public:
                 // sender = slot, action = display
                 TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
                 if (res == LANG_ERR_TRANSMOG_OK)
-                    session->SendAreaTriggerMessage(GTS(LANG_ERR_TRANSMOG_OK));
+                    session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else
                     session->SendNotification(res);
                 // OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, sender);
@@ -293,7 +293,7 @@ public:
                 sT->presetByName[player->GetGUID()][presetID] = name; // Make sure code doesnt mess up SQL!
                 CharacterDatabase.PExecute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES (%u, %u, \"%s\", \"%s\")", player->GetGUIDLow(), uint32(presetID), name.c_str(), ss.str().c_str());
                 if (cost)
-                    player->ModifyMoney(cost);
+                    player->ModifyMoney(-cost);
                 break;
             }
         }
@@ -374,6 +374,10 @@ public:
         if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
     }
+
+    void OnAfterMoveItemFromInventory(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) {
+        sT->DeleteFakeFromDB(it->GetGUIDLow());
+    }
     
     void OnLogin(Player* player)
     {
@@ -413,7 +417,7 @@ public:
 
     void OnLogout(Player* player)
     {
-        uint32 pGUID = player->GetGUID();
+        uint64 pGUID = player->GetGUID();
         for (Transmogrification::transmogData::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
             sT->dataMap.erase(it->first);
         sT->entryMap.erase(pGUID);
@@ -430,13 +434,13 @@ class WS_Transmogrification : public WorldScript
 public:
     WS_Transmogrification() : WorldScript("WS_Transmogrification") { }
 
-    void OnAfterConfigLoad(bool reload)
+    void OnAfterConfigLoad(bool reload) override
     {
         if (reload)
             sT->LoadConfig(reload);
     }
 
-    void OnStartup()
+    void OnStartup() override
     {
         sT->LoadConfig(false);
         //sLog->outInfo(LOG_FILTER_SERVER_LOADING, "Deleting non-existing transmogrification entries...");
@@ -447,6 +451,19 @@ public:
         // Dont delete even if player has more presets than should
         CharacterDatabase.Execute("DELETE FROM `custom_transmogrification_sets` WHERE NOT EXISTS(SELECT 1 FROM characters WHERE characters.guid = custom_transmogrification_sets.Owner)");
 #endif
+    }
+
+    void OnBeforeConfigLoad(bool reload) override
+    {
+        if (!reload) {
+            std::string conf_path = _CONF_DIR;
+            std::string cfg_file = conf_path + "/transmog.conf";
+            std::string cfg_def_file = cfg_file +".dist";
+
+            sConfigMgr->LoadMore(cfg_def_file.c_str());
+
+            sConfigMgr->LoadMore(cfg_file.c_str());
+        }
     }
 };
 
