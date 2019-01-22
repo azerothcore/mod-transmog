@@ -183,7 +183,7 @@ Transmogrification.IgnoreReqStats = 0
 #
 #    Transmogrification.SetNpcText
 #        Description: The npc_text entry of the info menu for the set feature
-#        Default:    50001
+#        Default:    500001
 #
 #    Transmogrification.SetCostModifier
 #        Description: A multiplier for the default gold cost (all costs summed together) (change to 0 for no default cost)
@@ -197,7 +197,7 @@ Transmogrification.EnableSets = 1
 Transmogrification.MaxSets = 10
 
 Transmogrification.EnableSetInfo = 1
-Transmogrification.SetNpcText = 50001
+Transmogrification.SetNpcText = 500001
 
 Transmogrification.SetCostModifier = 3.0
 Transmogrification.SetCopperCost = 0
