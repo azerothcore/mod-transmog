@@ -595,7 +595,7 @@ void Transmogrification::LoadConfig(bool reload)
 #endif
 
     EnableTransmogInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableTransmogInfo", true);
-    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 50000));
+    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 500000));
 
     std::istringstream issAllowed(sConfigMgr->GetStringDefault("Transmogrification.Allowed", ""));
     std::istringstream issNotAllowed(sConfigMgr->GetStringDefault("Transmogrification.NotAllowed", ""));
