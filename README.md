@@ -4,6 +4,18 @@
 
 This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature, it's based on [Rochet2 Transmog Script](http://rochet2.github.io/Transmogrification.html) 
 
+## Important notes
+
+If using this module with an AzerothCore commit older than
+
+https://github.com/azerothcore/azerothcore-wotlk/commit/b34bc28e5b02514fca3519beac420c58faa89cad
+
+please delete the IDs 50000 and 50001 from npc_text before upgrading AzerothCore:
+```
+DELETE FROM `npc_text` WHERE `ID` IN (50000,50001);
+```
+Otherwise there will be conflicts for these IDs. The module will now use IDs 500000 and 500001 as default.
+
 ## Requirements
 
 Transmogrification module currently requires:
