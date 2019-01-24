@@ -11,7 +11,7 @@ If using this module with an AzerothCore commit older than
 https://github.com/azerothcore/azerothcore-wotlk/commit/b34bc28e5b02514fca3519beac420c58faa89cad
 
 please delete the IDs 50000 and 50001 from npc_text before upgrading AzerothCore:
-```
+```sql
 DELETE FROM `npc_text` WHERE `ID` IN (50000,50001);
 ```
 Otherwise there will be conflicts for these IDs. The module will now use IDs 500000 and 500001 as default.
@@ -24,17 +24,18 @@ AzerothCore v1.0.2+
 
 ## How to install
 
-###1) Simply place the module under the `modules` folder of your AzerothCore source folder.
+### 1) Simply place the module under the `modules` folder of your AzerothCore source folder.
 
 You can do clone it via git under the azerothcore/modules directory:
 
-`cd path/to/azerothcore/modules`
-
-`git clone https://github.com/azerothcore/mod-transmog.git`
+```sh
+cd path/to/azerothcore/modules
+git clone https://github.com/azerothcore/mod-transmog.git
+```
 
 or you can manually [download the module](https://github.com/azerothcore/mod-transmog/archive/master.zip), unzip the Transmog folder and place it under the `azerothcore/modules` directory.
 
-###2) Re-run cmake and launch a clean build of AzerothCore
+### 2) Re-run cmake and launch a clean build of AzerothCore
 
 **That's it.**
 
