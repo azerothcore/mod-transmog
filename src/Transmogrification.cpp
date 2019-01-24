@@ -572,15 +572,6 @@ bool Transmogrification::IsAllowedQuality(uint32 quality) const
 
 void Transmogrification::LoadConfig(bool reload)
 {
-    std::string conf_path = _CONF_DIR;
-    std::string cfg_file = conf_path + "/transmog.conf";
-#ifdef WIN32
-    cfg_file = "transmog.conf";
-#endif
-    std::string cfg_def_file = cfg_file + ".dist";
-
-    sConfigMgr->LoadMore(cfg_def_file.c_str());
-    sConfigMgr->LoadMore(cfg_file.c_str());
 #ifdef PRESETS
     EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
     SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 500001));
