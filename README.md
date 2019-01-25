@@ -14,7 +14,7 @@ please delete the IDs 50000 and 50001 from npc_text before upgrading AzerothCore
 ```
 DELETE FROM `npc_text` WHERE `ID` IN (50000,50001);
 ```
-Otherwise there will be conflicts for these IDs. The module will now use IDs 500000 and 500001 as default.
+Otherwise there will be conflicts for these IDs. The module will now use IDs 602000 and 602001 as default.
 
 ## Requirements
 
