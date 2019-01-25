@@ -462,10 +462,13 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     //[AZTH] Yehonal
     if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
     {
-        if (!AllowMixedArmorTypes && proto->Class == ITEM_CLASS_ARMOR)
-            return false;
-
-        if (!AllowMixedWeaponTypes && proto->Class == ITEM_CLASS_WEAPON)
+        if (proto->Class == ITEM_CLASS_ARMOR)
+            if (!AllowMixedArmorTypes)
+                return false;
+        else if (proto->Class == ITEM_CLASS_WEAPON)
+            if (!AllowMixedWeaponTypes)
+                return false;
+        else
             return false;
     }
 
