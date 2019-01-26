@@ -17,7 +17,7 @@
 #
 #    Transmogrification.TransmogNpcText
 #        Description: The npc_text entry of the info menu for transmogrification
-#        Default:    500000
+#        Default:    601083
 #
 #    Transmogrification.Allowed
 #        Description: A list of item entries that are allowed for transmogrification (skips quality and CanUseItem check)
@@ -30,7 +30,7 @@
 #        Default:    ""
 
 Transmogrification.EnableTransmogInfo = 1
-Transmogrification.TransmogNpcText = 500000
+Transmogrification.TransmogNpcText = 601083
 
 Transmogrification.Allowed = ""
 Transmogrification.NotAllowed = ""
@@ -183,7 +183,7 @@ Transmogrification.IgnoreReqStats = 0
 #
 #    Transmogrification.SetNpcText
 #        Description: The npc_text entry of the info menu for the set feature
-#        Default:    500001
+#        Default:    601084
 #
 #    Transmogrification.SetCostModifier
 #        Description: A multiplier for the default gold cost (all costs summed together) (change to 0 for no default cost)
@@ -197,7 +197,7 @@ Transmogrification.EnableSets = 1
 Transmogrification.MaxSets = 10
 
 Transmogrification.EnableSetInfo = 1
-Transmogrification.SetNpcText = 500001
+Transmogrification.SetNpcText = 601084
 
 Transmogrification.SetCostModifier = 3.0
 Transmogrification.SetCopperCost = 0

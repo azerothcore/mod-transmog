@@ -1,6 +1,5 @@
-CU_SET_PATH("CMAKE_TRANSM_DIR" "${CMAKE_CURRENT_LIST_DIR}")
-CU_SET_PATH("CMAKE_TRANSM_SRC_DIR" "${CMAKE_CURRENT_LIST_DIR}/src/")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/transmog_scripts.cpp")
+AC_ADD_SCRIPT("${CMAKE_CURRENT_LIST_DIR}/src/Transmogrification.cpp")
+AC_ADD_SCRIPT_LOADER("Transmog" "${CMAKE_CURRENT_LIST_DIR}/src/transmog_scripts_loader.h")
 
-include("${CMAKE_TRANSM_SRC_DIR}/CMakeLists.txt")
-
-
+AC_ADD_CONFIG_FILE("${CMAKE_CURRENT_LIST_DIR}/conf/transmog.conf.dist")

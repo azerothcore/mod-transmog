@@ -460,8 +460,17 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
         return true;
 
     //[AZTH] Yehonal
-    if (/*TODO: conf here*/ proto->SubClass>0 && player->GetSkillValue(proto->GetSkill()) == 0)
-        return false;
+    if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
+    {
+        if (proto->Class == ITEM_CLASS_ARMOR)
+            if (!AllowMixedArmorTypes)
+                return false;
+        else if (proto->Class == ITEM_CLASS_WEAPON)
+            if (!AllowMixedWeaponTypes)
+                return false;
+        else
+            return false;
+    }
 
     if (IsNotAllowed(proto->ItemId))
         return false;
@@ -568,7 +577,7 @@ void Transmogrification::LoadConfig(bool reload)
 {
 #ifdef PRESETS
     EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
-    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 500001));
+    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 601084));
 
     EnableSets = sConfigMgr->GetBoolDefault("Transmogrification.EnableSets", true);
     MaxSets = (uint8)sConfigMgr->GetIntDefault("Transmogrification.MaxSets", 10);
@@ -595,7 +604,7 @@ void Transmogrification::LoadConfig(bool reload)
 #endif
 
     EnableTransmogInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableTransmogInfo", true);
-    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 500000));
+    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 601083));
 
     std::istringstream issAllowed(sConfigMgr->GetStringDefault("Transmogrification.Allowed", ""));
     std::istringstream issNotAllowed(sConfigMgr->GetStringDefault("Transmogrification.NotAllowed", ""));
