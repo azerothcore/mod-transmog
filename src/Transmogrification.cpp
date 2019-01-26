@@ -577,7 +577,7 @@ void Transmogrification::LoadConfig(bool reload)
 {
 #ifdef PRESETS
     EnableSetInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableSetInfo", true);
-    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 602001));
+    SetNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.SetNpcText", 601084));
 
     EnableSets = sConfigMgr->GetBoolDefault("Transmogrification.EnableSets", true);
     MaxSets = (uint8)sConfigMgr->GetIntDefault("Transmogrification.MaxSets", 10);
@@ -604,7 +604,7 @@ void Transmogrification::LoadConfig(bool reload)
 #endif
 
     EnableTransmogInfo = sConfigMgr->GetBoolDefault("Transmogrification.EnableTransmogInfo", true);
-    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 602000));
+    TransmogNpcText = uint32(sConfigMgr->GetIntDefault("Transmogrification.TransmogNpcText", 601083));
 
     std::istringstream issAllowed(sConfigMgr->GetStringDefault("Transmogrification.Allowed", ""));
     std::istringstream issNotAllowed(sConfigMgr->GetStringDefault("Transmogrification.NotAllowed", ""));
