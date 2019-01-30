@@ -10,7 +10,7 @@ git:
   depth: 1
 
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
+  - sudo apt-get -y install build-essential libtool make cmake cmake-data clang openssl libgoogle-perftools-dev
   - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - git tag -a -m "Travis build" init
@@ -22,8 +22,8 @@ install:
   - cd azerothcore
   - git submodule update --init --recursive
 
-  - mysql -uroot -e 'create database test_mysql;'
   - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
+  - mysql -uroot -e 'create database test_mysql;'
   - cd bin
   - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
   - cd ..
