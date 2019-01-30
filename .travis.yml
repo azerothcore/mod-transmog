@@ -1,6 +1,6 @@
 sudo: required
-dist: trusty # (14.04)
-# xenial (16.04) is not supported yet
+dist: xenial # (16.04)
+# bionic (18.04) is not yet available in travis
 
 language: cpp
 compiler:
@@ -22,6 +22,7 @@ install:
   - cd azerothcore
   - git submodule update --init --recursive
 
+  - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
   - mysql -uroot -e 'create database test_mysql;'
   - cd bin
   - cmake ../ -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=1 -DUSE_SCRIPTPCH=1 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=check_install
