@@ -68,5 +68,5 @@ script:
   - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
   - mysql -uroot < data/sql/create/drop_mysql.sql
   - cd bin
-  - make -j 2 -k && make install
+  - make -j 4 -k && make install
   - cd check_install/bin
