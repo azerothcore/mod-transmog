@@ -28,6 +28,8 @@ matrix:
     - os: linux
       addons:
         apt:
+          sources:
+            - llvm-toolchain-xenial-7
           packages:
             - clang-7
       env:
