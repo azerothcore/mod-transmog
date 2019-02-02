@@ -24,8 +24,8 @@ matrix:
           packages:
             - clang-3.8
       env:
-        - CCOMPILERC="/usr/bin/clang-3.8"
-        - CCOMPILERCXX="/usr/bin/clang++-3.8"
+        - CCOMPILERC="clang-3.8"
+        - CCOMPILERCXX="clang++-3.8"
 
     - os: linux
       addons:
@@ -35,8 +35,8 @@ matrix:
           packages:
             - clang-7
       env:
-        - CCOMPILERC="/usr/bin/clang-7"
-        - CCOMPILERCXX="/usr/bin/clang++-7"
+        - CCOMPILERC="clang-7"
+        - CCOMPILERCXX="clang++-7"
 
 before_install:
   - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev
@@ -54,7 +54,7 @@ install:
   - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
   - mysql -uroot -e 'create database test_mysql;'
   - cd bin
-  - cmake ../ -DCMAKE_C_COMPILER="${CCOMPILERC}" -DCMAKE_CXX_COMPILER="${CCOMPILERCXX}" -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
+  - cmake ../ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER="${CCOMPILERC}" -DCMAKE_CXX_COMPILER="${CCOMPILERCXX}" -DWITH_WARNINGS=1 -DWITH_COREDEBUG=1 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DWITH_PERFTOOLS=1 -DENABLE_EXTRA_LOGS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
   - cd ..
 
 script:
