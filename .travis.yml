@@ -4,6 +4,8 @@ dist: xenial # (16.04)
 
 language: cpp
 
+cache: ccache
+
 addons:
   apt:
     update: true
