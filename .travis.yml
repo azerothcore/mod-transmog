@@ -4,9 +4,7 @@ dist: xenial # (16.04)
 
 language: cpp
 
-cache:
-  directories:
-    - /home/travis/.ccache/
+cache: ccache
 
 addons:
   apt:
