@@ -26,8 +26,6 @@ matrix:
       env:
         - CCOMPILERC="clang-3.8"
         - CCOMPILERCXX="clang++-3.8"
-        - CCACHE_CPP2=true
-        - CCACHE_COMPILERCHECK=content
 
     - os: linux
       addons:
@@ -39,8 +37,6 @@ matrix:
       env:
         - CCOMPILERC="clang-7"
         - CCOMPILERCXX="clang++-7"
-        - CCACHE_CPP2=true
-        - CCACHE_COMPILERCHECK=content
 
 before_install:
   - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl libgoogle-perftools-dev
@@ -49,6 +45,8 @@ before_install:
   - git tag -a -m "Travis build" init
 
 install:
+  - export CCACHE_CPP2=true
+  - export CCACHE_COMPILERCHECK=content
   - cd ..
   - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore
   - mv mod-transmog azerothcore/modules
