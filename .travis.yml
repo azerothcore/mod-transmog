@@ -71,6 +71,6 @@ script:
   - cd bin
   - export CCACHE_CPP2=true
   - ccache -s
-  - make -j 4 -k && make install
+  - timeout 1500 make -j 4 -k && make install
   - ccache -s
   - cd check_install/bin
