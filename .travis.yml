@@ -39,8 +39,6 @@ matrix:
         - CCOMPILERCXX="clang++-7"
 
 before_install:
-  - sudo apt-get -y install build-essential libtool make cmake cmake-data openssl
-  - sudo apt-get -y install libssl-dev libmysqlclient-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev libace-dev
   - git config user.email "travis@build.bot" && git config user.name "Travis CI"
   - git tag -a -m "Travis build" init
 
@@ -49,26 +47,32 @@ install:
   - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore
   - mv mod-transmog azerothcore/modules
   - cd azerothcore
-  - git submodule update --init --recursive
 
+  # install OS deps (apt-get)
+  - bash ./acore.sh "install-deps"
+  # create config file
+  - echo "CCOMPILERC=$CCOMPILERC" >> conf/config.sh
+  - echo "CCOMPILERCXX=$CCOMPILERCXX" >> conf/config.sh
+  - echo "MTHREADS=4" >> conf/config.sh
+  - echo "CWARNINGS=ON" >> conf/config.sh
+  - echo "CDEBUG=OFF" >> conf/config.sh
+  - echo "CTYPE=Release" >> conf/config.sh
+  - echo "CSCRIPTS=ON" >> conf/config.sh
+  - echo "CSERVERS=ON" >> conf/config.sh
+  - echo "CTOOLS=ON" >> conf/config.sh
+  - echo "CSCRIPTPCH=OFF" >> conf/config.sh
+  - echo "CCOREPCH=OFF" >> conf/config.sh
+  - echo "CCUSTOMOPTIONS='-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_FLAGS=\"-Werror\" -DCMAKE_CXX_FLAGS=\"-Werror\"'" >> conf/config.sh
+  - echo "DB_CHARACTERS_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_AUTH_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh
+  - echo "DB_WORLD_CONF=\"MYSQL_USER='root'; MYSQL_PASS=''; MYSQL_HOST='127.0.0.1';\"" >> conf/config.sh  
+  # create and import mysql
   - mysql -e "SET GLOBAL sql_mode = '';" # this is necessary because of mysql 5.7
-  - mysql -uroot -e 'create database test_mysql;'
-  - cd bin
-  - cmake ../ -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_C_COMPILER="${CCOMPILERC}" -DCMAKE_CXX_COMPILER="${CCOMPILERCXX}" -DWITH_WARNINGS=1 -DWITH_COREDEBUG=0 -DUSE_COREPCH=0 -DUSE_SCRIPTPCH=0 -DTOOLS=0 -DSCRIPTS=1 -DSERVERS=1 -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Werror" -DCMAKE_CXX_FLAGS="-Werror" -DCMAKE_INSTALL_PREFIX=check_install
-  - cd ..
+  - bash ./acore.sh "db-assembler" "import-all"
 
 script:
-  - mysql -uroot < data/sql/create/create_mysql.sql
-  - cat data/sql/base/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/base/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/base/db_world/*.sql | mysql -uacore -pacore world
-  - cat data/sql/updates/db_auth/*.sql | mysql -uacore -pacore auth
-  - cat data/sql/updates/db_characters/*.sql | mysql -uacore -pacore characters
-  - cat data/sql/updates/db_world/*.sql | mysql -uacore -pacore world
-  - mysql -uroot < data/sql/create/drop_mysql.sql
-  - cd bin
+  # compile
   - export CCACHE_CPP2=true
   - ccache -s
-  - timeout 2400 make -j 4 -k && make install
+  - timeout 2400 bash ./acore.sh "compiler" "all"
   - ccache -s
-  - cd check_install/bin
