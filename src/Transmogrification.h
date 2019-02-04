@@ -4,6 +4,7 @@
 #include <vector>
 #include "Define.h"
 #include "ScriptPCH.h"
+#include "Language.h"
 #include "Config.h"
 
 #define PRESETS // comment this line to disable preset feature totally
