@@ -44,9 +44,9 @@ before_install:
 
 install:
   - cd ..
-  - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore
-  - mv mod-transmog azerothcore/modules
-  - cd azerothcore
+  - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+  - mv mod-transmog azerothcore-wotlk/modules
+  - cd azerothcore-wotlk
 
   # install OS deps (apt-get)
   - bash ./acore.sh "install-deps"
