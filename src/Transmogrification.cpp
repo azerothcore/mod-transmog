@@ -420,10 +420,13 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
 
     if (source->SubClass != target->SubClass && !IsRangedWeapon(target->Class, target->SubClass))
     {
-        if (source->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
-            return false;
-        if (source->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
-            return false;
+        if (!IsAllowed(source->ItemId))
+        {
+            if (source->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
+                return false;
+            if (source->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
+                return false;
+        }
     }
 
     if (source->InventoryType != target->InventoryType)
