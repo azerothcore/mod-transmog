@@ -16,21 +16,60 @@ services:
 git:
   depth: 1
 
-env:
-  - TRAVIS_BUILD_ID="1"
-  - TRAVIS_BUILD_ID="2"
+stages:
+  - prepare_cache
+  - run
 
-before_install:
-  - git config user.email "travis@build.bot" && git config user.name "Travis CI"
-  - git tag -a -m "Travis build" init
-  - cd ..
-  - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
-  - mv mod-transmog azerothcore-wotlk/modules
-  - cd azerothcore-wotlk
-  - source ./apps/ci/ci-before_install.sh
+jobs:
+  include:
+    - stage: prepare_cache
+      env: TRAVIS_BUILD_ID="1"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh OFF
+      script:
+        - source ./apps/ci/ci-compile.sh
 
-install:
-  - source ./apps/ci/ci-install.sh
+    - stage: run
+      env: TRAVIS_BUILD_ID="1"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh ON
+        - source ./apps/ci/ci-import-db.sh
+      script:
+        - source ./apps/ci/ci-compile.sh
+        - source ./apps/ci/ci-worldserver-dry-run.sh
 
-script:
-  - source ./apps/ci/ci-script.sh
+    - stage: prepare_cache
+      env: TRAVIS_BUILD_ID="2"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh OFF
+      script:
+        - source ./apps/ci/ci-compile.sh
+
+    - stage: run
+      env: TRAVIS_BUILD_ID="2"
+      before_install:
+        - cd ..
+        - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
+        - cd azerothcore-wotlk
+        - source ./apps/ci/ci-before_install.sh
+      install:
+        - source ./apps/ci/ci-install.sh ON
+      script:
+        - source ./apps/ci/ci-compile.sh
