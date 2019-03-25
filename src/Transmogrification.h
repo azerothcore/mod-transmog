@@ -7,6 +7,7 @@
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 #include "GameEventMgr.h"
+#include <unordered_map>
 
 #define PRESETS // comment this line to disable preset feature totally
 #define MAX_OPTIONS 25 // do not alter
@@ -38,8 +39,8 @@ enum TransmogTrinityStrings // Language.h might have same entries, appears when 
 class Transmogrification
 {
 public:
-    typedef UNORDERED_MAP<uint64, uint64> transmogData;
-    typedef UNORDERED_MAP<uint64, transmogData> transmogMap;
+    typedef unordered_map<uint64, uint64> transmogData;
+    typedef unordered_map<uint64, transmogData> transmogMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
 
@@ -49,10 +50,10 @@ public:
 
     typedef std::map<uint8, uint32> slotMap;
     typedef std::map<uint8, slotMap> presetData;
-    typedef UNORDERED_MAP<uint64, presetData> presetDataMap;
+    typedef unordered_map<uint64, presetData> presetDataMap;
     presetDataMap presetById; // presetById[pGUID][presetID][slot] = entry
     typedef std::map<uint8, std::string> presetIdMap;
-    typedef UNORDERED_MAP<uint64, presetIdMap> presetNameMap;
+    typedef unordered_map<uint64, presetIdMap> presetNameMap;
     presetNameMap presetByName; // presetByName[pGUID][presetID] = presetName
 
     void PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot);
