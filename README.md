@@ -6,9 +6,13 @@ This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmo
 
 ## Important notes
 
+You have to use at least this AzerothCore commit:
+
+<https://github.com/azerothcore/azerothcore-wotlk/commit/b6cb9247ba96a862ee274c0765004e6d2e66e9e4>
+
 If using this module with an AzerothCore commit older than
 
-https://github.com/azerothcore/azerothcore-wotlk/commit/b34bc28e5b02514fca3519beac420c58faa89cad
+<https://github.com/azerothcore/azerothcore-wotlk/commit/b34bc28e5b02514fca3519beac420c58faa89cad>
 
 please delete the IDs 50000 and 50001 from npc_text before upgrading AzerothCore:
 ```sql
