@@ -27,6 +27,7 @@ jobs:
       before_install:
         - cd ..
         - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
         - cd azerothcore-wotlk
         - source ./apps/ci/ci-before_install.sh
       install:
@@ -54,6 +55,7 @@ jobs:
       before_install:
         - cd ..
         - git clone --depth=1 --branch=master https://github.com/azerothcore/azerothcore-wotlk.git azerothcore-wotlk
+        - mv "$TRAVIS_BUILD_DIR" azerothcore-wotlk/modules
         - cd azerothcore-wotlk
         - source ./apps/ci/ci-before_install.sh
       install:
