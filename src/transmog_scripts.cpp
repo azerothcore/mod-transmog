@@ -378,7 +378,9 @@ public:
     void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) {
         sT->DeleteFakeFromDB(it->GetGUIDLow());
     }
-    
+
+    // There's a conflict with the module "mod-weapon-visual". Transmog has to be executed before applying weapon visuals, so
+    // use "OnLoadFromDB" instead of "OnLogin", because it is called at the beginning of the login process, "OnLogin" at the end
     void OnLoadFromDB(Player* player)
     {
         uint64 playerGUID = player->GetGUID();
