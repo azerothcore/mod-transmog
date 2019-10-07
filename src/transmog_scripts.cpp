@@ -378,7 +378,7 @@ public:
     void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) {
         sT->DeleteFakeFromDB(it->GetGUIDLow());
     }
-
+    
     void OnLogin(Player* player)
     {
         uint64 playerGUID = player->GetGUID();
