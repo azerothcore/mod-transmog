@@ -22,7 +22,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 
 #include "Transmogrification.h"
 #define sT  sTransmogrification
-#define GTS session->GetTrinityString // dropped translation support, no one using?
+#define GTS session->GetAcoreString // dropped translation support, no one using?
 
 class npc_transmogrifier : public CreatureScript
 {
