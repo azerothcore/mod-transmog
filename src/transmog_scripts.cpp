@@ -220,7 +220,7 @@ public:
                     return true;
                 }
                 // sender = slot, action = display
-                TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
+                TransmogAcoreStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
                 if (res == LANG_ERR_TRANSMOG_OK)
                     session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else
