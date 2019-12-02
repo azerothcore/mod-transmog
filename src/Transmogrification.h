@@ -17,7 +17,7 @@ class Player;
 class WorldSession;
 struct ItemTemplate;
 
-enum TransmogTrinityStrings // Language.h might have same entries, appears when executing SQL, change if needed
+enum TransmogAcoreStrings // Language.h might have same entries, appears when executing SQL, change if needed
 {
     LANG_ERR_TRANSMOG_OK = 11100, // change this
     LANG_ERR_TRANSMOG_INVALID_SLOT,
@@ -125,7 +125,7 @@ public:
     void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, SQLTransaction* trans = NULL);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
 
-    TransmogTrinityStrings Transmogrify(Player* player, uint64 itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, uint64 itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);

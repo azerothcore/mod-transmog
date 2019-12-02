@@ -22,7 +22,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 
 #include "Transmogrification.h"
 #define sT  sTransmogrification
-#define GTS session->GetTrinityString // dropped translation support, no one using?
+#define GTS session->GetAcoreString // dropped translation support, no one using?
 
 class npc_transmogrifier : public CreatureScript
 {
@@ -220,7 +220,7 @@ public:
                     return true;
                 }
                 // sender = slot, action = display
-                TransmogTrinityStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
+                TransmogAcoreStrings res = sT->Transmogrify(player, MAKE_NEW_GUID(action, 0, HIGHGUID_ITEM), sender);
                 if (res == LANG_ERR_TRANSMOG_OK)
                     session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                 else
