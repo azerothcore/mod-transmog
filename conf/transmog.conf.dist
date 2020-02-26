@@ -7,10 +7,6 @@
 #
 #    SETTINGS
 #
-#    Logger.custom.transmog
-#        Description: Transmogrification logging setting, see logger settings
-#        Default:    3, Console Server
-#
 #    Transmogrification.EnableTransmogInfo
 #        Description: Enables / Disables the info button for transmogrification
 #        Default:    1
