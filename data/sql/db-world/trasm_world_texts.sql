@@ -7,14 +7,15 @@ INSERT INTO `npc_text` (`ID`, `text0_0`) VALUES
 SET @STRING_ENTRY := 11100;
 DELETE FROM `acore_string` WHERE `entry` IN  (@STRING_ENTRY+0,@STRING_ENTRY+1,@STRING_ENTRY+2,@STRING_ENTRY+3,@STRING_ENTRY+4,@STRING_ENTRY+5,@STRING_ENTRY+6,@STRING_ENTRY+7,@STRING_ENTRY+8,@STRING_ENTRY+9,@STRING_ENTRY+10);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
-(@STRING_ENTRY+0, 'Item transmogrified'),
-(@STRING_ENTRY+1, 'Equipment slot is empty'),
-(@STRING_ENTRY+2, 'Invalid source item selected'),
-(@STRING_ENTRY+3, 'Source item does not exist'),
-(@STRING_ENTRY+4, 'Destination item does not exist'),
-(@STRING_ENTRY+5, 'Selected items are invalid'),
-(@STRING_ENTRY+6, 'Not enough money'),
-(@STRING_ENTRY+7, 'You don\'t have enough tokens'),
-(@STRING_ENTRY+8, 'Transmogrifications removed'),
-(@STRING_ENTRY+9, 'There are no transmogrifications'),
-(@STRING_ENTRY+10, 'Invalid name inserted');
+(@STRING_ENTRY+0, 'Item successfully transmogrified.'),
+(@STRING_ENTRY+1, 'Equipment slot is empty.'),
+(@STRING_ENTRY+2, 'Invalid source item selected.'),
+(@STRING_ENTRY+3, 'Source item does not exist.'),
+(@STRING_ENTRY+4, 'Destination item does not exist.'),
+(@STRING_ENTRY+5, 'Selected items are invalid.'),
+(@STRING_ENTRY+6, 'You don''t have  enough money.'),
+(@STRING_ENTRY+7, 'You don''t have enough tokens.'),
+(@STRING_ENTRY+8, 'All your transmogrifications were removed.'),
+(@STRING_ENTRY+9, 'No transmogrification found.'),
+(@STRING_ENTRY+10, 'Invalid name inserted.');
+
