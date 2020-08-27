@@ -45,8 +45,6 @@ Import the SQL manually to the right Database (auth, world or characters) or wit
 
 ### 3) Re-run cmake and launch a clean build of AzerothCore
 
-**That's it.**
-
 ### 4) Place transmog npc
 
 With a gm account goto the location you want to add the npc and use this command:
@@ -54,6 +52,8 @@ With a gm account goto the location you want to add the npc and use this command
 ```
 .npc add 190010
 ```
+
+**That's it.**
 
 ### (Optional) Edit module configuration
 
