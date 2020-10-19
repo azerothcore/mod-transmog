@@ -1,0 +1,24 @@
+on:
+  schedule:
+    - cron: "0 */12 * * *"
+jobs:
+  az-repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: az-repo-sync
+      uses: wei/git-sync@v2
+      with:
+        source_repo: "https://github.com/azerothcore/mod-transmog.git"
+        source_branch: "master"
+        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
+        destination_branch: "master"
+  dev-stg-repo-sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: dev-stg-repo-sync
+      uses: wei/git-sync@v2
+      with:
+        source_repo: "https://github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
+        source_branch: "master"
+        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
+        destination_branch: "dev-staging"
