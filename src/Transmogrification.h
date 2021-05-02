@@ -39,8 +39,9 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
 class Transmogrification
 {
 public:
-    typedef unordered_map<uint64, uint64> transmogData;
-    typedef unordered_map<uint64, transmogData> transmogMap;
+    typedef unordered_map<ObjectGuid, ObjectGuid> transmogData;
+    typedef unordered_map<ObjectGuid, uint32> transmog2Data;
+    typedef unordered_map<ObjectGuid, transmog2Data> transmogMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
 
@@ -50,10 +51,10 @@ public:
 
     typedef std::map<uint8, uint32> slotMap;
     typedef std::map<uint8, slotMap> presetData;
-    typedef unordered_map<uint64, presetData> presetDataMap;
+    typedef unordered_map<ObjectGuid, presetData> presetDataMap;
     presetDataMap presetById; // presetById[pGUID][presetID][slot] = entry
     typedef std::map<uint8, std::string> presetIdMap;
-    typedef unordered_map<uint64, presetIdMap> presetNameMap;
+    typedef unordered_map<ObjectGuid, presetIdMap> presetNameMap;
     presetNameMap presetByName; // presetByName[pGUID][presetID] = presetName
 
     void PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot);
@@ -68,8 +69,8 @@ public:
     float GetSetCostModifier() const;
     int32 GetSetCopperCost() const;
 
-    void LoadPlayerSets(uint64 pGUID);
-    void UnloadPlayerSets(uint64 pGUID);
+    void LoadPlayerSets(ObjectGuid pGUID);
+    void UnloadPlayerSets(ObjectGuid pGUID);
 #endif
 
     bool EnableTransmogInfo;
@@ -120,19 +121,19 @@ public:
     const char * GetSlotName(uint8 slot, WorldSession* session) const;
     std::string GetItemLink(Item* item, WorldSession* session) const;
     std::string GetItemLink(uint32 entry, WorldSession* session) const;
-    uint32 GetFakeEntry(uint64 itemGUID) const;
+    uint32 GetFakeEntry(ObjectGuid itemGUID) const;
     void UpdateItem(Player* player, Item* item) const;
     void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, SQLTransaction* trans = NULL);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
 
-    TransmogAcoreStrings Transmogrify(Player* player, uint64 itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
     // bool CanTransmogrify(Item const* item);
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
 
-    void DeleteFakeFromDB(uint64 itemGUID, SQLTransaction* trans = NULL);
+    void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, SQLTransaction* trans = NULL);
     float GetScaledCostModifier() const;
     int32 GetCopperCost() const;
 
