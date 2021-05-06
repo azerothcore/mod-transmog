@@ -1,13 +1,13 @@
 #ifndef DEF_TRANSMOGRIFICATION_H
 #define DEF_TRANSMOGRIFICATION_H
 
-#include <vector>
 #include "Player.h"
 #include "Config.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 #include "GameEventMgr.h"
 #include <unordered_map>
+#include <vector>
 
 #define PRESETS // comment this line to disable preset feature totally
 #define MAX_OPTIONS 25 // do not alter
@@ -39,6 +39,8 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
 class Transmogrification
 {
 public:
+    static Transmogrification* instance();
+
     typedef unordered_map<ObjectGuid, ObjectGuid> transmogData;
     typedef unordered_map<ObjectGuid, uint32> transmog2Data;
     typedef unordered_map<ObjectGuid, transmog2Data> transmogMap;
@@ -123,7 +125,7 @@ public:
     std::string GetItemLink(uint32 entry, WorldSession* session) const;
     uint32 GetFakeEntry(ObjectGuid itemGUID) const;
     void UpdateItem(Player* player, Item* item) const;
-    void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, SQLTransaction* trans = NULL);
+    void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, CharacterDatabaseTransaction* trans = nullptr);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
 
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
@@ -133,7 +135,7 @@ public:
     // bool CanTransmogrify(Item const* item);
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
 
-    void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, SQLTransaction* trans = NULL);
+    void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans = nullptr);
     float GetScaledCostModifier() const;
     int32 GetCopperCost() const;
 
@@ -150,6 +152,6 @@ public:
     bool GetEnableSetInfo() const;
     uint32 GetSetNpcText() const;
 };
-#define sTransmogrification ACE_Singleton<Transmogrification, ACE_Null_Mutex>::instance()
+#define sTransmogrification Transmogrification::instance()
 
 #endif
