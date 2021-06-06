@@ -39,9 +39,9 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
 class Transmogrification
 {
 public:
-    typedef unordered_map<ObjectGuid, ObjectGuid> transmogData;
-    typedef unordered_map<ObjectGuid, uint32> transmog2Data;
-    typedef unordered_map<ObjectGuid, transmog2Data> transmogMap;
+    typedef std::unordered_map<ObjectGuid, ObjectGuid> transmogData;
+    typedef std::unordered_map<ObjectGuid, uint32> transmog2Data;
+    typedef std::unordered_map<ObjectGuid, transmog2Data> transmogMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
 
@@ -51,10 +51,10 @@ public:
 
     typedef std::map<uint8, uint32> slotMap;
     typedef std::map<uint8, slotMap> presetData;
-    typedef unordered_map<ObjectGuid, presetData> presetDataMap;
+    typedef std::unordered_map<ObjectGuid, presetData> presetDataMap;
     presetDataMap presetById; // presetById[pGUID][presetID][slot] = entry
     typedef std::map<uint8, std::string> presetIdMap;
-    typedef unordered_map<ObjectGuid, presetIdMap> presetNameMap;
+    typedef std::unordered_map<ObjectGuid, presetIdMap> presetNameMap;
     presetNameMap presetByName; // presetByName[pGUID][presetID] = presetName
 
     void PresetTransmog(Player* player, Item* itemTransmogrified, uint32 fakeEntry, uint8 slot);
