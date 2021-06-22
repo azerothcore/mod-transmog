@@ -69,7 +69,7 @@ public:
             case EQUIPMENT_SLOT_END + 2: // Remove Transmogrifications
             {
                 bool removed = false;
-                SQLTransaction trans = CharacterDatabase.BeginTransaction();
+                auto trans = CharacterDatabase.BeginTransaction();
                 for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
                 {
                     if (Item* newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
@@ -455,23 +455,25 @@ public:
     }
 };
 
-class global_transmog_script : public GlobalScript {
-    public:
-        global_transmog_script() : GlobalScript("global_transmog_script") { }
+class global_transmog_script : public GlobalScript
+{
+public:
+    global_transmog_script() : GlobalScript("global_transmog_script") { }
 
-        void OnItemDelFromDB(SQLTransaction& trans, ObjectGuid::LowType itemGuid)
-        {
-            sT->DeleteFakeFromDB(itemGuid, &trans);
-        }
+    void OnItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
+    {
+        sT->DeleteFakeFromDB(itemGuid, &trans);
+    }
 
-        void OnMirrorImageDisplayItem(const Item *item, uint32 &display)
-        {
-            if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
-                display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
-        }
+    void OnMirrorImageDisplayItem(const Item *item, uint32 &display)
+    {
+        if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
+            display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
+    }
 };
 
-void AddSC_transmog() {
+void AddSC_transmog()
+{
     new global_transmog_script();
     new npc_transmogrifier();
     new PS_Transmogrification();
