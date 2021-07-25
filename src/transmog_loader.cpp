@@ -3,9 +3,6 @@
  * Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
  */
 
-#ifndef _TRANSMOG_LOADER_H_
-#define _TRANSMOG_LOADER_H_
-
 // From SC
 void AddSC_Transmog();
 
@@ -14,5 +11,3 @@ void Addmod_transmogScripts()
 {
     AddSC_Transmog();
 }
-
-#endif /* _TRANSMOG_LOADER_H_ */
