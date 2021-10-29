@@ -1,4 +1,5 @@
 #include "Transmogrification.h"
+#include "GameLocale.h"
 
 Transmogrification* Transmogrification::instance()
 {
@@ -193,8 +194,8 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
     int loc_idx = session->GetSessionDbLocaleIndex();
     const ItemTemplate* temp = item->GetTemplate();
     std::string name = temp->Name1;
-    if (ItemLocale const* il = sObjectMgr->GetItemLocale(temp->ItemId))
-        ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+    if (ItemLocale const* il = sGameLocale->GetItemLocale(temp->ItemId))
+        GameLocale::GetLocaleString(il->Name, loc_idx, name);
 
     if (int32 itemRandPropId = item->GetItemRandomPropertyId())
     {
@@ -238,17 +239,7 @@ std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session)
 {
     LOG_DEBUG("modules", "Transmogrification::GetItemLink");
 
-    const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
-    int loc_idx = session->GetSessionDbLocaleIndex();
-    std::string name = temp->Name1;
-    if (ItemLocale const* il = sObjectMgr->GetItemLocale(entry))
-        ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
-
-    std::ostringstream oss;
-    oss << "|c" << std::hex << ItemQualityColors[temp->Quality] << std::dec <<
-        "|Hitem:" << entry << ":0:0:0:0:0:0:0:0:0|h[" << name << "]|h|r";
-
-    return oss.str();
+    return sGameLocale->GetItemLink(entry, session->GetSessionDbLocaleIndex());
 }
 
 uint32 Transmogrification::GetFakeEntry(ObjectGuid itemGUID) const
