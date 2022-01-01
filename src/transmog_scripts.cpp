@@ -373,7 +373,9 @@ public:
             return;
 
         if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
+        {
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
+        }
     }
 
     void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/)
@@ -472,9 +474,33 @@ public:
     }
 };
 
+class unit_transmog_script : public UnitScript
+{
+public:
+    unit_transmog_script() : UnitScript("unit_transmog_script") { }
+
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 /*updateType*/, ByteBuffer& fieldBuffer, Player* target, uint16 index) override
+    {
+        if (unit->IsPlayer() && index >= PLAYER_VISIBLE_ITEM_1_ENTRYID && index <= PLAYER_VISIBLE_ITEM_19_ENTRYID && (index & 1))
+        {
+            if (Item* item = unit->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, ((index - PLAYER_VISIBLE_ITEM_1_ENTRYID) / 2U)))
+            {
+                if (target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
+                {
+                    fieldBuffer << item->GetEntry();
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+};
+
 void AddSC_Transmog()
 {
     new global_transmog_script();
+    new unit_transmog_script();
     new npc_transmogrifier();
     new PS_Transmogrification();
     new WS_Transmogrification();
