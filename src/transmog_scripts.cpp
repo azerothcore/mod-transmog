@@ -488,12 +488,12 @@ public:
                 if (target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
                 {
                     fieldBuffer << item->GetEntry();
-                    return false;
+                    return true;
                 }
             }
         }
 
-        return true;
+        return false;
     }
 };
 
