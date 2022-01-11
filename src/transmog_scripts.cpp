@@ -21,6 +21,8 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 */
 
 #include "Transmogrification.h"
+#include "ScriptedCreature.h"
+
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
 
@@ -28,6 +30,22 @@ class npc_transmogrifier : public CreatureScript
 {
 public:
     npc_transmogrifier() : CreatureScript("npc_transmogrifier") { }
+
+    struct npc_transmogrifierAI : ScriptedAI
+    {
+        npc_transmogrifierAI(Creature* creature) : ScriptedAI(creature) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+            return !sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_transmogrifierAI(creature);
+    }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
