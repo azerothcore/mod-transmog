@@ -30,7 +30,7 @@
 #                     Example: "25 35674 5623"
 #        Default:    ""
 
-Transmogrification.EnableTransmog = 1
+Transmogrification.Enable = 1
 
 Transmogrification.EnableTransmogInfo = 1
 Transmogrification.TransmogNpcText = 601083
