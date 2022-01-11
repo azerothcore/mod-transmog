@@ -21,6 +21,8 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 */
 
 #include "Transmogrification.h"
+#include "ScriptedCreature.h"
+
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
 
@@ -28,6 +30,22 @@ class npc_transmogrifier : public CreatureScript
 {
 public:
     npc_transmogrifier() : CreatureScript("npc_transmogrifier") { }
+
+    struct npc_transmogrifierAI : ScriptedAI
+    {
+        npc_transmogrifierAI(Creature* creature) : ScriptedAI(creature) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+            return !sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_transmogrifierAI(creature);
+    }
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
@@ -373,7 +391,9 @@ public:
             return;
 
         if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
+        {
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
+        }
     }
 
     void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/)
@@ -472,9 +492,33 @@ public:
     }
 };
 
+class unit_transmog_script : public UnitScript
+{
+public:
+    unit_transmog_script() : UnitScript("unit_transmog_script") { }
+
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 /*updateType*/, ByteBuffer& fieldBuffer, Player* target, uint16 index) override
+    {
+        if (unit->IsPlayer() && index >= PLAYER_VISIBLE_ITEM_1_ENTRYID && index <= PLAYER_VISIBLE_ITEM_19_ENTRYID && (index & 1))
+        {
+            if (Item* item = unit->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, ((index - PLAYER_VISIBLE_ITEM_1_ENTRYID) / 2U)))
+            {
+                if (!sTransmogrification->IsEnabled() || target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
+                {
+                    fieldBuffer << item->GetEntry();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
 void AddSC_Transmog()
 {
     new global_transmog_script();
+    new unit_transmog_script();
     new npc_transmogrifier();
     new PS_Transmogrification();
     new WS_Transmogrification();

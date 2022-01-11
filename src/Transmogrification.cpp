@@ -665,6 +665,8 @@ void Transmogrification::LoadConfig(bool reload)
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqStats", false);
 
+    IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
+
     if (!sObjectMgr->GetItemTemplate(TokenEntry))
     {
         //sLog->outError(LOG_FILTER_SERVER_LOADING, "Transmogrification.TokenEntry (%u) does not exist. Using default.", TokenEntry);
@@ -731,4 +733,9 @@ bool Transmogrification::GetAllowMixedArmorTypes() const
 bool Transmogrification::GetAllowMixedWeaponTypes() const
 {
     return AllowMixedWeaponTypes;
+};
+
+bool Transmogrification::IsEnabled() const
+{
+    return IsTransmogEnabled;
 };
