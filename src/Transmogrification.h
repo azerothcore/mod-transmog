@@ -118,6 +118,8 @@ public:
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
 
+    bool IsTransmogEnabled;
+
     bool IsAllowed(uint32 entry) const;
     bool IsNotAllowed(uint32 entry) const;
     bool IsAllowedQuality(uint32 quality) const;
@@ -158,6 +160,8 @@ public:
     uint32 GetTransmogNpcText() const;
     bool GetEnableSetInfo() const;
     uint32 GetSetNpcText() const;
+
+    [[nodiscard]] bool IsEnabled() const;
 };
 #define sTransmogrification Transmogrification::instance()
 

@@ -485,7 +485,7 @@ public:
         {
             if (Item* item = unit->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, ((index - PLAYER_VISIBLE_ITEM_1_ENTRYID) / 2U)))
             {
-                if (target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
+                if (!sTransmogrification->IsEnabled() || target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
                 {
                     fieldBuffer << item->GetEntry();
                     return true;
