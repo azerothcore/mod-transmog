@@ -47,7 +47,7 @@ public:
         return new npc_transmogrifierAI(creature);
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         WorldSession* session = player->GetSession();
         if (sT->GetEnableTransmogInfo())
