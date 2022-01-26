@@ -38,7 +38,7 @@ public:
         bool CanBeSeen(Player const* player) override
         {
             Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
-            return !sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
+            return sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
         }
     };
 
