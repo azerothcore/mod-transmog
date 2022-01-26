@@ -62,7 +62,7 @@ void Transmogrification::LoadPlayerSets(ObjectGuid pGUID)
                     break;
                 if (slot >= EQUIPMENT_SLOT_END)
                 {
-                    sLog->outError("Item entry (FakeEntry: %u, player: %s, slot: %u, presetId: %u) has invalid slot, ignoring.", entry, pGUID.ToString().c_str(), slot, uint32(PresetID));
+                    LOG_ERROR("module", "Item entry (FakeEntry: {}, player: {}, slot: {}, presetId: {}) has invalid slot, ignoring.", entry, pGUID.ToString(), slot, PresetID);
                     continue;
                 }
                 if (sObjectMgr->GetItemTemplate(entry))
