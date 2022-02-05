@@ -410,8 +410,8 @@ public:
         {
             do
             {
-                ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].GetUInt32());
-                uint32 fakeEntry = (*result)[1].GetUInt32();
+                ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].Get<uint32>());
+                uint32 fakeEntry = (*result)[1].Get<uint32>();
                 if (sObjectMgr->GetItemTemplate(fakeEntry))
                 {
                     sT->dataMap[itemGUID] = playerGUID;
