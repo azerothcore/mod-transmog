@@ -6,6 +6,12 @@
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 #include "GameEventMgr.h"
+#include "Item.h"
+#include "ScriptMgr.h"
+#include "Chat.h"
+#include "ItemTemplate.h"
+#include "QuestDef.h"
+#include "ItemTemplate.h"
 #include <unordered_map>
 #include <vector>
 
@@ -118,6 +124,9 @@ public:
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
 
+    bool UseCollectionSystem;
+    bool TrackUnusableItems;
+
     bool IsTransmogEnabled;
 
     bool IsAllowed(uint32 entry) const;
@@ -138,6 +147,8 @@ public:
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
 
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
@@ -161,6 +172,8 @@ public:
     bool GetEnableSetInfo() const;
     uint32 GetSetNpcText() const;
 
+    bool GetUseCollectionSystem() const;
+    bool GetTrackUnusableItems() const;
     [[nodiscard]] bool IsEnabled() const;
 };
 #define sTransmogrification Transmogrification::instance()

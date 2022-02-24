@@ -1,4 +1,5 @@
 #include "Transmogrification.h"
+#include "../../../src/server/game/Entities/Item/ItemTemplate.h"
 
 Transmogrification* Transmogrification::instance()
 {
@@ -227,7 +228,8 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
         item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3) << ":" <<
         item->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT) << ":" <<
         item->GetItemRandomPropertyId() << ":" << item->GetItemSuffixFactor() << ":" <<
-        (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
+//        (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
+        (uint32)0 << "|h[" << name << "]|h|r";
 
     return oss.str();
 }
@@ -291,16 +293,12 @@ void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*s
     UpdateItem(player, itemTransmogrified);
 }
 
-TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost)
-{
-    int32 cost = 0;
-    // slot of the transmogrified item
-    if (slot >= EQUIPMENT_SLOT_END)
-    {
-        // TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify an item (lowguid: {}) with a wrong slot ({}) when transmogrifying items.", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGUID), slot);
-        return LANG_ERR_TRANSMOG_INVALID_SLOT;
-    }
+TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
+    Item* itemTransmogrifier = Item::CreateItem(itemEntry, 1, 0);
+    return Transmogrify(player, itemTransmogrifier, slot, no_cost);
+}
 
+TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost) {
     Item* itemTransmogrifier = NULL;
     // guid of the transmogrifier item, if it's not 0
     if (itemGUID)
@@ -311,6 +309,18 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid
             //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify with an invalid item (lowguid: {}).", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGUID));
             return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
         }
+    }
+    return Transmogrify(player, itemTransmogrifier, slot, no_cost);
+}
+
+TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost)
+{
+    int32 cost = 0;
+    // slot of the transmogrified item
+    if (slot >= EQUIPMENT_SLOT_END)
+    {
+        // TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify an item (lowguid: {}) with a wrong slot ({}) when transmogrifying items.", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGUID), slot);
+        return LANG_ERR_TRANSMOG_INVALID_SLOT;
     }
 
     // transmogrified item
@@ -662,6 +672,8 @@ void Transmogrification::LoadConfig(bool reload)
     IgnoreReqLevel = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqLevel", false);
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqStats", false);
+    UseCollectionSystem = sConfigMgr->GetOption<bool>("Transmogrification.UseCollectionSystem", true);
+    TrackUnusableItems = sConfigMgr->GetOption<bool>("Transmogrification.TrackUnusableItems", true);
 
     IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
 
@@ -731,6 +743,15 @@ bool Transmogrification::GetAllowMixedWeaponTypes() const
 {
     return AllowMixedWeaponTypes;
 };
+bool Transmogrification::GetUseCollectionSystem() const
+{
+    return UseCollectionSystem;
+};
+
+bool Transmogrification::GetTrackUnusableItems() const
+{
+    return TrackUnusableItems;
+}
 
 bool Transmogrification::IsEnabled() const
 {
