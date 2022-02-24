@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `custom_transmogrification_sets` (
   PRIMARY KEY (`Owner`,`PresetID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='6_1';
 
-CREATE TABLE IF NOT EXISTS `custom_transmog_unlocked_appearances` (
+CREATE TABLE IF NOT EXISTS `custom_unlocked_appearances` (
     `account_id`       int(10) unsigned      NOT NULL,
     `item_template_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
     PRIMARY KEY (`account_id`, `item_template_id`)
