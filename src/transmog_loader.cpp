@@ -5,9 +5,11 @@
 
 // From SC
 void AddSC_Transmog();
+void AddSC_transmog_commandscript();
 
 // Add all
 void Addmod_transmogScripts()
 {
     AddSC_Transmog();
+    AddSC_transmog_commandscript();
 }

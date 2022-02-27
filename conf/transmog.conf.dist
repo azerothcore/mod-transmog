@@ -7,6 +7,11 @@
 #
 #    SETTINGS
 #
+#    Transmogrification.Enable
+#        Description: Enables/Disables transmog.
+#                     Players won't be able to see any transmogrified item while disabled, however, database data remains intact.
+#        Default:     1
+#
 #    Transmogrification.EnableTransmogInfo
 #        Description: Enables / Disables the info button for transmogrification
 #        Default:    1
@@ -24,6 +29,8 @@
 #        Description: A list of item entries that are NOT allowed for transmogrification
 #                     Example: "25 35674 5623"
 #        Default:    ""
+
+Transmogrification.Enable = 1
 
 Transmogrification.EnableTransmogInfo = 1
 Transmogrification.TransmogNpcText = 601083

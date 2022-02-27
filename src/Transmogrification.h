@@ -17,6 +17,11 @@ class Player;
 class WorldSession;
 struct ItemTemplate;
 
+enum TransmogSettings
+{
+    SETTING_HIDE_TRANSMOG = 0,
+};
+
 enum TransmogAcoreStrings // Language.h might have same entries, appears when executing SQL, change if needed
 {
     LANG_ERR_TRANSMOG_OK = 11100, // change this
@@ -34,6 +39,8 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
 #ifdef PRESETS
     LANG_PRESET_ERR_INVALID_NAME,
 #endif
+    LANG_CMD_TRANSMOG_SHOW = 11111,
+    LANG_CMD_TRANSMOG_HIDE = 11112,
 };
 
 class Transmogrification
@@ -111,6 +118,8 @@ public:
     bool IgnoreReqEvent;
     bool IgnoreReqStats;
 
+    bool IsTransmogEnabled;
+
     bool IsAllowed(uint32 entry) const;
     bool IsNotAllowed(uint32 entry) const;
     bool IsAllowedQuality(uint32 quality) const;
@@ -151,6 +160,8 @@ public:
     uint32 GetTransmogNpcText() const;
     bool GetEnableSetInfo() const;
     uint32 GetSetNpcText() const;
+
+    [[nodiscard]] bool IsEnabled() const;
 };
 #define sTransmogrification Transmogrification::instance()
 

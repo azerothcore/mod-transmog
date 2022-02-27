@@ -21,6 +21,8 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 */
 
 #include "Transmogrification.h"
+#include "ScriptedCreature.h"
+
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
 
@@ -29,7 +31,23 @@ class npc_transmogrifier : public CreatureScript
 public:
     npc_transmogrifier() : CreatureScript("npc_transmogrifier") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    struct npc_transmogrifierAI : ScriptedAI
+    {
+        npc_transmogrifierAI(Creature* creature) : ScriptedAI(creature) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+            return sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_transmogrifierAI(creature);
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature) override
     {
         WorldSession* session = player->GetSession();
         if (sT->GetEnableTransmogInfo())
@@ -54,7 +72,7 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action) override
     {
         player->PlayerTalkClass->ClearMenus();
         WorldSession* session = player->GetSession();
@@ -160,7 +178,7 @@ public:
                     return true;
                 }
                 // action = presetID
-                CharacterDatabase.PExecute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = %u AND PresetID = %u", player->GetGUID().GetCounter(), action);
+                CharacterDatabase.Execute("DELETE FROM `custom_transmogrification_sets` WHERE Owner = {} AND PresetID = {}", player->GetGUID().GetCounter(), action);
                 sT->presetById[player->GetGUID()][action].clear();
                 sT->presetById[player->GetGUID()].erase(action);
                 sT->presetByName[player->GetGUID()].erase(action);
@@ -234,7 +252,7 @@ public:
     }
 
 #ifdef PRESETS
-    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code)
+    bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code) override
     {
         player->PlayerTalkClass->ClearMenus();
         if (sender || action)
@@ -291,7 +309,7 @@ public:
                     sT->presetById[player->GetGUID()][presetID][it->first] = it->second;
                 }
                 sT->presetByName[player->GetGUID()][presetID] = name; // Make sure code doesnt mess up SQL!
-                CharacterDatabase.PExecute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES (%u, %u, \"%s\", \"%s\")", player->GetGUID().GetCounter(), uint32(presetID), name.c_str(), ss.str().c_str());
+                CharacterDatabase.Execute("REPLACE INTO `custom_transmogrification_sets` (`Owner`, `PresetID`, `SetName`, `SetData`) VALUES ({}, {}, \"{}\", \"{}\")", player->GetGUID().GetCounter(), uint32(presetID), name, ss.str());
                 if (cost)
                     player->ModifyMoney(-cost);
                 break;
@@ -373,7 +391,9 @@ public:
             return;
 
         if (uint32 entry = sT->GetFakeEntry(item->GetGUID()))
+        {
             player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + (slot * 2), entry);
+        }
     }
 
     void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/)
@@ -385,13 +405,13 @@ public:
     {
         ObjectGuid playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
-        QueryResult result = CharacterDatabase.PQuery("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = %u", player->GetGUID().GetCounter());
+        QueryResult result = CharacterDatabase.Query("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetGUID().GetCounter());
         if (result)
         {
             do
             {
-                ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].GetUInt32());
-                uint32 fakeEntry = (*result)[1].GetUInt32();
+                ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].Get<uint32>());
+                uint32 fakeEntry = (*result)[1].Get<uint32>();
                 if (sObjectMgr->GetItemTemplate(fakeEntry))
                 {
                     sT->dataMap[itemGUID] = playerGUID;
@@ -399,8 +419,8 @@ public:
                 }
                 else
                 {
-                    //sLog->outError(LOG_FILTER_SQL, "Item entry (Entry: %u, itemGUID: %u, playerGUID: %u) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUIDLow());
-                    // CharacterDatabase.PExecute("DELETE FROM custom_transmogrification WHERE FakeEntry = %u", fakeEntry);
+                    //sLog->outError(LOG_FILTER_SQL, "Item entry (Entry: {}, itemGUID: {}, playerGUID: {}) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUIDLow());
+                    // CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE FakeEntry = {}", fakeEntry);
                 }
             } while (result->NextRow());
 
@@ -472,9 +492,33 @@ public:
     }
 };
 
+class unit_transmog_script : public UnitScript
+{
+public:
+    unit_transmog_script() : UnitScript("unit_transmog_script") { }
+
+    bool OnBuildValuesUpdate(Unit const* unit, uint8 /*updateType*/, ByteBuffer& fieldBuffer, Player* target, uint16 index) override
+    {
+        if (unit->IsPlayer() && index >= PLAYER_VISIBLE_ITEM_1_ENTRYID && index <= PLAYER_VISIBLE_ITEM_19_ENTRYID && (index & 1))
+        {
+            if (Item* item = unit->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, ((index - PLAYER_VISIBLE_ITEM_1_ENTRYID) / 2U)))
+            {
+                if (!sTransmogrification->IsEnabled() || target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
+                {
+                    fieldBuffer << item->GetEntry();
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
 void AddSC_Transmog()
 {
     new global_transmog_script();
+    new unit_transmog_script();
     new npc_transmogrifier();
     new PS_Transmogrification();
     new WS_Transmogrification();
