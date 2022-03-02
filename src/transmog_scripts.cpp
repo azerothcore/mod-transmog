@@ -344,7 +344,6 @@ public:
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         if (oldItem)
         {
-            uint32 limit = 0;
             uint32 price = sT->GetSpecialPrice(oldItem->GetTemplate());
             price *= sT->GetScaledCostModifier();
             price += sT->GetCopperCost();
@@ -356,52 +355,67 @@ public:
             if (sT->GetUseCollectionSystem())
             {
                 uint16 pageNumber = 0;
-                uint32 startValue = 1;
-                uint32 endValue = MAX_OPTIONS - 2;
+                uint32 startValue = 0;
+                uint32 endValue = MAX_OPTIONS - 3;
+                bool lastPage = false;
                 if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
                 {
                     pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
-                    startValue = (pageNumber * (MAX_OPTIONS - 2)) + 1;
-                    endValue = (pageNumber + 1) * (MAX_OPTIONS - 2);
+                    startValue = (pageNumber * (MAX_OPTIONS - 2));
+                    endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
                 }
                 QueryResult result = CharacterDatabase.Query(
-                        "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id={} ORDER BY item_template_id LIMIT {},{}",
-                        player->GetGUID().GetRawValue(), startValue, endValue);
+                        "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id={} ORDER BY item_template_id",
+                        player->GetGUID().GetRawValue());
                 if (result)
                 {
+                    std::vector<Item*> allowedItems;
                     do {
-                        if (limit > MAX_OPTIONS)
-                            break;
                         uint32 newItemEntryId = (*result)[0].Get<uint32>();
                         Item *newItem = Item::CreateItem(newItemEntryId, 1, 0);
                         if (!newItem)
                             continue;
-
                         if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
                             continue;
                         if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                             continue;
-                        ++limit;
-                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                        allowedItems.push_back(newItem);
                     } while (result -> NextRow());
+                    for (uint32 i = startValue; i <= endValue; i++)
+                    {
+                        if (allowedItems.empty() || i > allowedItems.size() - 1)
+                        {
+                            lastPage = true;
+                            break;
+                        }
+                        Item* newItem = allowedItems.at(i);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                    }
                 }
                 if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, 0);
+                    if (!lastPage)
+                    {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, 0);
+                    }
                 }
                 else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, 0);
+                    if (!lastPage)
+                    {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, 0);
+                    }
                 }
-                else
+                else if (!lastPage)
                 {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, 0);
                 }
             }
             else
             {
+                uint32 limit = 0;
                 for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
                 {
                     if (limit > MAX_OPTIONS)
@@ -478,6 +492,36 @@ public:
         ItemTemplate const* pProto = it->GetTemplate();
         AddToDatabase(player, pProto);
     }
+
+    void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    }
+
+    void OnCreateItem(Player* player, Item* item, uint32 /*count*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    }
+
+    void OnAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
+    {
+        if (!sT->GetUseCollectionSystem())
+            return;
+        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        {
+            AddToDatabase(player, item->GetTemplate());
+        }
+    };
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
     {
