@@ -357,12 +357,12 @@ public:
             {
                 uint16 pageNumber = 0;
                 uint32 startValue = 1;
-                uint32 endValue = MAX_OPTIONS - 1;
+                uint32 endValue = MAX_OPTIONS - 2;
                 if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
                 {
                     pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
-                    startValue = (pageNumber * MAX_OPTIONS);
-                    endValue = ((pageNumber + 1) * MAX_OPTIONS) - 1;
+                    startValue = (pageNumber * (MAX_OPTIONS - 2)) + 1;
+                    endValue = (pageNumber + 1) * (MAX_OPTIONS - 2);
                 }
                 QueryResult result = CharacterDatabase.Query(
                         "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id={} ORDER BY item_template_id LIMIT {},{}",
@@ -385,8 +385,14 @@ public:
                         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
                     } while (result -> NextRow());
                 }
-                if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
+                if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
                 {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, 0);
+                }
+                else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, 0);
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, 0);
                 }
                 else
