@@ -365,8 +365,8 @@ public:
                     endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
                 }
                 QueryResult result = CharacterDatabase.Query(
-                        "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id={} ORDER BY item_template_id",
-                        player->GetGUID().GetRawValue());
+                        "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = {} ORDER BY item_template_id",
+                        player->GetSession()->GetAccountId());
                 if (result)
                 {
                     std::vector<Item*> allowedItems;
@@ -471,17 +471,17 @@ private:
         if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
             return;
         uint32 itemId = itemTemplate->ItemId;
-        uint64 playerEntry = player -> GetGUID().GetRawValue();
+        uint32 accountId = player->GetSession()->GetAccountId();
         std::string itemName = itemTemplate -> Name1;
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
-        QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id={} AND item_template_id={}", playerEntry, itemId);
+        QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = {} AND item_template_id = {}", accountId, itemId);
         if (!result) {
             if (showChatMessage)
                 ChatHandler(player->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
-            CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", playerEntry, itemId);
+            CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
         }
     }
 public:
