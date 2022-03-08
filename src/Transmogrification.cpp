@@ -1,5 +1,5 @@
 #include "Transmogrification.h"
-#include "../../../src/server/game/Entities/Item/ItemTemplate.h"
+#include "ItemTemplate.h"
 
 Transmogrification* Transmogrification::instance()
 {

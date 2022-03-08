@@ -539,7 +539,7 @@ public:
         {
             AddToDatabase(player, item->GetTemplate());
         }
-    };
+    }
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
     {
@@ -563,7 +563,7 @@ public:
         }
     }
 
-    void OnAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item)
+    void OnAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item) override
     {
         if (!item)
             return;
@@ -574,12 +574,12 @@ public:
         }
     }
 
-    void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/)
+    void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
     {
         sT->DeleteFakeFromDB(it->GetGUID().GetCounter());
     }
 
-    void OnLogin(Player* player)
+    void OnLogin(Player* player) override
     {
         ObjectGuid playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
