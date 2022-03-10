@@ -615,7 +615,7 @@ public:
 #endif
     }
 
-    void OnLogout(Player* player)
+    void OnLogout(Player* player) override
     {
         ObjectGuid pGUID = player->GetGUID();
         for (Transmogrification::transmog2Data::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
@@ -658,12 +658,12 @@ class global_transmog_script : public GlobalScript
 public:
     global_transmog_script() : GlobalScript("global_transmog_script") { }
 
-    void OnItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
+    void OnItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid) override
     {
         sT->DeleteFakeFromDB(itemGuid, &trans);
     }
 
-    void OnMirrorImageDisplayItem(const Item *item, uint32 &display)
+    void OnMirrorImageDisplayItem(const Item *item, uint32 &display) override
     {
         if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
             display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
