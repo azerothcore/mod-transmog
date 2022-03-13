@@ -12,6 +12,17 @@
 #                     Players won't be able to see any transmogrified item while disabled, however, database data remains intact.
 #        Default:     1
 #
+#    Transmogrification.UseCollectionSystem
+#        Description: Enables/Disables Legion-style appearance collection system.
+#                     If enabled, players can use the appearance of any item equipped or rewarded from a completed quest.
+#                     If disabled, players must have an item in their bags to use as a transmogrification appearance source.
+#        Default:     1
+#
+#    Transmogrification.TrackUnusableItems
+#        Description: If enabled, appearances are collected even for items that are not suitable for transmogrification.
+#                     This allows these appearances to be used later if the configuration is changed.
+#        Default:     1
+#
 #    Transmogrification.EnableTransmogInfo
 #        Description: Enables / Disables the info button for transmogrification
 #        Default:    1
@@ -31,6 +42,8 @@
 #        Default:    ""
 
 Transmogrification.Enable = 1
+Transmogrification.UseCollectionSystem = 1
+Transmogrification.TrackUnusableItems = 1
 
 Transmogrification.EnableTransmogInfo = 1
 Transmogrification.TransmogNpcText = 601083
