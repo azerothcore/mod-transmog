@@ -371,9 +371,23 @@ public:
                         startValue = (pageNumber * (MAX_OPTIONS - 2));
                         endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
                     }
+                    std::vector<Item*> allowedItems;
+                    if (sT->GetAllowHiddenTransmog())
+                    {
+                        // Offset the start and end values to make space for invisible item entry
+                        endValue--;
+                        if (pageNumber != 0)
+                        {
+                            startValue--;
+                        }
+                        else
+                        {
+                            // Add invisible item entry
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Hide Slot", slot, UINT_MAX, "You are hiding the item in this slot.\nDo you wish to continue?\n\n" + lineEnd, 0, false);
+                        }
+                    }
                     if (result)
                     {
-                        std::vector<Item*> allowedItems;
                         do {
                             uint32 newItemEntryId = (*result)[0].Get<uint32>();
                             Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
@@ -385,16 +399,16 @@ public:
                                 continue;
                             allowedItems.push_back(newItem);
                         } while (result->NextRow());
-                        for (uint32 i = startValue; i <= endValue; i++)
+                    }
+                    for (uint32 i = startValue; i <= endValue; i++)
+                    {
+                        if (allowedItems.empty() || i > allowedItems.size() - 1)
                         {
-                            if (allowedItems.empty() || i > allowedItems.size() - 1)
-                            {
-                                lastPage = true;
-                                break;
-                            }
-                            Item* newItem = allowedItems.at(i);
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                            lastPage = true;
+                            break;
                         }
+                        Item* newItem = allowedItems.at(i);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
                     }
                     if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
                     {
@@ -590,7 +604,7 @@ public:
             {
                 ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].Get<uint32>());
                 uint32 fakeEntry = (*result)[1].Get<uint32>();
-                if (sObjectMgr->GetItemTemplate(fakeEntry))
+                if (fakeEntry == HIDDEN_ITEM_ID || sObjectMgr->GetItemTemplate(fakeEntry))
                 {
                     sT->dataMap[itemGUID] = playerGUID;
                     sT->entryMap[playerGUID][itemGUID] = fakeEntry;

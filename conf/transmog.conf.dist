@@ -18,6 +18,11 @@
 #                     If disabled, players must have an item in their bags to use as a transmogrification appearance source.
 #        Default:     1
 #
+#    Transmogrification.AllowHiddenTransmog
+#        Description: Enables/Disables the hiding of equipment through transmog
+#                     If enabled, players can select an "invisible" appearance for items at the transmog vendor
+#        Default:     1
+#
 #    Transmogrification.TrackUnusableItems
 #        Description: If enabled, appearances are collected even for items that are not suitable for transmogrification.
 #                     This allows these appearances to be used later if the configuration is changed.
@@ -43,6 +48,7 @@
 
 Transmogrification.Enable = 1
 Transmogrification.UseCollectionSystem = 1
+Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.TrackUnusableItems = 1
 
 Transmogrification.EnableTransmogInfo = 1
