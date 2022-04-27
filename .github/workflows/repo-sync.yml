@@ -12,7 +12,7 @@ jobs:
       with:
         source_repo: "https://github.com/azerothcore/mod-transmog.git"
         source_branch: "master"
-        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
+        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
         destination_branch: "master"
   dev-stg-repo-sync:
     runs-on: ubuntu-latest
@@ -22,5 +22,5 @@ jobs:
       with:
         source_repo: "https://github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
         source_branch: "master"
-        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GH_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
+        destination_repo: "https://${{ secrets.GH_USERNAME }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ secrets.GH_USERNAME }}/mod-transmog.git"
         destination_branch: "dev-staging"
