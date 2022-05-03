@@ -57,8 +57,10 @@ public:
     typedef std::unordered_map<ObjectGuid, ObjectGuid> transmogData;
     typedef std::unordered_map<ObjectGuid, uint32> transmog2Data;
     typedef std::unordered_map<ObjectGuid, transmog2Data> transmogMap;
+    typedef std::unordered_map<uint32, std::vector<uint32>> collectionCacheMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
+    collectionCacheMap collectionCache;
 
 #ifdef PRESETS
     bool EnableSetInfo;
@@ -145,6 +147,7 @@ public:
     void UpdateItem(Player* player, Item* item) const;
     void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, CharacterDatabaseTransaction* trans = nullptr);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
+    bool AddCollectedAppearance(uint32 accountId, uint32 itemId);
 
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
