@@ -30,9 +30,15 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable transmogTable =
+        {
+            { "add", HandleAddTransmogItem,       SEC_MODERATOR, Console::No },
+            { "",    HandleDisableTransMogVisual, SEC_PLAYER,    Console::No },
+        };
+
         static ChatCommandTable commandTable =
         {
-            { "transmog", HandleDisableTransMogVisual, SEC_PLAYER, Console::No },
+            { "transmog", transmogTable },
         };
 
         return commandTable;
@@ -54,6 +60,56 @@ public:
         }
 
         player->UpdateObjectVisibility();
+        return true;
+    }
+
+    static bool HandleAddTransmogItem(ChatHandler* handler, Optional <PlayerIdentifier> player, ItemTemplate const* itemTemplate)
+    {
+        if (!sTransmogrification->GetUseCollectionSystem())
+            return true;
+
+        if (!sObjectMgr->GetItemTemplate(itemTemplate->ItemId))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemTemplate->ItemId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+        if (!player || !player->IsConnected())
+            return false;
+
+        Player* target = player->GetConnectedPlayer();
+
+        if (!sTransmogrification->GetTrackUnusableItems() && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate))
+        {
+            handler->SendSysMessage(LANG_CMD_TRANSMOG_ADD);
+            handler->SetSentErrorMessage(true);
+            return true;
+        }
+
+        if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
+            return true;
+
+        uint32 itemId = itemTemplate->ItemId;
+        uint32 accountId = target->GetSession()->GetAccountId();
+        std::stringstream tempStream;
+        tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
+        std::string itemQuality = tempStream.str();
+        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
+        target->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+        {
+           if (!result)
+           {
+               if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
+               {
+                   ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemTemplate->Name1.c_str());
+               }
+               CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+           }
+        }));
+
         return true;
     }
 };
