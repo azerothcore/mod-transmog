@@ -22,6 +22,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 
 #include "Transmogrification.h"
 #include "ScriptedCreature.h"
+#include "ItemTemplate.h"
 
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
@@ -472,6 +473,14 @@ public:
 class PS_Transmogrification : public PlayerScript
 {
 private:
+    void AddToDatabase(Player* player, Item* item)
+    {
+        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
+            return;
+        ItemTemplate const* itemTemplate = item->GetTemplate();
+        AddToDatabase(player, itemTemplate);
+    }
+
     void AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
     {
         if (!sT->GetTrackUnusableItems() && !sT->SuitableForTransmogrification(player, itemTemplate))
@@ -499,8 +508,7 @@ public:
     {
         if (!sT->GetUseCollectionSystem())
             return;
-        ItemTemplate const* pProto = it->GetTemplate();
-        AddToDatabase(player, pProto);
+        AddToDatabase(player, it);
     }
 
     void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
@@ -509,7 +517,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
@@ -519,7 +527,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
@@ -529,7 +537,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
