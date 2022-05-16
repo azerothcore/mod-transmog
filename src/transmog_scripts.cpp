@@ -23,6 +23,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 #include "Transmogrification.h"
 #include "ScriptedCreature.h"
 #include "ItemTemplate.h"
+#include "../../../src/server/game/Entities/Item/ItemTemplate.h"
 
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
@@ -475,7 +476,7 @@ class PS_Transmogrification : public PlayerScript
 private:
     void AddToDatabase(Player* player, Item* item)
     {
-        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
+        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return;
         ItemTemplate const* itemTemplate = item->GetTemplate();
         AddToDatabase(player, itemTemplate);
