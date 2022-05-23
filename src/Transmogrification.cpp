@@ -293,6 +293,22 @@ void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*s
     UpdateItem(player, itemTransmogrified);
 }
 
+bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
+{
+    if (collectionCache.find(accountId)  == collectionCache.end())
+    {
+        collectionCache.insert({accountId, {itemId}});
+        return true;
+    }
+    if (std::find(collectionCache[accountId].begin(), collectionCache[accountId].end(), itemId) == collectionCache[accountId].end())
+    {
+        collectionCache[accountId].push_back(itemId);
+        std::sort(collectionCache[accountId].begin(), collectionCache[accountId].end());
+        return true;
+    }
+    return false;
+}
+
 TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
     if (itemEntry == UINT_MAX) // Hidden transmog
     {
