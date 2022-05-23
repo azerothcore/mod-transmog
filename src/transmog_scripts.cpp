@@ -22,6 +22,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 
 #include "Transmogrification.h"
 #include "ScriptedCreature.h"
+#include "ItemTemplate.h"
 
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
@@ -358,70 +359,66 @@ public:
             {
                 sendGossip = false;
 
-                std::string query = "SELECT item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(player->GetSession()->GetAccountId()) + " ORDER BY item_template_id";
-                session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+                uint16 pageNumber = 0;
+                uint32 startValue = 0;
+                uint32 endValue = MAX_OPTIONS - 3;
+                bool lastPage = false;
+                if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
                 {
-                    uint16 pageNumber = 0;
-                    uint32 startValue = 0;
-                    uint32 endValue = MAX_OPTIONS - 3;
-                    bool lastPage = false;
-                    if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
-                    {
-                        pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
-                        startValue = (pageNumber * (MAX_OPTIONS - 2));
-                        endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
+                    pageNumber = gossipPageNumber - EQUIPMENT_SLOT_END - 10;
+                    startValue = (pageNumber * (MAX_OPTIONS - 2));
+                    endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
+                }
+                uint32 accountId = player->GetSession()->GetAccountId();
+                if (sT->collectionCache.find(accountId) != sT->collectionCache.end())
+                {
+                    std::vector<Item*> allowedItems;
+                    for (uint32 newItemEntryId : sT->collectionCache[accountId]) {
+                        Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
+                        if (!newItem)
+                            continue;
+                        if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
+                            continue;
+                        if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
+                            continue;
+                        allowedItems.push_back(newItem);
                     }
-                    if (result)
+                    for (uint32 i = startValue; i <= endValue; i++)
                     {
-                        std::vector<Item*> allowedItems;
-                        do {
-                            uint32 newItemEntryId = (*result)[0].Get<uint32>();
-                            Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
-                            if (!newItem)
-                                continue;
-                            if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
-                                continue;
-                            if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
-                                continue;
-                            allowedItems.push_back(newItem);
-                        } while (result->NextRow());
-                        for (uint32 i = startValue; i <= endValue; i++)
+                        if (allowedItems.empty() || i > allowedItems.size() - 1)
                         {
-                            if (allowedItems.empty() || i > allowedItems.size() - 1)
-                            {
-                                lastPage = true;
-                                break;
-                            }
-                            Item* newItem = allowedItems.at(i);
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                            lastPage = true;
+                            break;
                         }
+                        Item* newItem = allowedItems.at(i);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
                     }
-                    if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
+                }
+                if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, slot);
+                    if (!lastPage)
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, slot);
-                        if (!lastPage)
-                        {
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
-                        }
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
                     }
-                    else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
+                }
+                else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, slot);
+                    if (!lastPage)
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, slot);
-                        if (!lastPage)
-                        {
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
-                        }
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
                     }
-                    else if (!lastPage)
-                    {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
-                    }
+                }
+                else if (!lastPage)
+                {
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
+                }
 
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
-                    SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
-                }));
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
             else
             {
@@ -476,6 +473,14 @@ public:
 class PS_Transmogrification : public PlayerScript
 {
 private:
+    void AddToDatabase(Player* player, Item* item)
+    {
+        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+            return;
+        ItemTemplate const* itemTemplate = item->GetTemplate();
+        AddToDatabase(player, itemTemplate);
+    }
+
     void AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
     {
         if (!sT->GetTrackUnusableItems() && !sT->SuitableForTransmogrification(player, itemTemplate))
@@ -489,16 +494,12 @@ private:
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
-        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
-        player->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+        if (sT->AddCollectedAppearance(accountId, itemId))
         {
-            if (!result)
-            {
-                if (showChatMessage)
-                    ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
-                CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
-            }
-        }));
+            if (showChatMessage)
+                ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
+            CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+        }
     }
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify") { }
@@ -507,8 +508,7 @@ public:
     {
         if (!sT->GetUseCollectionSystem())
             return;
-        ItemTemplate const* pProto = it->GetTemplate();
-        AddToDatabase(player, pProto);
+        AddToDatabase(player, it);
     }
 
     void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
@@ -517,7 +517,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
@@ -527,7 +527,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
@@ -537,7 +537,7 @@ public:
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
-            AddToDatabase(player, item->GetTemplate());
+            AddToDatabase(player, item);
         }
     }
 
@@ -637,6 +637,25 @@ public:
     void OnAfterConfigLoad(bool reload) override
     {
         sT->LoadConfig(reload);
+        if (sT->GetUseCollectionSystem())
+        {
+            LOG_INFO("module", "Loading transmog appearance collection cache....");
+            uint32 collectedAppearanceCount = 0;
+            QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances");
+            if (result)
+            {
+                do
+                {
+                    uint32 accountId = (*result)[0].Get<uint32>();
+                    uint32 itemId = (*result)[1].Get<uint32>();
+                    if (sT->AddCollectedAppearance(accountId, itemId))
+                    {
+                        collectedAppearanceCount++;
+                    }
+                } while (result->NextRow());
+            }
+            LOG_INFO("module", "Loaded {} collected appearances into cache", collectedAppearanceCount);
+        }
     }
 
     void OnStartup() override
