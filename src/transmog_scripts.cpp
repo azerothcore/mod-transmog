@@ -373,6 +373,20 @@ public:
                 if (sT->collectionCache.find(accountId) != sT->collectionCache.end())
                 {
                     std::vector<Item*> allowedItems;
+                    if (sT->GetAllowHiddenTransmog())
+                    {
+                        // Offset the start and end values to make space for invisible item entry
+                        endValue--;
+                        if (pageNumber != 0)
+                        {
+                            startValue--;
+                        }
+                        else
+                        {
+                            // Add invisible item entry
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Hide Slot", slot, UINT_MAX, "You are hiding the item in this slot.\nDo you wish to continue?\n\n" + lineEnd, 0, false);
+                        }
+                    }
                     for (uint32 newItemEntryId : sT->collectionCache[accountId]) {
                         Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
                         if (!newItem)
@@ -590,7 +604,7 @@ public:
             {
                 ObjectGuid itemGUID = ObjectGuid::Create<HighGuid::Item>((*result)[0].Get<uint32>());
                 uint32 fakeEntry = (*result)[1].Get<uint32>();
-                if (sObjectMgr->GetItemTemplate(fakeEntry))
+                if (fakeEntry == HIDDEN_ITEM_ID || sObjectMgr->GetItemTemplate(fakeEntry))
                 {
                     sT->dataMap[itemGUID] = playerGUID;
                     sT->entryMap[playerGUID][itemGUID] = fakeEntry;

@@ -16,6 +16,7 @@
 #include <vector>
 
 #define PRESETS // comment this line to disable preset feature totally
+#define HIDDEN_ITEM_ID 1 // used for hidden transmog - do not use a valid equipment ID
 #define MAX_OPTIONS 25 // do not alter
 
 class Item;
@@ -127,6 +128,7 @@ public:
     bool IgnoreReqStats;
 
     bool UseCollectionSystem;
+    bool AllowHiddenTransmog;
     bool TrackUnusableItems;
 
     bool IsTransmogEnabled;
@@ -151,7 +153,7 @@ public:
 
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
-    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
@@ -176,6 +178,7 @@ public:
     uint32 GetSetNpcText() const;
 
     bool GetUseCollectionSystem() const;
+    bool GetAllowHiddenTransmog() const;
     bool GetTrackUnusableItems() const;
     [[nodiscard]] bool IsEnabled() const;
 };
