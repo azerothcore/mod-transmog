@@ -20,7 +20,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (@STRING_ENTRY+10, 'Invalid name inserted.'),
 (@STRING_ENTRY+11, 'Showing transmogrifieded items, relog to update the current area.'),
 (@STRING_ENTRY+12, 'Hiding transmogrifieded items, relog to update the current area.'),
-(@STRING_ENTRY+13, 'The selected Item is not suitable for transmogrification.');
+(@STRING_ENTRY+13, 'The selected Item is not suitable for transmogrification.'),
+(@STRING_ENTRY+14, 'The selected Item cannot be used for transmogrification of the target player.');
 
 DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog add set');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
