@@ -103,18 +103,14 @@ public:
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
-        std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
-        target->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+        if (sTransmogrification->AddCollectedAppearance(accountId, itemId))
         {
-            if (!result)
+            if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
             {
-                if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
-                {
-                    ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemTemplate->Name1.c_str());
-                }
-                CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+                ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemTemplate->Name1.c_str());
             }
-        }));
+            CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+        }
 
         return true;
     }
@@ -146,6 +142,7 @@ public:
             return false;
         }
 
+        uint32 accountId = target->GetSession()->GetAccountId();
         uint32 itemId;
         for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
         {
@@ -160,13 +157,10 @@ public:
                     if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
                         continue;
 
-                    uint32 accountId = target->GetSession()->GetAccountId();
-                    std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances WHERE account_id = " + std::to_string(accountId) + " AND item_template_id = " + std::to_string(itemId);
-                    target->GetSession()->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(query).WithCallback([=](QueryResult result)
+                    if (sTransmogrification->AddCollectedAppearance(accountId, itemId))
                     {
-                        if (!result)
-                            CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
-                    }));
+                        CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+                    }
                 }
             }
         }
