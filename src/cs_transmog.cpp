@@ -31,21 +31,21 @@ public:
     ChatCommandTable GetCommands() const override
     {
         static ChatCommandTable addCollectionTable =
-                {
-                        { "set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::No },
-                        { "",    HandleAddTransmogItem,       SEC_MODERATOR, Console::No },
-                };
+        {
+            { "set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::No },
+            { "",    HandleAddTransmogItem,       SEC_MODERATOR, Console::No },
+        };
 
         static ChatCommandTable transmogTable =
-                {
-                        { "add", addCollectionTable },
-                        { "",    HandleDisableTransMogVisual, SEC_PLAYER,    Console::No },
-                };
+        {
+            { "add", addCollectionTable },
+            { "",    HandleDisableTransMogVisual, SEC_PLAYER,    Console::No },
+        };
 
         static ChatCommandTable commandTable =
-                {
-                        { "transmog", transmogTable },
-                };
+        {
+            { "transmog", transmogTable },
+        };
 
         return commandTable;
     }
@@ -192,15 +192,12 @@ public:
             }
         }
 
-        LOG_DEBUG("module", "Transmog Error {}", error);
-        // .transmog add set 699
         if (!added && error > 0)
         {
             handler->SendSysMessage(error);
             handler->SetSentErrorMessage(true);
             return true;
         }
-
 
         int locale = handler->GetSessionDbcLocale();
         std::string setName = set->name[locale];
