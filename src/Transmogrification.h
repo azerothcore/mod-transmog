@@ -16,6 +16,7 @@
 #include <vector>
 
 #define PRESETS // comment this line to disable preset feature totally
+#define HIDDEN_ITEM_ID 1 // used for hidden transmog - do not use a valid equipment ID
 #define MAX_OPTIONS 25 // do not alter
 
 class Item;
@@ -59,8 +60,10 @@ public:
     typedef std::unordered_map<ObjectGuid, ObjectGuid> transmogData;
     typedef std::unordered_map<ObjectGuid, uint32> transmog2Data;
     typedef std::unordered_map<ObjectGuid, transmog2Data> transmogMap;
+    typedef std::unordered_map<uint32, std::vector<uint32>> collectionCacheMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
+    collectionCacheMap collectionCache;
 
 #ifdef PRESETS
     bool EnableSetInfo;
@@ -127,6 +130,7 @@ public:
     bool IgnoreReqStats;
 
     bool UseCollectionSystem;
+    bool AllowHiddenTransmog;
     bool TrackUnusableItems;
 
     bool IsTransmogEnabled;
@@ -147,10 +151,11 @@ public:
     void UpdateItem(Player* player, Item* item) const;
     void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, CharacterDatabaseTransaction* trans = nullptr);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
+    bool AddCollectedAppearance(uint32 accountId, uint32 itemId);
 
     TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
-    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
@@ -175,6 +180,7 @@ public:
     uint32 GetSetNpcText() const;
 
     bool GetUseCollectionSystem() const;
+    bool GetAllowHiddenTransmog() const;
     bool GetTrackUnusableItems() const;
     [[nodiscard]] bool IsEnabled() const;
 };

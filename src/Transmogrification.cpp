@@ -293,9 +293,29 @@ void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*s
     UpdateItem(player, itemTransmogrified);
 }
 
+bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
+{
+    if (collectionCache.find(accountId)  == collectionCache.end())
+    {
+        collectionCache.insert({accountId, {itemId}});
+        return true;
+    }
+    if (std::find(collectionCache[accountId].begin(), collectionCache[accountId].end(), itemId) == collectionCache[accountId].end())
+    {
+        collectionCache[accountId].push_back(itemId);
+        std::sort(collectionCache[accountId].begin(), collectionCache[accountId].end());
+        return true;
+    }
+    return false;
+}
+
 TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
+    if (itemEntry == UINT_MAX) // Hidden transmog
+    {
+        return Transmogrify(player, nullptr, slot, no_cost, true);
+    }
     Item* itemTransmogrifier = Item::CreateItem(itemEntry, 1, 0);
-    return Transmogrify(player, itemTransmogrifier, slot, no_cost);
+    return Transmogrify(player, itemTransmogrifier, slot, no_cost, false);
 }
 
 TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost) {
@@ -310,10 +330,10 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid
             return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
         }
     }
-    return Transmogrify(player, itemTransmogrifier, slot, no_cost);
+    return Transmogrify(player, itemTransmogrifier, slot, no_cost, false);
 }
 
-TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost)
+TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost, bool hidden_transmog)
 {
     int32 cost = 0;
     // slot of the transmogrified item
@@ -329,6 +349,12 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
     {
         //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify an invalid item in a valid slot (slot: {}).", player->GetGUIDLow(), player->GetName(), slot);
         return LANG_ERR_TRANSMOG_MISSING_DEST_ITEM;
+    }
+
+    if (hidden_transmog)
+    {
+        SetFakeEntry(player, HIDDEN_ITEM_ID, slot, itemTransmogrified); // newEntry
+        return LANG_ERR_TRANSMOG_OK;
     }
 
     if (!itemTransmogrifier) // reset look newEntry
@@ -673,6 +699,7 @@ void Transmogrification::LoadConfig(bool reload)
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqStats", false);
     UseCollectionSystem = sConfigMgr->GetOption<bool>("Transmogrification.UseCollectionSystem", true);
+    AllowHiddenTransmog = sConfigMgr->GetOption<bool>("Transmogrification.AllowHiddenTransmog", true);
     TrackUnusableItems = sConfigMgr->GetOption<bool>("Transmogrification.TrackUnusableItems", true);
 
     IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
@@ -747,6 +774,11 @@ bool Transmogrification::GetUseCollectionSystem() const
 {
     return UseCollectionSystem;
 };
+
+bool Transmogrification::GetAllowHiddenTransmog() const
+{
+    return AllowHiddenTransmog;
+}
 
 bool Transmogrification::GetTrackUnusableItems() const
 {
