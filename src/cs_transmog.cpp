@@ -20,7 +20,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Transmogrification.h"
-#include "Log.h"
 
 using namespace Acore::ChatCommands;
 
