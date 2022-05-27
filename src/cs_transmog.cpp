@@ -26,26 +26,26 @@ using namespace Acore::ChatCommands;
 class transmog_commandscript : public CommandScript
 {
 public:
-    transmog_commandscript() : CommandScript("transmog_commandscript") {}
+    transmog_commandscript() : CommandScript("transmog_commandscript") { }
 
     ChatCommandTable GetCommands() const override
     {
         static ChatCommandTable addCollectionTable =
-            {
-                {"set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::Yes},
-                {"",    HandleAddTransmogItem,       SEC_MODERATOR, Console::Yes},
-            };
+        {
+            { "set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::Yes },
+            { "",    HandleAddTransmogItem,       SEC_MODERATOR, Console::Yes },
+        };
 
         static ChatCommandTable transmogTable =
-            {
-                {"add", addCollectionTable},
-                {"",    HandleDisableTransMogVisual, SEC_PLAYER, Console::No},
-            };
+        {
+            { "add", addCollectionTable },
+            { "",    HandleDisableTransMogVisual, SEC_PLAYER,    Console::No },
+        };
 
         static ChatCommandTable commandTable =
-            {
-                {"transmog", transmogTable},
-            };
+        {
+            { "transmog", transmogTable },
+        };
 
         return commandTable;
     }
