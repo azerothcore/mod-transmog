@@ -566,7 +566,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (!CheckPureProtoRequirements(proto))
         return false;
 
-    ObjectGuid::LowType playerGuid = guid.GetCounter();
+    auto playerGuid = guid.GetCounter();
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
     if (!playerData)
         return false;

@@ -120,12 +120,8 @@ public:
         }
 
         auto guid = player->GetGUID();
-        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
-        if (!playerData)
-            return false;
-
+        uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
         uint32 itemId = itemTemplate->ItemId;
-        uint32 accountId = playerData->AccountId;
 
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
