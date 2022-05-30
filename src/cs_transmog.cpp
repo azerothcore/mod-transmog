@@ -26,33 +26,6 @@ using namespace Acore::ChatCommands;
 
 class transmog_commandscript : public CommandScript
 {
-private:
-    static uint32 GetTransmogSettingValue(ObjectGuid::LowType guid, TransmogSettings settingIndex)
-    {
-        if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            return 0;
-        }
-
-        if (QueryResult result = CharacterDatabase.Query("SELECT data FROM character_settings WHERE guid = {} AND source = \"mod-transmog\"", guid))
-        {
-            Field* fields = result->Fetch();
-            std::string data = fields[0].Get<std::string>();
-
-            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
-
-            if (tokens.size() < settingIndex + 1)
-            {
-                return 0;
-            }
-
-            auto setting = tokens[settingIndex];
-            return Acore::StringTo<uint32>(setting).value();
-        }
-
-        return 0;
-    }
-
 public:
     transmog_commandscript() : CommandScript("transmog_commandscript") { }
 
