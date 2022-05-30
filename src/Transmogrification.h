@@ -158,6 +158,8 @@ public:
     TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
+    bool SuitableForTransmogrification(ObjectGuid::LowType playerGuid, ItemTemplate const* proto) const;
+    bool CheckPureProtoRequirements(ItemTemplate const* proto) const;
     // bool CanBeTransmogrified(Item const* item);
     // bool CanTransmogrify(Item const* item);
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;

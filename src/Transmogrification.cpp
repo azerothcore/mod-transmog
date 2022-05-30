@@ -501,6 +501,9 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
+    if (!CheckPureProtoRequirements(proto))
+        return false;
+
     //[AZTH] Yehonal
     if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
     {
@@ -517,15 +520,6 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
         else
             return false;
     }
-
-    if (IsNotAllowed(proto->ItemId))
-        return false;
-
-    if (!AllowFishingPoles && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-        return false;
-
-    if (!IsAllowedQuality(proto->Quality)) // (proto->Quality == ITEM_QUALITY_LEGENDARY)
-        return false;
 
     if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE)
         return false;
@@ -553,6 +547,121 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (!IgnoreReqLevel && player->getLevel() < proto->RequiredLevel)
         return false;
 
+    return true;
+}
+
+bool Transmogrification::SuitableForTransmogrification(ObjectGuid::LowType playerGuid, ItemTemplate const* proto) const
+{
+    if (!playerGuid || !proto)
+        return false;
+
+    if (proto->Class != ITEM_CLASS_ARMOR &&
+        proto->Class != ITEM_CLASS_WEAPON)
+        return false;
+
+    // Skip all checks for allowed items
+    if (IsAllowed(proto->ItemId))
+        return true;
+
+    if (!CheckPureProtoRequirements(proto))
+        return false;
+
+    uint32 playerRaceMask;
+    uint32 playerClassMask;
+    TeamId playerTeamId;
+    uint8 playerLevel;
+    std::unordered_map<uint32, uint32> playerSkillValues;
+
+    if (QueryResult resultPlayer = CharacterDatabase.Query("SELECT `race`, `class`, `level` FROM `characters` WHERE `guid` = {}", playerGuid))
+    {
+        Field* fields = resultPlayer->Fetch();
+        uint8 playerRace = fields[0].Get<uint8>();
+        uint8 playerClass = fields[1].Get<uint8>();
+        playerLevel = fields[2].Get<uint8>();
+        playerRaceMask = 1 << (playerRace - 1);
+        playerClassMask = 1 << (playerClass - 1);
+        playerTeamId = Player::TeamIdForRace(playerRace);
+    }
+    else
+    {
+        LOG_ERROR("module", "Transmogification could not find player with guid {} in database.", playerGuid);
+        return false;
+    }
+
+    if (QueryResult resultSkills = CharacterDatabase.Query("SELECT `skill`, `value` FROM `character_skills` WHERE `guid` = {}", playerGuid))
+    {
+        do
+        {
+            Field* fields = resultSkills->Fetch();
+            uint16 skill = fields[0].Get<uint16>();
+            uint16 value = fields[1].Get<uint16>();
+            playerSkillValues[skill] = value;
+        } while (resultSkills->NextRow());
+    }
+    else {
+        LOG_ERROR("module", "Transmogification could not find skills for player with guid {} in database.", playerGuid);
+        return false;
+    }
+
+    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && playerTeamId != TEAM_HORDE)
+        return false;
+
+    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && playerTeamId != TEAM_ALLIANCE)
+        return false;
+
+    if (!IgnoreReqClass && (proto->AllowableClass & playerClassMask) == 0)
+        return false;
+
+    if (!IgnoreReqRace && (proto->AllowableRace & playerRaceMask) == 0)
+        return false;
+
+    if (!IgnoreReqLevel && playerLevel < proto->RequiredLevel)
+        return false;
+
+    if (!IgnoreReqSkill && proto->RequiredSkill != 0)
+    {
+        if (playerSkillValues[proto->RequiredSkill] == 0)
+            return false;
+        else if (playerSkillValues[proto->RequiredSkill] < proto->RequiredSkillRank)
+            return false;
+    }
+
+    if (proto->SubClass > 0 && playerSkillValues[proto->GetSkill()] == 0)
+    {
+        if (proto->Class == ITEM_CLASS_ARMOR)
+        {
+            if (!AllowMixedArmorTypes)
+                return false;
+        }
+        else if (proto->Class == ITEM_CLASS_WEAPON)
+        {
+            if (!AllowMixedWeaponTypes)
+                return false;
+        }
+        else
+            return false;
+    }
+
+    if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !(CharacterDatabase.Query("SELECT `spell` FROM `character_spell` WHERE `guid` = {} and `spell` = {}", playerGuid, proto->RequiredSpell)))
+        return false;
+
+    return true;
+}
+
+bool Transmogrification::CheckPureProtoRequirements(ItemTemplate const* proto) const
+{
+    if (!proto)
+        return false;
+
+    if (IsNotAllowed(proto->ItemId))
+        return false;
+
+    if (!AllowFishingPoles && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
+        return false;
+
+    if (!IsAllowedQuality(proto->Quality)) // (proto->Quality == ITEM_QUALITY_LEGENDARY)
+        return false;
+
     // If World Event is not active, prevent using event dependant items
     if (!IgnoreReqEvent && proto->HolidayId && !IsHolidayActive((HolidayIds)proto->HolidayId))
         return false;
@@ -560,8 +669,8 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (!IgnoreReqStats)
     {
         if (!proto->RandomProperty && !proto->RandomSuffix
-                /*[AZTH] Yehonal: we should transmorg also items without stats*/
-                && proto->StatsCount > 0)
+            /*[AZTH] Yehonal: we should transmorg also items without stats*/
+            && proto->StatsCount > 0)
         {
             bool found = false;
             for (uint8 i = 0; i < proto->StatsCount; ++i)

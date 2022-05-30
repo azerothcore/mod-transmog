@@ -20,11 +20,39 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Transmogrification.h"
+#include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
 
 class transmog_commandscript : public CommandScript
 {
+private:
+    static uint32 GetTransmogSettingValue(ObjectGuid::LowType guid, TransmogSettings settingIndex)
+    {
+        if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        {
+            return 0;
+        }
+
+        if (QueryResult result = CharacterDatabase.Query("SELECT data FROM character_settings WHERE guid = {} AND source = \"mod-transmog\"", guid))
+        {
+            Field* fields = result->Fetch();
+            std::string data = fields[0].Get<std::string>();
+
+            std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
+
+            if (tokens.size() < settingIndex + 1)
+            {
+                return 0;
+            }
+
+            auto setting = tokens[settingIndex];
+            return Acore::StringTo<uint32>(setting).value();
+        }
+
+        return 0;
+    }
+
 public:
     transmog_commandscript() : CommandScript("transmog_commandscript") { }
 
@@ -92,8 +120,19 @@ public:
         }
 
         Player* target = player->GetConnectedPlayer();
+        bool isNotConsole = handler->GetSession();
+        bool suitableForTransmog;
 
-        if (!sTransmogrification->GetTrackUnusableItems() && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate))
+        if (target)
+        {
+            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(target, itemTemplate);
+        }
+        else
+        {
+            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(player->GetGUID().GetCounter(), itemTemplate);
+        }
+
+        if (!sTransmogrification->GetTrackUnusableItems() && !suitableForTransmog)
         {
             handler->SendSysMessage(LANG_CMD_TRANSMOG_ADD_UNSUITABLE);
             handler->SetSentErrorMessage(true);
@@ -124,33 +163,30 @@ public:
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         std::string itemName = itemTemplate->Name1;
-
-        bool isNotConsoleAndIsPlayerOnline = handler->GetSession() && target->GetSession();
+        std::string playerName = player->GetName();
+        std::string nameLink = handler->playerLink(playerName);
 
         if (sTransmogrification->AddCollectedAppearance(accountId, itemId))
         {
-            if (isNotConsoleAndIsPlayerOnline)
+            // Notify target of new item in appearance collection
+            if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
             {
-                std::string nameLink = handler->playerLink(target->GetName());
+                ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
+            }
 
-                if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
-                {
-                    ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
-                }
-
-                if (target != handler->GetPlayer())
-                {
-                    handler->PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to the appearance collection of Player %s.)", itemQuality.c_str(), itemId, itemName.c_str(), nameLink);
-                }
+            // Feedback of successful command execution to GM
+            if (isNotConsole && target != handler->GetPlayer())
+            {
+                handler->PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to the appearance collection of Player %s.)", itemQuality.c_str(), itemId, itemName.c_str(), nameLink);
             }
 
             CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
         }
         else
         {
-            if (isNotConsoleAndIsPlayerOnline)
+            // Feedback of failed command execution to GM
+            if (isNotConsole)
             {
-                std::string nameLink = handler->playerLink(target->GetName());
                 handler->PSendSysMessage(R"(Player %s already has item |c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r in the appearance collection.)", nameLink, itemQuality.c_str(), itemId, itemName.c_str());
                 handler->SetSentErrorMessage(true);
             }
@@ -183,6 +219,7 @@ public:
 
         Player* target = player->GetConnectedPlayer();
         ItemSetEntry const* set = sItemSetStore.LookupEntry(uint32(itemSetId));
+        bool isNotConsole = handler->GetSession();
 
         if (!set)
         {
@@ -215,7 +252,10 @@ public:
                 ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
                 if (itemTemplate)
                 {
-                    if (!sTransmogrification->GetTrackUnusableItems() && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate))
+                    if (!sTransmogrification->GetTrackUnusableItems() && (
+                            (target && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate)) ||
+                            !sTransmogrification->SuitableForTransmogrification(player->GetGUID().GetCounter(), itemTemplate)
+                            ))
                     {
                         error = LANG_CMD_TRANSMOG_ADD_UNSUITABLE;
                         continue;
@@ -242,14 +282,14 @@ public:
             return true;
         }
 
-        bool isNotConsoleAndIsPlayerOnline = handler->GetSession() && target->GetSession();
+        int locale = handler->GetSessionDbcLocale();
+        std::string setName = set->name[locale];
+        std::string nameLink = handler->playerLink(target->GetName());
 
-        if (isNotConsoleAndIsPlayerOnline)
+        // Feedback of command execution to GM
+        if (isNotConsole)
         {
-            int locale = handler->GetSessionDbcLocale();
-            std::string setName = set->name[locale];
-            std::string nameLink = handler->playerLink(target->GetName());
-
+            // Failed command execution
             if (!added)
             {
                 handler->PSendSysMessage("Player %s already has ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r in the appearance collection.", nameLink, uint32(itemSetId), setName.c_str(), localeNames[locale]);
@@ -257,15 +297,17 @@ public:
                 return true;
             }
 
-            if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
-            {
-                ChatHandler(target->GetSession()).PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to your appearance collection.", uint32(itemSetId), setName.c_str(), localeNames[locale]);
-            }
-
+            // Successful command execution
             if (target != handler->GetPlayer())
             {
                 handler->PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to the appearance collection of Player %s.", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
             }
+        }
+
+        // Notify target of new item in appearance collection
+        if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
+        {
+            ChatHandler(target->GetSession()).PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to your appearance collection.", uint32(itemSetId), setName.c_str(), localeNames[locale]);
         }
 
         return true;
