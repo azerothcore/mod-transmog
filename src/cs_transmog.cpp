@@ -129,7 +129,7 @@ public:
         }
         else
         {
-            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(player->GetGUID().GetCounter(), itemTemplate);
+            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(player->GetGUID(), itemTemplate);
         }
 
         if (!sTransmogrification->GetTrackUnusableItems() && !suitableForTransmog)
@@ -146,18 +146,13 @@ public:
             return true;
         }
 
-        uint32 itemId = itemTemplate->ItemId;
-        uint32 accountId;
-        auto guid = player->GetGUID().GetCounter();
-        if (QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", guid))
-        {
-            Field* fields = result->Fetch();
-            accountId = fields[0].Get<uint32>();
-        }
-        else
-        {
+        auto guid = player->GetGUID();
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (!playerData)
             return false;
-        }
+
+        uint32 itemId = itemTemplate->ItemId;
+        uint32 accountId = playerData->AccountId;
 
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
@@ -228,21 +223,15 @@ public:
             return false;
         }
 
+        auto guid = player->GetGUID();
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (!playerData)
+            return false;
+
         bool added = false;
         uint32 error = 0;
         uint32 itemId;
-        uint32 accountId;
-
-        auto guid = player->GetGUID().GetCounter();
-        if (QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", guid))
-        {
-            Field* fields = result->Fetch();
-            accountId = fields[0].Get<uint32>();
-        }
-        else
-        {
-            return false;
-        }
+        uint32 accountId = playerData->AccountId;
 
         for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
         {
@@ -254,7 +243,7 @@ public:
                 {
                     if (!sTransmogrification->GetTrackUnusableItems() && (
                             (target && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate)) ||
-                            !sTransmogrification->SuitableForTransmogrification(player->GetGUID().GetCounter(), itemTemplate)
+                            !sTransmogrification->SuitableForTransmogrification(guid, itemTemplate)
                             ))
                     {
                         error = LANG_CMD_TRANSMOG_ADD_UNSUITABLE;
@@ -284,7 +273,7 @@ public:
 
         int locale = handler->GetSessionDbcLocale();
         std::string setName = set->name[locale];
-        std::string nameLink = handler->playerLink(target->GetName());
+        std::string nameLink = handler->playerLink(player->GetName());
 
         // Feedback of command execution to GM
         if (isNotConsole)

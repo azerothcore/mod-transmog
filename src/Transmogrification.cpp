@@ -550,9 +550,9 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     return true;
 }
 
-bool Transmogrification::SuitableForTransmogrification(ObjectGuid::LowType playerGuid, ItemTemplate const* proto) const
+bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemplate const* proto) const
 {
-    if (!playerGuid || !proto)
+    if (!guid || !proto)
         return false;
 
     if (proto->Class != ITEM_CLASS_ARMOR &&
@@ -566,28 +566,18 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid::LowType playe
     if (!CheckPureProtoRequirements(proto))
         return false;
 
-    uint32 playerRaceMask;
-    uint32 playerClassMask;
-    TeamId playerTeamId;
-    uint8 playerLevel;
-    std::unordered_map<uint32, uint32> playerSkillValues;
-
-    if (QueryResult resultPlayer = CharacterDatabase.Query("SELECT `race`, `class`, `level` FROM `characters` WHERE `guid` = {}", playerGuid))
-    {
-        Field* fields = resultPlayer->Fetch();
-        uint8 playerRace = fields[0].Get<uint8>();
-        uint8 playerClass = fields[1].Get<uint8>();
-        playerLevel = fields[2].Get<uint8>();
-        playerRaceMask = 1 << (playerRace - 1);
-        playerClassMask = 1 << (playerClass - 1);
-        playerTeamId = Player::TeamIdForRace(playerRace);
-    }
-    else
-    {
-        LOG_ERROR("module", "Transmogification could not find player with guid {} in database.", playerGuid);
+    ObjectGuid::LowType playerGuid = guid.GetCounter();
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+    if (!playerData)
         return false;
-    }
 
+    uint8 playerRace = playerData->Race;
+    uint8 playerLevel = playerData->Level;
+    uint32 playerRaceMask = 1 << (playerRace - 1);
+    uint32 playerClassMask = 1 << (playerData->Class - 1);
+    TeamId playerTeamId = Player::TeamIdForRace(playerRace);
+
+    std::unordered_map<uint32, uint32> playerSkillValues;
     if (QueryResult resultSkills = CharacterDatabase.Query("SELECT `skill`, `value` FROM `character_skills` WHERE `guid` = {}", playerGuid))
     {
         do
