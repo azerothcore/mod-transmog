@@ -159,9 +159,7 @@ public:
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     bool SuitableForTransmogrification(ObjectGuid guid, ItemTemplate const* proto) const;
-    bool CheckPureProtoRequirements(ItemTemplate const* proto) const;
-    // bool CanBeTransmogrified(Item const* item);
-    // bool CanTransmogrify(Item const* item);
+    bool IsItemTransmogrifiable(ItemTemplate const* proto) const;
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
 
     void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans = nullptr);

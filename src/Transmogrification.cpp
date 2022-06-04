@@ -451,7 +451,7 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
         target->InventoryType == INVTYPE_QUIVER)
         return false;
 
-    if (!SuitableForTransmogrification(player, target) || !SuitableForTransmogrification(player, source)) // if (!transmogrified->CanTransmogrify() || !transmogrifier->CanBeTransmogrified())
+    if (!SuitableForTransmogrification(player, target) || !SuitableForTransmogrification(player, source))
         return false;
 
     if (IsRangedWeapon(source->Class, source->SubClass) != IsRangedWeapon(target->Class, target->SubClass))
@@ -501,24 +501,21 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!CheckPureProtoRequirements(proto))
+    if (!IsItemTransmogrifiable(proto))
         return false;
 
     //[AZTH] Yehonal
     if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
     {
-        if (proto->Class == ITEM_CLASS_ARMOR)
+        if (proto->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
         {
-            if (!AllowMixedArmorTypes)
-                return false;
-        }
-        else if (proto->Class == ITEM_CLASS_WEAPON)
-        {
-            if (!AllowMixedWeaponTypes)
-                return false;
-        }
-        else
             return false;
+        }
+
+        if (proto->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
+        {
+            return false;
+        }
     }
 
     if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId() != TEAM_HORDE)
@@ -537,14 +534,15 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     {
         if (player->GetSkillValue(proto->RequiredSkill) == 0)
             return false;
-        else if (player->GetSkillValue(proto->RequiredSkill) < proto->RequiredSkillRank)
+
+        if (player->GetSkillValue(proto->RequiredSkill) < proto->RequiredSkillRank)
             return false;
     }
 
-    if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !player->HasSpell(proto->RequiredSpell))
+    if (!IgnoreReqLevel && player->getLevel() < proto->RequiredLevel)
         return false;
 
-    if (!IgnoreReqLevel && player->getLevel() < proto->RequiredLevel)
+    if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !player->HasSpell(proto->RequiredSpell))
         return false;
 
     return true;
@@ -563,7 +561,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!CheckPureProtoRequirements(proto))
+    if (!IsItemTransmogrifiable(proto))
         return false;
 
     auto playerGuid = guid.GetCounter();
@@ -593,6 +591,19 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
         return false;
     }
 
+    if (proto->SubClass > 0 && playerSkillValues[proto->GetSkill()] == 0)
+    {
+        if (proto->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
+        {
+            return false;
+        }
+
+        if (proto->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
+        {
+            return false;
+        }
+    }
+
     if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && playerTeamId != TEAM_HORDE)
         return false;
 
@@ -605,32 +616,17 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (!IgnoreReqRace && (proto->AllowableRace & playerRaceMask) == 0)
         return false;
 
-    if (!IgnoreReqLevel && playerLevel < proto->RequiredLevel)
-        return false;
-
     if (!IgnoreReqSkill && proto->RequiredSkill != 0)
     {
         if (playerSkillValues[proto->RequiredSkill] == 0)
             return false;
-        else if (playerSkillValues[proto->RequiredSkill] < proto->RequiredSkillRank)
+
+        if (playerSkillValues[proto->RequiredSkill] < proto->RequiredSkillRank)
             return false;
     }
 
-    if (proto->SubClass > 0 && playerSkillValues[proto->GetSkill()] == 0)
-    {
-        if (proto->Class == ITEM_CLASS_ARMOR)
-        {
-            if (!AllowMixedArmorTypes)
-                return false;
-        }
-        else if (proto->Class == ITEM_CLASS_WEAPON)
-        {
-            if (!AllowMixedWeaponTypes)
-                return false;
-        }
-        else
-            return false;
-    }
+    if (!IgnoreReqLevel && playerLevel < proto->RequiredLevel)
+        return false;
 
     if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !(CharacterDatabase.Query("SELECT `spell` FROM `character_spell` WHERE `guid` = {} and `spell` = {}", playerGuid, proto->RequiredSpell)))
         return false;
@@ -638,7 +634,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     return true;
 }
 
-bool Transmogrification::CheckPureProtoRequirements(ItemTemplate const* proto) const
+bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto) const
 {
     if (!proto)
         return false;
