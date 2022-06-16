@@ -158,8 +158,8 @@ public:
     TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
-    // bool CanBeTransmogrified(Item const* item);
-    // bool CanTransmogrify(Item const* item);
+    bool SuitableForTransmogrification(ObjectGuid guid, ItemTemplate const* proto) const;
+    bool IsItemTransmogrifiable(ItemTemplate const* proto) const;
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
 
     void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans = nullptr);

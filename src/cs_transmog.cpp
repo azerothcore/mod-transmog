@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Transmogrification.h"
+#include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,8 +33,8 @@ public:
     {
         static ChatCommandTable addCollectionTable =
         {
-            { "set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::No },
-            { "",    HandleAddTransmogItem,       SEC_MODERATOR, Console::No },
+            { "set", HandleAddTransmogItemSet,    SEC_MODERATOR, Console::Yes },
+            { "",    HandleAddTransmogItem,       SEC_MODERATOR, Console::Yes },
         };
 
         static ChatCommandTable transmogTable =
@@ -82,13 +83,29 @@ public:
         }
 
         if (!player)
+        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        if (!player || !player->IsConnected())
+        }
+
+        if (!player)
+        {
             return false;
+        }
 
         Player* target = player->GetConnectedPlayer();
+        bool isNotConsole = handler->GetSession();
+        bool suitableForTransmog;
 
-        if (!sTransmogrification->GetTrackUnusableItems() && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate))
+        if (target)
+        {
+            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(target, itemTemplate);
+        }
+        else
+        {
+            suitableForTransmog = sTransmogrification->SuitableForTransmogrification(player->GetGUID(), itemTemplate);
+        }
+
+        if (!sTransmogrification->GetTrackUnusableItems() && !suitableForTransmog)
         {
             handler->SendSysMessage(LANG_CMD_TRANSMOG_ADD_UNSUITABLE);
             handler->SetSentErrorMessage(true);
@@ -102,22 +119,27 @@ public:
             return true;
         }
 
+        auto guid = player->GetGUID();
+        uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
         uint32 itemId = itemTemplate->ItemId;
-        uint32 accountId = target->GetSession()->GetAccountId();
+
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         std::string itemName = itemTemplate->Name1;
-        std::string nameLink = handler->playerLink(target->GetName());
+        std::string playerName = player->GetName();
+        std::string nameLink = handler->playerLink(playerName);
+
         if (sTransmogrification->AddCollectedAppearance(accountId, itemId))
         {
-
-            if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
+            // Notify target of new item in appearance collection
+            if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
             {
                 ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
             }
 
-            if (target != handler->GetPlayer())
+            // Feedback of successful command execution to GM
+            if (isNotConsole && target != handler->GetPlayer())
             {
                 handler->PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to the appearance collection of Player %s.)", itemQuality.c_str(), itemId, itemName.c_str(), nameLink);
             }
@@ -126,8 +148,12 @@ public:
         }
         else
         {
-            handler->PSendSysMessage(R"(Player %s already has item |c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r in the appearance collection.)", nameLink, itemQuality.c_str(), itemId, itemName.c_str());
-            handler->SetSentErrorMessage(true);
+            // Feedback of failed command execution to GM
+            if (isNotConsole)
+            {
+                handler->PSendSysMessage(R"(Player %s already has item |c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r in the appearance collection.)", nameLink, itemQuality.c_str(), itemId, itemName.c_str());
+                handler->SetSentErrorMessage(true);
+            }
         }
 
         return true;
@@ -146,12 +172,18 @@ public:
         }
 
         if (!player)
+        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        if (!player || !player->IsConnected())
+        }
+
+        if (!player)
+        {
             return false;
+        }
 
         Player* target = player->GetConnectedPlayer();
         ItemSetEntry const* set = sItemSetStore.LookupEntry(uint32(itemSetId));
+        bool isNotConsole = handler->GetSession();
 
         if (!set)
         {
@@ -160,10 +192,16 @@ public:
             return false;
         }
 
+        auto guid = player->GetGUID();
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (!playerData)
+            return false;
+
         bool added = false;
         uint32 error = 0;
-        uint32 accountId = target->GetSession()->GetAccountId();
         uint32 itemId;
+        uint32 accountId = playerData->AccountId;
+
         for (uint32 i = 0; i < MAX_ITEM_SET_ITEMS; ++i)
         {
             itemId = set->itemId[i];
@@ -172,7 +210,10 @@ public:
                 ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
                 if (itemTemplate)
                 {
-                    if (!sTransmogrification->GetTrackUnusableItems() && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate))
+                    if (!sTransmogrification->GetTrackUnusableItems() && (
+                            (target && !sTransmogrification->SuitableForTransmogrification(target, itemTemplate)) ||
+                            !sTransmogrification->SuitableForTransmogrification(guid, itemTemplate)
+                            ))
                     {
                         error = LANG_CMD_TRANSMOG_ADD_UNSUITABLE;
                         continue;
@@ -201,23 +242,30 @@ public:
 
         int locale = handler->GetSessionDbcLocale();
         std::string setName = set->name[locale];
-        std::string nameLink = handler->playerLink(target->GetName());
+        std::string nameLink = handler->playerLink(player->GetName());
 
-        if (!added)
+        // Feedback of command execution to GM
+        if (isNotConsole)
         {
-            handler->PSendSysMessage("Player %s already has ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r in the appearance collection.", nameLink, uint32(itemSetId), setName.c_str(), localeNames[locale]);
-            handler->SetSentErrorMessage(true);
-            return true;
+            // Failed command execution
+            if (!added)
+            {
+                handler->PSendSysMessage("Player %s already has ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r in the appearance collection.", nameLink, uint32(itemSetId), setName.c_str(), localeNames[locale]);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+
+            // Successful command execution
+            if (target != handler->GetPlayer())
+            {
+                handler->PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to the appearance collection of Player %s.", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
+            }
         }
 
-        if (!(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
+        // Notify target of new item in appearance collection
+        if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
         {
             ChatHandler(target->GetSession()).PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to your appearance collection.", uint32(itemSetId), setName.c_str(), localeNames[locale]);
-        }
-
-        if (target != handler->GetPlayer())
-        {
-            handler->PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to the appearance collection of Player %s.", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
         }
 
         return true;
