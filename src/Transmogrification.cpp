@@ -781,6 +781,7 @@ void Transmogrification::LoadConfig(bool reload)
     AllowLegendary = sConfigMgr->GetOption<bool>("Transmogrification.AllowLegendary", false);
     AllowArtifact = sConfigMgr->GetOption<bool>("Transmogrification.AllowArtifact", false);
     AllowHeirloom = sConfigMgr->GetOption<bool>("Transmogrification.AllowHeirloom", true);
+    AllowTradeable = sConfigMgr->GetOption<bool>("Transmogrification.AllowTradeable", false);
 
     AllowMixedArmorTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedArmorTypes", false);
     AllowMixedWeaponTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedWeaponTypes", false);
@@ -873,6 +874,11 @@ bool Transmogrification::GetUseCollectionSystem() const
 bool Transmogrification::GetAllowHiddenTransmog() const
 {
     return AllowHiddenTransmog;
+}
+
+bool Transmogrification::GetAllowTradeable() const
+{
+    return AllowTradeable;
 }
 
 bool Transmogrification::GetTrackUnusableItems() const
