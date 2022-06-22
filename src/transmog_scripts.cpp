@@ -489,7 +489,7 @@ class PS_Transmogrification : public PlayerScript
 private:
     void AddToDatabase(Player* player, Item* item)
     {
-        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE) || AllowTradeable)
             return;
         ItemTemplate const* itemTemplate = item->GetTemplate();
         AddToDatabase(player, itemTemplate);
