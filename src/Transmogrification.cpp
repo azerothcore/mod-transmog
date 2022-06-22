@@ -876,6 +876,11 @@ bool Transmogrification::GetAllowHiddenTransmog() const
     return AllowHiddenTransmog;
 }
 
+bool Transmogrification::GetAllowTradeable() const
+{
+    return AllowTradeable;
+}
+
 bool Transmogrification::GetTrackUnusableItems() const
 {
     return TrackUnusableItems;

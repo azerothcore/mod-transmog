@@ -116,6 +116,7 @@ public:
     bool AllowLegendary;
     bool AllowArtifact;
     bool AllowHeirloom;
+    bool AllowTradeable;
 
     bool AllowMixedArmorTypes;
     bool AllowMixedWeaponTypes;
@@ -178,6 +179,7 @@ public:
     uint32 GetTransmogNpcText() const;
     bool GetEnableSetInfo() const;
     uint32 GetSetNpcText() const;
+    bool GetAllowTradeable() const;
 
     bool GetUseCollectionSystem() const;
     bool GetAllowHiddenTransmog() const;
