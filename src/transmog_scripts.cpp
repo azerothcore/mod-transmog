@@ -517,6 +517,21 @@ private:
             CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
         }
     }
+
+    void CheckRetroActiveQuestAppearances(Player* player)
+    {
+        QueryResult result = CharacterDatabase.Query("SELECT `quest` FROM `character_queststatus` WHERE `status` = 3 AND `guid` = {}", player->GetGUID().GetCounter());
+        if (result)
+        {
+            do
+            {
+                uint32 questId = (*result)[0].Get<uint32>();
+                Quest* questTemplate = const_cast<Quest*>(sObjectMgr->GetQuestTemplate(questId));
+                OnPlayerCompleteQuest(player, questTemplate);
+            } while (result->NextRow());
+        }
+        player->UpdatePlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK, 1);
+    }
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify") { }
 
@@ -597,6 +612,14 @@ public:
 
     void OnLogin(Player* player) override
     {
+        if (sT->EnableResetRetroActiveAppearances())
+        {
+            player->UpdatePlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK, 0);
+        }
+        if (sT->EnableRetroActiveAppearances() && !(player->GetPlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK).value))
+        {
+            CheckRetroActiveQuestAppearances(player);
+        }
         ObjectGuid playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
         QueryResult result = CharacterDatabase.Query("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetGUID().GetCounter());

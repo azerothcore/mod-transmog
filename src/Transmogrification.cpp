@@ -797,6 +797,8 @@ void Transmogrification::LoadConfig(bool reload)
     UseCollectionSystem = sConfigMgr->GetOption<bool>("Transmogrification.UseCollectionSystem", true);
     AllowHiddenTransmog = sConfigMgr->GetOption<bool>("Transmogrification.AllowHiddenTransmog", true);
     TrackUnusableItems = sConfigMgr->GetOption<bool>("Transmogrification.TrackUnusableItems", true);
+    RetroActiveAppearances = sConfigMgr->GetOption<bool>("Transmogrification.RetroActiveAppearances", true);
+    ResetRetroActiveAppearances = sConfigMgr->GetOption<bool>("Transmogrification.ResetRetroActiveAppearancesFlag", false);
 
     IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
 
@@ -884,6 +886,16 @@ bool Transmogrification::GetAllowTradeable() const
 bool Transmogrification::GetTrackUnusableItems() const
 {
     return TrackUnusableItems;
+}
+
+bool Transmogrification::EnableRetroActiveAppearances() const
+{
+    return RetroActiveAppearances;
+}
+
+bool Transmogrification::EnableResetRetroActiveAppearances() const
+{
+    return ResetRetroActiveAppearances;
 }
 
 bool Transmogrification::IsEnabled() const
