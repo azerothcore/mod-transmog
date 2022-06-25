@@ -28,6 +28,16 @@
 #                     This allows these appearances to be used later if the configuration is changed.
 #        Default:     1
 #
+#    Transmogrification.RetroActiveAppearances
+#        Description: Enables/Disables checking all completed quests for uncollected appearances.
+#                     Occurs only once per player.
+#        Default:    1
+#
+#    Transmogrification.ResetRetroActiveAppearancesFlag
+#        Description: Resets the flag indicating whether the retroactive appearance check has been run.
+#                     Occurs for each character on log in.
+#        Default:    0
+#
 #    Transmogrification.EnableTransmogInfo
 #        Description: Enables / Disables the info button for transmogrification
 #        Default:    1
@@ -50,6 +60,8 @@ Transmogrification.Enable = 1
 Transmogrification.UseCollectionSystem = 1
 Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.TrackUnusableItems = 1
+Transmogrification.RetroActiveAppearances = 1
+Transmogrification.ResetRetroActiveAppearancesFlag = 0
 
 Transmogrification.EnableTransmogInfo = 1
 Transmogrification.TransmogNpcText = 601083

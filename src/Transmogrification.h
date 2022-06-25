@@ -27,6 +27,7 @@ struct ItemTemplate;
 enum TransmogSettings
 {
     SETTING_HIDE_TRANSMOG = 0,
+    SETTING_RETROACTIVE_CHECK = 1
 };
 
 enum TransmogAcoreStrings // Language.h might have same entries, appears when executing SQL, change if needed
@@ -133,6 +134,8 @@ public:
     bool UseCollectionSystem;
     bool AllowHiddenTransmog;
     bool TrackUnusableItems;
+    bool RetroActiveAppearances;
+    bool ResetRetroActiveAppearances;
 
     bool IsTransmogEnabled;
 
@@ -184,6 +187,8 @@ public:
     bool GetUseCollectionSystem() const;
     bool GetAllowHiddenTransmog() const;
     bool GetTrackUnusableItems() const;
+    bool EnableRetroActiveAppearances() const;
+    bool EnableResetRetroActiveAppearances() const;
     [[nodiscard]] bool IsEnabled() const;
 };
 #define sTransmogrification Transmogrification::instance()
