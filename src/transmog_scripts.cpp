@@ -520,7 +520,7 @@ private:
 
     void CheckRetroActiveQuestAppearances(Player* player)
     {
-        QueryResult result = CharacterDatabase.Query("SELECT `quest` FROM `character_queststatus` WHERE `status` = 1 AND `guid` = {}", player->GetGUID().GetCounter());
+        QueryResult result = CharacterDatabase.Query("SELECT `quest` FROM `character_queststatus_rewarded` WHERE `guid` = {}", player->GetGUID().GetCounter());
         if (result)
         {
             do
