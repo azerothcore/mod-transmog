@@ -520,7 +520,7 @@ private:
 
     void CheckRetroActiveQuestAppearances(Player* player)
     {
-        const RewardedQuestSet& rewQuests = GetPlayer()->getRewardedQuests();
+        const RewardedQuestSet& rewQuests = player->getRewardedQuests();
         for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
         {
             Quest const* quest = sObjectMgr->GetQuestTemplate(*itr);
