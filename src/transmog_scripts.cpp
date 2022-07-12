@@ -520,15 +520,11 @@ private:
 
     void CheckRetroActiveQuestAppearances(Player* player)
     {
-        QueryResult result = CharacterDatabase.Query("SELECT `quest` FROM `character_queststatus_rewarded` WHERE `guid` = {}", player->GetGUID().GetCounter());
-        if (result)
+        const RewardedQuestSet& rewQuests = player->getRewardedQuests();
+        for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
         {
-            do
-            {
-                uint32 questId = (*result)[0].Get<uint32>();
-                Quest* questTemplate = const_cast<Quest*>(sObjectMgr->GetQuestTemplate(questId));
-                OnPlayerCompleteQuest(player, questTemplate);
-            } while (result->NextRow());
+            Quest const* quest = sObjectMgr->GetQuestTemplate(*itr);
+            OnPlayerCompleteQuest(player, quest);
         }
         player->UpdatePlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK, 1);
     }
