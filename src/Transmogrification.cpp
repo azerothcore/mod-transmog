@@ -714,6 +714,16 @@ bool Transmogrification::IsAllowedQuality(uint32 quality) const
     }
 }
 
+bool Transmogrification::CanNeverTransmog(ItemTemplate const* itemTemplate)
+{
+    return (itemTemplate->InventoryType == INVTYPE_BAG ||
+        itemTemplate->InventoryType == INVTYPE_RELIC ||
+        itemTemplate->InventoryType == INVTYPE_FINGER ||
+        itemTemplate->InventoryType == INVTYPE_TRINKET ||
+        itemTemplate->InventoryType == INVTYPE_AMMO ||
+        itemTemplate->InventoryType == INVTYPE_QUIVER);
+}
+
 void Transmogrification::LoadConfig(bool reload)
 {
 #ifdef PRESETS

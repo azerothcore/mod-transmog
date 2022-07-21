@@ -509,7 +509,7 @@ private:
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
-        bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
+        bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value) && !sT->CanNeverTransmog(itemTemplate);
         if (sT->AddCollectedAppearance(accountId, itemId))
         {
             if (showChatMessage)
