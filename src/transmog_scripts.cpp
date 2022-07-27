@@ -51,6 +51,10 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         WorldSession* session = player->GetSession();
+
+        // Clear the search string for the player
+        sT->searchStringByPlayer.erase(player->GetGUID().GetCounter());
+
         if (sT->GetEnableTransmogInfo())
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow does transmogrification work?", EQUIPMENT_SLOT_END + 9, 0);
         for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -273,7 +277,18 @@ public:
     bool OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code) override
     {
         player->PlayerTalkClass->ClearMenus();
-        if (sender || action)
+        if (sender)
+        {
+            // "sender" is an equipment slot for a search - execute the search
+            std::string searchString(code);
+            if (searchString.length() > MAX_SEARCH_STRING_LENGTH)
+                searchString = searchString.substr(0, MAX_SEARCH_STRING_LENGTH);
+            sT->searchStringByPlayer.erase(player->GetGUID().GetCounter());
+            sT->searchStringByPlayer.insert({player->GetGUID().GetCounter(), searchString});
+            OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, sender - 1);
+            return true;
+        }
+        if (action)
             return true; // should never happen
         if (!sT->GetEnableSets())
         {
@@ -344,6 +359,7 @@ public:
         WorldSession* session = player->GetSession();
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         bool sendGossip = true;
+        bool hasSearchString;
         if (oldItem)
         {
             uint32 price = sT->GetSpecialPrice(oldItem->GetTemplate());
@@ -361,7 +377,7 @@ public:
 
                 uint16 pageNumber = 0;
                 uint32 startValue = 0;
-                uint32 endValue = MAX_OPTIONS - 3;
+                uint32 endValue = MAX_OPTIONS - 4;
                 bool lastPage = false;
                 if (gossipPageNumber > EQUIPMENT_SLOT_END + 10)
                 {
@@ -372,6 +388,25 @@ public:
                 uint32 accountId = player->GetSession()->GetAccountId();
                 if (sT->collectionCache.find(accountId) != sT->collectionCache.end())
                 {
+                    std::unordered_map<uint32, std::string>::iterator searchStringIterator = sT->searchStringByPlayer.find(player->GetGUID().GetCounter());
+                    hasSearchString = !(searchStringIterator == sT->searchStringByPlayer.end());
+                    std::string searchDisplayValue(hasSearchString ? searchStringIterator->second : "Search....");
+                    // Offset values to add Search gossip item
+                    if (pageNumber == 0)
+                    {
+                        if (hasSearchString)
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + "Searching for: " + searchDisplayValue, slot + 1, 0, "Search for what item?", 0, true);
+                        }
+                        else
+                        {
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + "Search....", slot + 1, 0, "Search for what item?", 0, true);
+                        }
+                    }
+                    else
+                    {
+                        startValue--;
+                    }
                     std::vector<Item*> allowedItems;
                     if (sT->GetAllowHiddenTransmog())
                     {
@@ -394,6 +429,8 @@ public:
                         if (!sT->CanTransmogrifyItemWithItem(player, oldItem->GetTemplate(), newItem->GetTemplate()))
                             continue;
                         if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
+                            continue;
+                        if (hasSearchString && newItem->GetTemplate()->Name1.find(searchDisplayValue) == std::string::npos)
                             continue;
                         allowedItems.push_back(newItem);
                     }
