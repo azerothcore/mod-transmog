@@ -720,7 +720,16 @@ public:
     void OnMirrorImageDisplayItem(const Item *item, uint32 &display) override
     {
         if (uint32 entry = sTransmogrification->GetFakeEntry(item->GetGUID()))
-            display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
+        {
+            if (entry == HIDDEN_ITEM_ID)
+            {
+                display = 0;
+            }
+            else
+            {
+                display=uint32(sObjectMgr->GetItemTemplate(entry)->DisplayInfoID);
+            }
+        }
     }
 };
 
