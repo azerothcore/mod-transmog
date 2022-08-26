@@ -146,6 +146,7 @@ public:
     bool IsNotAllowed(uint32 entry) const;
     bool IsAllowedQuality(uint32 quality) const;
     bool IsRangedWeapon(uint32 Class, uint32 SubClass) const;
+    bool CanNeverTransmog(ItemTemplate const* itemTemplate);
 
     void LoadConfig(bool reload); // thread unsafe
 
