@@ -423,6 +423,8 @@ public:
                         }
                     }
                     for (uint32 newItemEntryId : sT->collectionCache[accountId]) {
+                        if (!sObjectMgr->GetItemTemplate(newItemEntryId))
+                            continue;
                         Item* newItem = Item::CreateItem(newItemEntryId, 1, 0);
                         if (!newItem)
                             continue;
