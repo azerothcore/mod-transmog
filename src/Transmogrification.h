@@ -52,6 +52,8 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
     LANG_CMD_TRANSMOG_HIDE = 11112,
     LANG_CMD_TRANSMOG_ADD_UNSUITABLE = 11113,
     LANG_CMD_TRANSMOG_ADD_FORBIDDEN = 11114,
+    LANG_CMD_TRANSMOG_BEGIN_SYNC = 11115,
+    LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
 };
 
 class Transmogrification
