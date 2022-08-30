@@ -52,7 +52,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleSyncTransMogCommand(ChatHandler* handler, char const* /*args*/)
+    static bool HandleSyncTransMogCommand(ChatHandler* handler)
     {
         Player* player = handler->GetPlayer();
         uint32 accountId = player->GetSession()->GetAccountId();
