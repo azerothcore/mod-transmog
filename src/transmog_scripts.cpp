@@ -609,7 +609,7 @@ public:
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
     {
-        if (!sT->GetUseCollectionSystem())
+        if (!sT->GetUseCollectionSystem() || !quest)
             return;
         for (uint8 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         {
