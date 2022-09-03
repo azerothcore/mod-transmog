@@ -25,7 +25,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (@STRING_ENTRY+15, 'Performing transmog appearance sync....'),
 (@STRING_ENTRY+16, 'Appearance sync complete.');
 
-DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog add set');
+DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog sync', 'transmog add set');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('transmog', 0, 'Syntax: .transmog <on/off>\nAllows seeing transmogrified items and the transmogrifier NPC.'),
 ('transmog add', 1, 'Syntax: .transmog add $player $item\nAdds an item to a player\'s appearance collection.'),
