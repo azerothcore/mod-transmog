@@ -18,7 +18,7 @@ void Transmogrification::PresetTransmog(Player* player, Item* itemTransmogrified
         return;
     if (slot >= EQUIPMENT_SLOT_END)
         return;
-    if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry)))
+    if (fakeEntry != HIDDEN_ITEM_ID && (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), sObjectMgr->GetItemTemplate(fakeEntry))))
         return;
 
     // [AZTH] Custom
@@ -66,7 +66,7 @@ void Transmogrification::LoadPlayerSets(ObjectGuid pGUID)
                     LOG_ERROR("module", "Item entry (FakeEntry: {}, player: {}, slot: {}, presetId: {}) has invalid slot, ignoring.", entry, pGUID.ToString(), slot, PresetID);
                     continue;
                 }
-                if (sObjectMgr->GetItemTemplate(entry))
+                if (entry == HIDDEN_ITEM_ID || sObjectMgr->GetItemTemplate(entry))
                     presetById[pGUID][PresetID][slot] = entry; // Transmogrification::Preset(presetName, fakeEntry);
             }
 
@@ -238,6 +238,13 @@ std::string Transmogrification::GetItemLink(uint32 entry, WorldSession* session)
 {
     LOG_DEBUG("module", "Transmogrification::GetItemLink");
 
+    if (entry == HIDDEN_ITEM_ID)
+    {
+        std::ostringstream oss;
+        oss << "(Hidden)";
+
+        return oss.str();
+    }
     const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
     int loc_idx = session->GetSessionDbLocaleIndex();
     std::string name = temp->Name1;
