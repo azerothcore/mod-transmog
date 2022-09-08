@@ -316,12 +316,15 @@ public:
                         uint32 entry = sT->GetFakeEntry(newItem->GetGUID());
                         if (!entry)
                             continue;
-                        const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
-                        if (!temp)
-                            continue;
-                        if (!sT->SuitableForTransmogrification(player, temp))
-                            continue;
-                        cost += sT->GetSpecialPrice(temp);
+                        if (entry != HIDDEN_ITEM_ID)
+                        {
+                            const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
+                            if (!temp)
+                                continue;
+                            if (!sT->SuitableForTransmogrification(player, temp))
+                                continue;
+                            cost += sT->GetSpecialPrice(temp);
+                        }
                         items[slot] = entry;
                     }
                 }
