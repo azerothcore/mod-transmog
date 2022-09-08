@@ -29,5 +29,5 @@ DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog syn
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('transmog', 0, 'Syntax: .transmog <on/off>\nAllows seeing transmogrified items and the transmogrifier NPC.'),
 ('transmog add', 1, 'Syntax: .transmog add $player $item\nAdds an item to a player\'s appearance collection.'),
-('transmog sync', 1, 'Syntax: .transmog sync\nSyncs transmog addon appearances with the server.'),
+('transmog sync', 0, 'Syntax: .transmog sync\nSyncs transmog addon appearances with the server.'),
 ('transmog add set', 1, 'Syntax: .transmog add set $player $itemSet\nAdds items of an ItemSet to a player\'s appearance collection.');
