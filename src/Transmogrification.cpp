@@ -485,14 +485,22 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
                         case ITEM_SUBCLASS_WEAPON_FIST:
                             return false;
                         case ITEM_SUBCLASS_WEAPON_AXE:
+                        case ITEM_SUBCLASS_WEAPON_SWORD:
+                        case ITEM_SUBCLASS_WEAPON_MACE:
                             if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
                                 target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
                             {
                                 return false;
                             }
                             break;
                         case ITEM_SUBCLASS_WEAPON_AXE2:
+                        case ITEM_SUBCLASS_WEAPON_SWORD2:
+                        case ITEM_SUBCLASS_WEAPON_MACE2:
+                        case ITEM_SUBCLASS_WEAPON_STAFF:
+                        case ITEM_SUBCLASS_WEAPON_POLEARM:
                             if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
                                 target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
                                 target->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
                                 target->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM)
