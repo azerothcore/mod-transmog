@@ -476,7 +476,7 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
                 {
                     return false;
                 }
-                else if (AllowMixedWeaponTypes == MIXED_WEAPONS_MODERN)
+                if (AllowMixedWeaponTypes == MIXED_WEAPONS_MODERN)
                 {
                     switch (source->SubClass)
                     {
@@ -852,7 +852,7 @@ void Transmogrification::LoadConfig(bool reload)
     AllowMixedArmorTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedArmorTypes", false);
     AllowFishingPoles = sConfigMgr->GetOption<bool>("Transmogrification.AllowFishingPoles", false);
 
-    AllowMixedWeaponTypes = sConfigMgr->GetOption<uint8>("Transmogrification.AllowMixedWeaponTypes", 0);
+    AllowMixedWeaponTypes = sConfigMgr->GetOption<uint8>("Transmogrification.AllowMixedWeaponTypes", MIXED_WEAPONS_STRICT);
 
     IgnoreReqRace = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqRace", false);
     IgnoreReqClass = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqClass", false);
