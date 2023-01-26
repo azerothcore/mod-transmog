@@ -470,13 +470,62 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
         {
             if (source->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
                 return false;
-            if (source->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
-                return false;
+            if (source->Class == ITEM_CLASS_WEAPON)
+            {
+                if (AllowMixedWeaponTypes == MIXED_WEAPONS_STRICT)
+                {
+                    return false;
+                }
+                if (AllowMixedWeaponTypes == MIXED_WEAPONS_MODERN)
+                {
+                    switch (source->SubClass)
+                    {
+                        case ITEM_SUBCLASS_WEAPON_WAND:
+                        case ITEM_SUBCLASS_WEAPON_DAGGER:
+                        case ITEM_SUBCLASS_WEAPON_FIST:
+                            return false;
+                        case ITEM_SUBCLASS_WEAPON_AXE:
+                        case ITEM_SUBCLASS_WEAPON_SWORD:
+                        case ITEM_SUBCLASS_WEAPON_MACE:
+                            if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
+                            {
+                                return false;
+                            }
+                            break;
+                        case ITEM_SUBCLASS_WEAPON_AXE2:
+                        case ITEM_SUBCLASS_WEAPON_SWORD2:
+                        case ITEM_SUBCLASS_WEAPON_MACE2:
+                        case ITEM_SUBCLASS_WEAPON_STAFF:
+                        case ITEM_SUBCLASS_WEAPON_POLEARM:
+                            if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
+                                target->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM)
+                            {
+                                return false;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
         }
     }
 
     if (source->InventoryType != target->InventoryType)
     {
+
+        // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
+        if (AllowMixedWeaponTypes != MIXED_WEAPONS_LOOSE && ((source->InventoryType == INVTYPE_WEAPONMAINHAND && target->InventoryType != INVTYPE_WEAPONMAINHAND)
+            || (source->InventoryType == INVTYPE_WEAPONOFFHAND && target->InventoryType != INVTYPE_WEAPONOFFHAND)))
+        {
+            return false;
+        }
+
         if (source->Class == ITEM_CLASS_WEAPON && !(IsRangedWeapon(target->Class, target->SubClass) ||
             (
                 // [AZTH] Yehonal: fixed weapon check
@@ -519,7 +568,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
             return false;
         }
 
-        if (proto->Class == ITEM_CLASS_WEAPON && !AllowMixedWeaponTypes)
+        if (proto->Class == ITEM_CLASS_WEAPON && AllowMixedWeaponTypes != MIXED_WEAPONS_LOOSE)
         {
             return false;
         }
@@ -801,8 +850,9 @@ void Transmogrification::LoadConfig(bool reload)
     AllowTradeable = sConfigMgr->GetOption<bool>("Transmogrification.AllowTradeable", false);
 
     AllowMixedArmorTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedArmorTypes", false);
-    AllowMixedWeaponTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedWeaponTypes", false);
     AllowFishingPoles = sConfigMgr->GetOption<bool>("Transmogrification.AllowFishingPoles", false);
+
+    AllowMixedWeaponTypes = sConfigMgr->GetOption<uint8>("Transmogrification.AllowMixedWeaponTypes", MIXED_WEAPONS_STRICT);
 
     IgnoreReqRace = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqRace", false);
     IgnoreReqClass = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqClass", false);
@@ -881,7 +931,7 @@ bool Transmogrification::GetAllowMixedArmorTypes() const
 {
     return AllowMixedArmorTypes;
 };
-bool Transmogrification::GetAllowMixedWeaponTypes() const
+uint8 Transmogrification::GetAllowMixedWeaponTypes() const
 {
     return AllowMixedWeaponTypes;
 };

@@ -149,7 +149,10 @@ Transmogrification.TokenAmount = 1
 #
 #    Transmogrification.AllowMixedWeaponTypes
 #        Description: Allow axe to be transmogrified with dagger for example
-#        Default:    0
+#        Possible options:
+#            Default:    0 - STRICT - Fully restricted like original Blizzard 4.3 transmog - Weapons must be the same weapon type (exceptions: Guns, Crossbows, or Bows)
+#                        1 - MODERN - Like later retail WoW, allow swords to be transmogged to axes, etc.
+#                        2 - FULL - No restrictions, allow any weapon to be transmogrified to any other weapon
 #
 #    Transmogrification.AllowFishingPoles
 #        Description: Allow fishing poles to be transmogrified

@@ -31,6 +31,13 @@ enum TransmogSettings
     SETTING_RETROACTIVE_CHECK = 1
 };
 
+enum MixedWeaponSettings
+{
+    MIXED_WEAPONS_STRICT = 0,
+    MIXED_WEAPONS_MODERN = 1,
+    MIXED_WEAPONS_LOOSE  = 2
+};
+
 enum TransmogAcoreStrings // Language.h might have same entries, appears when executing SQL, change if needed
 {
     LANG_ERR_TRANSMOG_OK = 11100, // change this
@@ -125,8 +132,9 @@ public:
     bool AllowTradeable;
 
     bool AllowMixedArmorTypes;
-    bool AllowMixedWeaponTypes;
     bool AllowFishingPoles;
+
+    uint8 AllowMixedWeaponTypes;
 
     bool IgnoreReqRace;
     bool IgnoreReqClass;
@@ -181,7 +189,7 @@ public:
     uint32 GetTokenAmount() const;
 
     bool GetAllowMixedArmorTypes() const;
-    bool GetAllowMixedWeaponTypes() const;
+    uint8 GetAllowMixedWeaponTypes() const;
 
     // Config
     bool GetEnableTransmogInfo() const;
