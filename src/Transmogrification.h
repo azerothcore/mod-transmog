@@ -132,6 +132,7 @@ public:
     bool AllowTradeable;
 
     bool AllowMixedArmorTypes;
+    bool AllowMixedWeaponHandedness;
     bool AllowFishingPoles;
 
     uint8 AllowMixedWeaponTypes;
