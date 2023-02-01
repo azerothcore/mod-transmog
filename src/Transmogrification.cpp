@@ -520,10 +520,14 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     {
 
         // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
-        if (AllowMixedWeaponTypes != MIXED_WEAPONS_LOOSE && ((source->InventoryType == INVTYPE_WEAPONMAINHAND && target->InventoryType != INVTYPE_WEAPONMAINHAND)
-            || (source->InventoryType == INVTYPE_WEAPONOFFHAND && target->InventoryType != INVTYPE_WEAPONOFFHAND)))
+        if (!AllowMixedWeaponHandedness && AllowMixedWeaponTypes != MIXED_WEAPONS_LOOSE)
         {
-            return false;
+            if ((source->InventoryType == INVTYPE_WEAPONMAINHAND && target->InventoryType != INVTYPE_WEAPONMAINHAND) ||
+                (source->InventoryType == INVTYPE_WEAPONOFFHAND && target->InventoryType != INVTYPE_WEAPONOFFHAND))
+            {
+                return false;
+            }
+
         }
 
         if (source->Class == ITEM_CLASS_WEAPON && !(IsRangedWeapon(target->Class, target->SubClass) ||
@@ -850,6 +854,7 @@ void Transmogrification::LoadConfig(bool reload)
     AllowTradeable = sConfigMgr->GetOption<bool>("Transmogrification.AllowTradeable", false);
 
     AllowMixedArmorTypes = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedArmorTypes", false);
+    AllowMixedWeaponHandedness = sConfigMgr->GetOption<bool>("Transmogrification.AllowMixedWeaponHandedness", false);
     AllowFishingPoles = sConfigMgr->GetOption<bool>("Transmogrification.AllowFishingPoles", false);
 
     AllowMixedWeaponTypes = sConfigMgr->GetOption<uint8>("Transmogrification.AllowMixedWeaponTypes", MIXED_WEAPONS_STRICT);

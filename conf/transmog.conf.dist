@@ -154,6 +154,11 @@ Transmogrification.TokenAmount = 1
 #                        1 - MODERN - Like later retail WoW, allow swords to be transmogged to axes, etc.
 #                        2 - FULL - No restrictions, allow any weapon to be transmogrified to any other weapon
 #
+#    Transmogrification.AllowMixedWeaponHandedness
+#        Description: Normally main-hand and off-hand weapons can only be transmogged to this same type. Enable to remove this restriction.
+#                     Not necessary when AllowMixedWeaponTypes is set to FULL.
+#        Default:    0
+#
 #    Transmogrification.AllowFishingPoles
 #        Description: Allow fishing poles to be transmogrified
 #        Default:    0
@@ -198,6 +203,7 @@ Transmogrification.AllowTradeable = 0
 
 Transmogrification.AllowMixedArmorTypes = 0
 Transmogrification.AllowMixedWeaponTypes = 0
+Transmogrification.AllowMixedWeaponHandedness = 0
 Transmogrification.AllowFishingPoles = 0
 
 Transmogrification.IgnoreReqRace = 0
