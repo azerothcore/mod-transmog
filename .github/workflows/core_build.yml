@@ -7,6 +7,6 @@ on:
 
 jobs:
   build:
-    uses: azerothcore/reusable-workflows/.github/workflows/core_build_modules.yml@main
+    uses: azerothcore/reusable-workflows/.github/workflows/core_build_modules.yml@cpp-check-modules
     with:
       module_repo: ${{ github.event.repository.name }}
