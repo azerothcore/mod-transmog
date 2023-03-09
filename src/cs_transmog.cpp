@@ -59,7 +59,7 @@ public:
         handler->SendSysMessage(LANG_CMD_TRANSMOG_BEGIN_SYNC);
         for (uint32 itemId : sTransmogrification->collectionCache[accountId])
         {
-            handler->PSendSysMessage("TRANSMOG_SYNC:%u", itemId);
+            handler->PSendSysMessage("外观同步：%u", itemId);
         }
         handler->SendSysMessage(LANG_CMD_TRANSMOG_COMPLETE_SYNC);
         return true;
@@ -149,13 +149,13 @@ public:
             // Notify target of new item in appearance collection
             if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value) && !sTransmogrification->CanNeverTransmog(itemTemplate))
             {
-                ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
+                ChatHandler(target->GetSession()).PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r 已被添加到你的外观收藏中。)", itemQuality.c_str(), itemId, itemName.c_str());
             }
 
             // Feedback of successful command execution to GM
             if (isNotConsole && target != handler->GetPlayer())
             {
-                handler->PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to the appearance collection of Player %s.)", itemQuality.c_str(), itemId, itemName.c_str(), nameLink);
+                handler->PSendSysMessage(R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r 已被添加到玩家 %s 的外观收藏中。)", itemQuality.c_str(), itemId, itemName.c_str(), nameLink);
             }
 
             CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
@@ -165,7 +165,7 @@ public:
             // Feedback of failed command execution to GM
             if (isNotConsole)
             {
-                handler->PSendSysMessage(R"(Player %s already has item |c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r in the appearance collection.)", nameLink, itemQuality.c_str(), itemId, itemName.c_str());
+                handler->PSendSysMessage(R"(玩家 %s 的外观收藏中已经有物品 |c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r。)", nameLink, itemQuality.c_str(), itemId, itemName.c_str());
                 handler->SetSentErrorMessage(true);
             }
         }
@@ -264,7 +264,7 @@ public:
             // Failed command execution
             if (!added)
             {
-                handler->PSendSysMessage("Player %s already has ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r in the appearance collection.", nameLink, uint32(itemSetId), setName.c_str(), localeNames[locale]);
+                handler->PSendSysMessage("玩家 %s 的外观收藏中已经有套装 |cffffffff|Hitemset:%d|h[%s %s]|h|r。", nameLink, uint32(itemSetId), setName.c_str(), localeNames[locale]);
                 handler->SetSentErrorMessage(true);
                 return true;
             }
@@ -272,14 +272,14 @@ public:
             // Successful command execution
             if (target != handler->GetPlayer())
             {
-                handler->PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to the appearance collection of Player %s.", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
+                handler->PSendSysMessage("套装 |cffffffff|Hitemset:%d|h[%s %s]|h|r 已被添加到玩家 %s 的外观收藏中。", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
             }
         }
 
         // Notify target of new item in appearance collection
         if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
         {
-            ChatHandler(target->GetSession()).PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[%s %s]|h|r has been added to your appearance collection.", uint32(itemSetId), setName.c_str(), localeNames[locale]);
+            ChatHandler(target->GetSession()).PSendSysMessage("套装 |cffffffff|Hitemset:%d|h[%s %s]|h|r 已被添加到你的外观收藏中。", uint32(itemSetId), setName.c_str(), localeNames[locale]);
         }
 
         return true;
