@@ -1,7 +1,7 @@
 SET
 @Entry = 190010,
-@Name = "Warpweaver";
-@Subname = "Transmogrifier"
+@Name = "Warpweaver",
+@Subname = "Transmogrifier";
 
 DELETE FROM `creature_template` WHERE `entry` = 190010;
 INSERT INTO `creature_template` (`entry`, `modelid1`, `modelid2`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `scale`, `rank`, `dmgschool`, `baseattacktime`, `rangeattacktime`, `unit_class`, `unit_flags`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `AIName`, `MovementType`, `HoverHeight`, `RacialLeader`, `movementId`, `RegenHealth`, `mechanic_immune_mask`, `flags_extra`, `ScriptName`) VALUES
