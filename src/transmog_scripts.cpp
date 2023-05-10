@@ -582,7 +582,7 @@ public:
 
     void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
     {
-        if (!sT->GetUseCollectionSystem() || !item)
+        if (!sT->GetUseCollectionSystem() || !item || typeid(*item) != typeid(Item))
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
         {
