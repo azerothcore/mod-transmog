@@ -21,6 +21,7 @@
 #include "ScriptMgr.h"
 #include "Transmogrification.h"
 #include "Tokenize.h"
+#include "DatabaseEnv.h"
 
 using namespace Acore::ChatCommands;
 
