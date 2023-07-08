@@ -1,5 +1,6 @@
 #include "Transmogrification.h"
 #include "ItemTemplate.h"
+#include "DatabaseEnv.h"
 
 Transmogrification* Transmogrification::instance()
 {
