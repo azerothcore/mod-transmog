@@ -121,20 +121,20 @@ const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* session) c
     LocaleConstant locale = session->GetSessionDbLocaleIndex();
 
     std::unordered_map<uint8, const char*> defaultNames = {
-        { EQUIPMENT_SLOT_HEAD, "Head" },
-        { EQUIPMENT_SLOT_SHOULDERS, "Shoulders" },
-        { EQUIPMENT_SLOT_BODY, "Shirt" },
-        { EQUIPMENT_SLOT_CHEST, "Chest" },
-        { EQUIPMENT_SLOT_WAIST, "Waist" },
-        { EQUIPMENT_SLOT_LEGS, "Legs" },
-        { EQUIPMENT_SLOT_FEET, "Feet" },
-        { EQUIPMENT_SLOT_WRISTS, "Wrists" },
-        { EQUIPMENT_SLOT_HANDS, "Hands" },
-        { EQUIPMENT_SLOT_BACK, "Back" },
-        { EQUIPMENT_SLOT_MAINHAND, "Main Hand" },
-        { EQUIPMENT_SLOT_OFFHAND, "Off Hand" },
-        { EQUIPMENT_SLOT_RANGED, "Ranged" },
-        { EQUIPMENT_SLOT_TABARD, "Tabard" },
+        { EQUIPMENT_SLOT_HEAD, "Head" }, // session->GetAcoreString(LANG_SLOT_NAME_HEAD);
+        { EQUIPMENT_SLOT_SHOULDERS, "Shoulders" }, // session->GetAcoreString(LANG_SLOT_NAME_SHOULDERS);
+        { EQUIPMENT_SLOT_BODY, "Shirt" }, // session->GetAcoreString(LANG_SLOT_NAME_BODY);
+        { EQUIPMENT_SLOT_CHEST, "Chest" }, // session->GetAcoreString(LANG_SLOT_NAME_CHEST);
+        { EQUIPMENT_SLOT_WAIST, "Waist" }, // session->GetAcoreString(LANG_SLOT_NAME_WAIST);
+        { EQUIPMENT_SLOT_LEGS, "Legs" }, // session->GetAcoreString(LANG_SLOT_NAME_LEGS);
+        { EQUIPMENT_SLOT_FEET, "Feet" }, // session->GetAcoreString(LANG_SLOT_NAME_FEET);
+        { EQUIPMENT_SLOT_WRISTS, "Wrists" }, // session->GetAcoreString(LANG_SLOT_NAME_WRISTS);
+        { EQUIPMENT_SLOT_HANDS, "Hands" }, // session->GetAcoreString(LANG_SLOT_NAME_HANDS);
+        { EQUIPMENT_SLOT_BACK, "Back" }, // session->GetAcoreString(LANG_SLOT_NAME_BACK);
+        { EQUIPMENT_SLOT_MAINHAND, "Main Hand" }, // session->GetAcoreString(LANG_SLOT_NAME_MAINHAND);
+        { EQUIPMENT_SLOT_OFFHAND, "Off Hand" }, // session->GetAcoreString(LANG_SLOT_NAME_OFFHAND);
+        { EQUIPMENT_SLOT_RANGED, "Ranged" }, // session->GetAcoreString(LANG_SLOT_NAME_RANGED);
+        { EQUIPMENT_SLOT_TABARD, "Tabard" }, // session->GetAcoreString(LANG_SLOT_NAME_TABARD);
     };
 
     std::unordered_map<uint8, std::unordered_map<LocaleConstant, const char*>> slotNames = {
