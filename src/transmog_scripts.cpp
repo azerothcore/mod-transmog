@@ -19,7 +19,7 @@ Blizzard might have changed the quality requirements.
 Cant transmogrify rediculus items // Foereaper: would be fun to stab people with a fish
 -- Cant think of any good way to handle this easily, could rip flagged items from cata DB
 */
-
+#include <unordered_map>
 #include "Transmogrification.h"
 #include "ScriptedCreature.h"
 #include "ItemTemplate.h"
@@ -27,6 +27,366 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 
 #define sT  sTransmogrification
 #define GTS session->GetAcoreString // dropped translation support, no one using?
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HOWWORKS = {
+    {LOCALE_enUS, "How does transmogrification work?"},
+    {LOCALE_koKR, "형상변환은 어떻게 작동합니까?"},
+    {LOCALE_frFR, "Comment fonctionne la transmogrification ?"},
+    {LOCALE_deDE, "Wie funktioniert Transmogrifizierung?"},
+    {LOCALE_zhCN, "变形术是如何运作的？"},
+    {LOCALE_zhTW, "การแปลงร่างทำงานอย่างไร"},
+    {LOCALE_esES, "¿Cómo funciona la transfiguración?"},
+    {LOCALE_esMX, "¿Cómo funciona la transfiguración?"},
+    {LOCALE_ruRU, "Как работает трансмогрификация?"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_MANAGESETS = {
+    {LOCALE_enUS, "Manage sets"},
+    {LOCALE_koKR, "세트 관리"},
+    {LOCALE_frFR, "Gérer les ensembles"},
+    {LOCALE_deDE, "Sets verwalten"},
+    {LOCALE_zhCN, "管理套装"},
+    {LOCALE_zhTW, "จัดการชุด"},
+    {LOCALE_esES, "Administrar conjuntos"},
+    {LOCALE_esMX, "Administrar conjuntos"},
+    {LOCALE_ruRU, "Управление комплектами"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSMOG = {
+    {LOCALE_enUS, "Remove all transmogrifications"},
+    {LOCALE_koKR, "모든 변형 제거"},
+    {LOCALE_frFR, "Supprimer toutes les transmogrifications"},
+    {LOCALE_deDE, "Alle Transmogrifikationen entfernen"},
+    {LOCALE_zhCN, "移除所有幻化"},
+    {LOCALE_zhTW, "ลบการแปลงร่างทั้งหมด"},
+    {LOCALE_esES, "Eliminar todas las transfiguraciones"},
+    {LOCALE_esMX, "Eliminar todas las transfiguraciones"},
+    {LOCALE_ruRU, "Удалить все трансмогрификации"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSMOG_ASK = {
+    {LOCALE_enUS, "Remove transmogrifications from all equipped items?"},
+    {LOCALE_koKR, "장착한 모든 아이템의 변형을 제거합니까?"},
+    {LOCALE_frFR, "Supprimer les transmogrifications de tous les objets équipés ?"},
+    {LOCALE_deDE, "Transmogrifikationen von allen ausgerüsteten Gegenständen entfernen?"},
+    {LOCALE_zhCN, "是否要从所有已装备的物品中移除幻化？"},
+    {LOCALE_zhTW, "ลบการแปลงร่างออกจากรายการที่ติดตั้งทั้งหมดหรือไม่"},
+    {LOCALE_esES, "¿Eliminar las transfiguraciones de todos los objetos equipados?"},
+    {LOCALE_esMX, "¿Eliminar las transfiguraciones de todos los objetos equipados?"},
+    {LOCALE_ruRU, "Удалить трансмогрификации со всех экипированных предметов?"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_UPDATEMENU = {
+    {LOCALE_enUS, "Update menu"},
+    {LOCALE_koKR, "메뉴 업데이트"},
+    {LOCALE_frFR, "Mettre à jour le menu"},
+    {LOCALE_deDE, "Menü aktualisieren"},
+    {LOCALE_zhCN, "更新菜单"},
+    {LOCALE_zhTW, "อัพเดทเมนู"},
+    {LOCALE_esES, "Actualizar menú"},
+    {LOCALE_esMX, "Actualizar menú"},
+    {LOCALE_ruRU, "Обновить меню"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HOWSETSWORK = {
+    {LOCALE_enUS, "How do sets work?"},
+    {LOCALE_koKR, "세트는 어떻게 작동합니까?"},
+    {LOCALE_frFR, "Comment fonctionnent les ensembles ?"},
+    {LOCALE_deDE, "Wie funktionieren Sets?"},
+    {LOCALE_zhCN, "套装是如何运作的？"},
+    {LOCALE_zhTW, "ชุดทำงานอย่างไร?"},
+    {LOCALE_esES, "¿Cómo funcionan los conjuntos?"},
+    {LOCALE_esMX, "¿Cómo funcionan los conjuntos?"},
+    {LOCALE_ruRU, "Как работают комплекты?"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SAVESET = {
+    {LOCALE_enUS, "Save set"},
+    {LOCALE_koKR, "세트 저장"},
+    {LOCALE_frFR, "Sauvegarder l'ensemble"},
+    {LOCALE_deDE, "Set speichern"},
+    {LOCALE_zhCN, "保存套装"},
+    {LOCALE_zhTW, "บันทึกชุด"},
+    {LOCALE_esES, "Guardar conjunto"},
+    {LOCALE_esMX, "Guardar conjunto"},
+    {LOCALE_ruRU, "Сохранить комплект"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_BACK = {
+    {LOCALE_enUS, "Back..."},
+    {LOCALE_koKR, "뒤로..."},
+    {LOCALE_frFR, "Retour..."},
+    {LOCALE_deDE, "Zurück..."},
+    {LOCALE_zhCN, "返回..."},
+    {LOCALE_zhTW, "บันทึกชุด"},
+    {LOCALE_esES, "Atrás..."},
+    {LOCALE_esMX, "Atrás..."},
+    {LOCALE_ruRU, "Назад..."}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_USESET = {
+    {LOCALE_enUS, "Use this set"},
+    {LOCALE_koKR, "이 세트를 사용"},
+    {LOCALE_frFR, "Utiliser cet ensemble"},
+    {LOCALE_deDE, "Dieses Set verwenden"},
+    {LOCALE_zhCN, "使用此套装"},
+    {LOCALE_zhTW, "ใช้ชุดนี้"},
+    {LOCALE_esES, "Usar este conjunto"},
+    {LOCALE_esMX, "Usar este conjunto"},
+    {LOCALE_ruRU, "Использовать этот комплект"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_USESET = {
+    {LOCALE_enUS, "Using this set for transmogrify will bind transmogrified items to you and make them non-refundable and non-tradeable.\nDo you wish to continue?\n\n"},
+    {LOCALE_koKR, "이 세트를 변형에 사용하면 변형된 아이템이 계정에 제한되어 환불 및 거래가 불가능합니다.\n계속하시겠습니까?\n\n"},
+    {LOCALE_frFR, "En utilisant cet ensemble pour la transmogrification, les objets transmogrifiés seront liés à votre personnage et deviendront non remboursables et non échangeables.\nVoulez-vous continuer ?\n\n"},
+    {LOCALE_deDE, "Wenn du dieses Set für die Transmogrifikation verwendest, werden die transmogrifizierten Gegenstände an dich gebunden und können nicht erstattet oder gehandelt werden.\nMöchtest du fortfahren?\n\n"},
+    {LOCALE_zhCN, "将此套装用于幻化将使幻化后的物品与您绑定，并使其不可退还和不可交易。\n您是否要继续？\n\n"},
+    {LOCALE_zhTW, "การใช้ชุดนี้สำหรับทรานส์โมกริฟายจะผูกมัดไอเท็มทรานส์โมกริฟายกับคุณ และทำให้ไม่สามารถคืนเงินและแลกเปลี่ยนไม่ได้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_esES, "Usar este conjunto para transfigurar vinculará los objetos transfigurados a ti y los volverá no reembolsables y no intercambiables.\n¿Deseas continuar?\n\n"},
+    {LOCALE_esMX, "Usar este conjunto para transfigurar vinculará los objetos transfigurados a ti y los volverá no reembolsables y no intercambiables.\n¿Deseas continuar?\n\n"},
+    {LOCALE_ruRU, "Использование этого комплекта для трансмогрификации привяжет трансмогрифицированные предметы к вам и сделает их неподлежащими возврату и обмену.\nЖелаете продолжить?\n\n"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_DELETESET = {
+    {LOCALE_enUS, "Delete set"},
+    {LOCALE_koKR, "세트 삭제"},
+    {LOCALE_frFR, "Supprimer l'ensemble"},
+    {LOCALE_deDE, "Set löschen"},
+    {LOCALE_zhCN, "删除套装"},
+    {LOCALE_zhTW, "ลบชุด"},
+    {LOCALE_esES, "Eliminar conjunto"},
+    {LOCALE_esMX, "Eliminar conjunto"},
+    {LOCALE_ruRU, "Удалить комплект"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_DELETESET = {
+    {LOCALE_enUS, "Are you sure you want to delete "},
+    {LOCALE_koKR, "을(를) 삭제하시겠습니까 "},
+    {LOCALE_frFR, "Êtes-vous sûr de vouloir supprimer "},
+    {LOCALE_deDE, "Möchten Sie wirklich löschen "},
+    {LOCALE_zhCN, "您确定要删除吗 "},
+    {LOCALE_zhTW, "คุณแน่ใจหรือว่าต้องการลบ "},
+    {LOCALE_esES, "¿Estás seguro de que quieres eliminar "},
+    {LOCALE_esMX, "¿Estás seguro de que quieres eliminar "},
+    {LOCALE_ruRU, "Вы уверены, что хотите удалить "}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_INSERTSETNAME = {
+    {LOCALE_enUS, "Insert set name"},
+    {LOCALE_koKR, "세트 이름 입력"},
+    {LOCALE_frFR, "Insérer le nom de l'ensemble"},
+    {LOCALE_deDE, "Set-Namen einfügen"},
+    {LOCALE_zhCN, "插入套装名称"},
+    {LOCALE_zhTW, "ใส่ชื่อชุด"},
+    {LOCALE_esES, "Insertar nombre del conjunto"},
+    {LOCALE_esMX, "Insertar nombre del conjunto"},
+    {LOCALE_ruRU, "Введите имя комплекта"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCH = {
+    {LOCALE_enUS, "Search..."},
+    {LOCALE_koKR, "검색..."},
+    {LOCALE_frFR, "Rechercher..."},
+    {LOCALE_deDE, "Suche..."},
+    {LOCALE_zhCN, "搜索..."},
+    {LOCALE_zhTW, "ค้นหา...."},
+    {LOCALE_esES, "Buscar..."},
+    {LOCALE_esMX, "Buscar..."},
+    {LOCALE_ruRU, "Поиск..."}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCHING_FOR = {
+    {LOCALE_enUS, "Searching for: "},
+    {LOCALE_koKR, "검색 중: "},
+    {LOCALE_frFR, "Recherche en cours: "},
+    {LOCALE_deDE, "Suche nach: "},
+    {LOCALE_zhCN, "正在搜索： "},
+    {LOCALE_zhTW, "ค้นหา: "},
+    {LOCALE_esES, "Buscando:" },
+    {LOCALE_esMX, "Buscando: "},
+    {LOCALE_ruRU, "Поиск: "}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCH_FOR_ITEM = {
+    {LOCALE_enUS, "Search for what item?"},
+    {LOCALE_koKR, "어떤 아이템을 찾으시겠습니까?"},
+    {LOCALE_frFR, "Rechercher quel objet ?"},
+    {LOCALE_deDE, "Nach welchem Gegenstand suchen?"},
+    {LOCALE_zhCN, "搜索哪个物品？"},
+    {LOCALE_zhTW, "ค้นหารายการอะไร"},
+    {LOCALE_esES, "¿Buscar un objeto?"},
+    {LOCALE_esMX, "¿Buscar un objeto?"},
+    {LOCALE_ruRU, "Поиск предмета:"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_HIDE_ITEM = {
+    {LOCALE_enUS, "You are hiding the item in this slot.\nDo you wish to continue?\n\n"},
+    {LOCALE_koKR, "이 슬롯에 아이템을 감추고 있습니다.\n계속하시겠습니까?\n\n"},
+    {LOCALE_frFR, "Vous masquez l'objet dans cet emplacement.\nVoulez-vous continuer ?\n\n"},
+    {LOCALE_deDE, "Du versteckst das Item in diesem Slot.\nMöchtest du fortfahren?\n\n"},
+    {LOCALE_zhCN, "您正在隐藏此槽中的物品。\n您是否要继续？\n\n"},
+    {LOCALE_zhTW, "คุณกำลังซ่อนรายการในช่องนี้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_esES, "Estás ocultando el objeto en esta ranura.\n¿Deseas continuar?\n\n"},
+    {LOCALE_esMX, "Estás ocultando el objeto en esta ranura.\n¿Deseas continuar?\n\n"},
+    {LOCALE_ruRU, "Вы скрываете предмет в этом слоте.\nЖелаете продолжить?\n\n"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HIDESLOT = {
+    {LOCALE_enUS, "Hide Slot"},
+    {LOCALE_koKR, "슬롯 숨기기"},
+    {LOCALE_frFR, "Cacher l'emplacement"},
+    {LOCALE_deDE, "Slot verbergen"},
+    {LOCALE_zhCN, "隐藏槽位"},
+    {LOCALE_zhTW, "ซ่อนสล็อต"},
+    {LOCALE_esES, "Ocultar ranura"},
+    {LOCALE_esMX, "Ocultar ranura"},
+    {LOCALE_ruRU, "Скрыть слот"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSMOG_SLOT = {
+    {LOCALE_enUS, "Remove transmogrification from the slot?"},
+    {LOCALE_koKR, "해당 슬롯의 형상변환을 제거합니까?"},
+    {LOCALE_frFR, "Supprimer la transmogrification de l'emplacement ?"},
+    {LOCALE_deDE, "Transmogrifikation aus dem Slot entfernen?"},
+    {LOCALE_zhCN, "是否要从该槽位中移除幻化？"},
+    {LOCALE_zhTW, "นำการแปลงร่างออกจากสล็อตหรือไม่"},
+    {LOCALE_esES, "¿Eliminar la transfiguración del espacio?"},
+    {LOCALE_esMX, "¿Eliminar la transfiguración del espacio?"},
+    {LOCALE_ruRU, "Удалить трансмогрификацию из ячейки?"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_USEITEM = {
+    {LOCALE_enUS, "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n"},
+    {LOCALE_koKR, "이 아이템을 변형에 사용하면 계정에 제한되어 환불 및 거래가 불가능하게 됩니다.\n계속하시겠습니까?\n\n"},
+    {LOCALE_frFR, "En utilisant cet objet pour la transmogrification, il sera lié à votre personnage et deviendra non remboursable et non échangeable.\nVoulez-vous continuer ?\n\n"},
+    {LOCALE_deDE, "Wenn du diesen Gegenstand für die Transmogrifikation verwendest, wird er an dich gebunden und kann nicht erstattet oder gehandelt werden.\nMöchtest du fortfahren?\n\n"},
+    {LOCALE_zhCN, "将此物品用于幻化将使其与您绑定，并使其不可退还和不可交易。\n您是否要继续？\n\n"},
+    {LOCALE_zhTW, "การใช้ไอเทมนี้เพื่อทรานส์โมกริฟายจะผูกมัดกับคุณและทำให้ไม่สามารถคืนเงินและแลกเปลี่ยนไม่ได้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_esES, "Usar este objeto para transfigurar lo vinculará a ti y lo volverá no reembolsable y no intercambiable.\n¿Deseas continuar?\n\n"},
+    {LOCALE_esMX, "Usar este objeto para transfigurar lo vinculará a ti y lo volverá no reembolsable y no intercambiable.\n¿Deseas continuar?\n\n"},
+    {LOCALE_ruRU, "Использование этого предмета для трансмогрификации привяжет его к вам и сделает его неподлежащим возврату и обмену.\nЖелаете продолжить?\n\n"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_PREVIOUS_PAGE = {
+    {LOCALE_enUS, "Previous Page"},
+    {LOCALE_koKR, "이전 페이지"},
+    {LOCALE_frFR, "Page précédente"},
+    {LOCALE_deDE, "Vorherige Seite"},
+    {LOCALE_zhCN, "上一页"},
+    {LOCALE_zhTW, "หน้าก่อนหน้า"},
+    {LOCALE_esES, "Página anterior"},
+    {LOCALE_esMX, "Página anterior"},
+    {LOCALE_ruRU, "Предыдущая страница"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_NEXT_PAGE = {
+    {LOCALE_enUS, "Next Page"},
+    {LOCALE_koKR, "다음 페이지"},
+    {LOCALE_frFR, "Page suivante"},
+    {LOCALE_deDE, "Nächste Seite"},
+    {LOCALE_zhCN, "下一页"},
+    {LOCALE_zhTW, "หน้าต่อไป"},
+    {LOCALE_esES, "Página siguiente"},
+    {LOCALE_esMX, "Página siguiente"},
+    {LOCALE_ruRU, "Следующая страница"}
+};
+
+const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_ADDED_APPEARANCE = {
+    {LOCALE_enUS, "has been added to your appearance collection."},
+    {LOCALE_koKR, "이(가) 외형 컬렉션에 추가되었습니다."},
+    {LOCALE_frFR, "a été ajouté(e) à votre collection d'apparences."},
+    {LOCALE_deDE, "wurde deiner Transmog-Sammlung hinzugefügt."},
+    {LOCALE_zhCN, "已添加到外观收藏中。"},
+    {LOCALE_zhTW, "ถูกเพิ่มในคอลเลกชันรูปลักษณ์ของคุณแล้ว"},
+    {LOCALE_esES, "se ha añadido a tu colección de apariencias."},
+    {LOCALE_esMX, "se ha agregado a tu colección de apariencias."},
+    {LOCALE_ruRU, "был добавлен в вашу коллекцию обликов."}
+};
+
+std::string GetLocaleText(LocaleConstant locale, const std::string& titleType)
+{
+    const std::unordered_map<LocaleConstant, std::string>* textMap = nullptr;
+
+    if (titleType == "how_works") {
+        textMap = &TRANSMOG_TEXT_HOWWORKS;
+    }
+    else if (titleType == "manage_sets") {
+        textMap = &TRANSMOG_TEXT_MANAGESETS;
+    }
+    else if (titleType == "remove_transmog") {
+        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG;
+    }
+    else if (titleType == "remove_transmog_ask") {
+        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG_ASK;
+    }
+    else if (titleType == "update_menu") {
+        textMap = &TRANSMOG_TEXT_UPDATEMENU;
+    }
+    else if (titleType == "how_sets_work") {
+        textMap = &TRANSMOG_TEXT_HOWSETSWORK;
+    }
+    else if (titleType == "save_set") {
+        textMap = &TRANSMOG_TEXT_SAVESET;
+    }
+    else if (titleType == "back") {
+        textMap = &TRANSMOG_TEXT_BACK;
+    }
+    else if (titleType == "use_set") {
+        textMap = &TRANSMOG_TEXT_USESET;
+    }
+    else if (titleType == "confirm_use_set") {
+        textMap = &TRANSMOG_TEXT_CONFIRM_USESET;
+    }
+    else if (titleType == "delete_set") {
+        textMap = &TRANSMOG_TEXT_DELETESET;
+    }
+    else if (titleType == "confirm_delete_set") {
+        textMap = &TRANSMOG_TEXT_CONFIRM_DELETESET;
+    }
+    else if (titleType == "insert_set_name") {
+        textMap = &TRANSMOG_TEXT_INSERTSETNAME;
+    }
+    else if (titleType == "search") {
+        textMap = &TRANSMOG_TEXT_SEARCH;
+    }
+    else if (titleType == "searching_for") {
+        textMap = &TRANSMOG_TEXT_SEARCHING_FOR;
+    }
+    else if (titleType == "search_for_item") {
+        textMap = &TRANSMOG_TEXT_SEARCH_FOR_ITEM;
+    }
+    else if (titleType == "confirm_hide_item") {
+        textMap = &TRANSMOG_TEXT_CONFIRM_HIDE_ITEM;
+    }
+    else if (titleType == "hide_slot") {
+        textMap = &TRANSMOG_TEXT_HIDESLOT;
+    }
+    else if (titleType == "remove_transmog_slot") {
+        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG_SLOT;
+    }
+    else if (titleType == "confirm_use_item") {
+        textMap = &TRANSMOG_TEXT_CONFIRM_USEITEM;
+    }
+    else if (titleType == "previous_page") {
+        textMap = &TRANSMOG_TEXT_PREVIOUS_PAGE;
+    }
+    else if (titleType == "next_page") {
+        textMap = &TRANSMOG_TEXT_NEXT_PAGE;
+    }
+    else if (titleType == "added_appearance") {
+        textMap = &TRANSMOG_TEXT_ADDED_APPEARANCE;
+    }
+
+    if (textMap) {
+        auto it = textMap->find(locale);
+        if (it != textMap->end()) {
+            return it->second;
+        }
+    }
+
+    return "";
+}
 
 class npc_transmogrifier : public CreatureScript
 {
@@ -52,12 +412,13 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         WorldSession* session = player->GetSession();
+        LocaleConstant locale = session->GetSessionDbLocaleIndex();
 
         // Clear the search string for the player
         sT->searchStringByPlayer.erase(player->GetGUID().GetCounter());
 
         if (sT->GetEnableTransmogInfo())
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow does transmogrification work?", EQUIPMENT_SLOT_END + 9, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t" + GetLocaleText(locale, "how_works"), EQUIPMENT_SLOT_END + 9, 0);
         for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
         {
             if (const char* slotName = sT->GetSlotName(slot, session))
@@ -70,10 +431,10 @@ public:
         }
 #ifdef PRESETS
         if (sT->GetEnableSets())
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:30:30:-18:0|tManage sets", EQUIPMENT_SLOT_END + 4, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:30:30:-18:0|t" + GetLocaleText(locale, "manage_sets"), EQUIPMENT_SLOT_END + 4, 0);
 #endif
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove all transmogrifications", EQUIPMENT_SLOT_END + 2, 0, "Remove transmogrifications from all equipped items?", 0, false);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END + 1, 0);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t" + GetLocaleText(locale, "remove_transmog"), EQUIPMENT_SLOT_END + 2, 0, GetLocaleText(locale, "remove_transmog_ask"), 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t" + GetLocaleText(locale, "update_menu"), EQUIPMENT_SLOT_END + 1, 0);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         return true;
     }
@@ -82,6 +443,7 @@ public:
     {
         player->PlayerTalkClass->ClearMenus();
         WorldSession* session = player->GetSession();
+        LocaleConstant locale = session->GetSessionDbLocaleIndex();
         // Next page
         if (sender > EQUIPMENT_SLOT_END + 10)
         {
@@ -142,13 +504,13 @@ public:
                     return true;
                 }
                 if (sT->GetEnableSetInfo())
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow do sets work?", EQUIPMENT_SLOT_END + 10, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t" + GetLocaleText(locale, "how_sets_work"), EQUIPMENT_SLOT_END + 10, 0);
                 for (Transmogrification::presetIdMap::const_iterator it = sT->presetByName[player->GetGUID()].begin(); it != sT->presetByName[player->GetGUID()].end(); ++it)
                     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t" + it->second, EQUIPMENT_SLOT_END + 6, it->first);
 
                 if (sT->presetByName[player->GetGUID()].size() < sT->GetMaxSets())
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|tSave set", EQUIPMENT_SLOT_END + 8, 0);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|t" + GetLocaleText(locale, "save_set"), EQUIPMENT_SLOT_END + 8, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 5: // Use preset
@@ -177,9 +539,9 @@ public:
                 for (Transmogrification::slotMap::const_iterator it = sT->presetById[player->GetGUID()][action].begin(); it != sT->presetById[player->GetGUID()][action].end(); ++it)
                     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(it->second, 30, 30, -18, 0) + sT->GetItemLink(it->second, session), sender, action);
 
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|tUse this set", EQUIPMENT_SLOT_END + 5, action, "Using this set for transmogrify will bind transmogrified items to you and make them non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->presetByName[player->GetGUID()][action], 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:30:30:-18:0|tDelete set", EQUIPMENT_SLOT_END + 7, action, "Are you sure you want to delete " + sT->presetByName[player->GetGUID()][action] + "?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t" + GetLocaleText(locale, "use_set"), EQUIPMENT_SLOT_END + 5, action, GetLocaleText(locale, "confirm_use_set") + sT->presetByName[player->GetGUID()][action], 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:30:30:-18:0|t" + GetLocaleText(locale, "delete_set"), EQUIPMENT_SLOT_END + 7, action, GetLocaleText(locale, "confirm_delete_set") + sT->presetByName[player->GetGUID()][action] + "?", 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 7: // Delete preset
@@ -226,20 +588,20 @@ public:
                     }
                 }
                 if (canSave)
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|tSave set", 0, 0, "Insert set name", cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", sender, action);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|t" + GetLocaleText(locale, "save_set"), 0, 0, GetLocaleText(locale, "insert_set_name"), cost*sT->GetSetCostModifier() + sT->GetSetCopperCost(), true);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t" + GetLocaleText(locale, "update_menu"), sender, action);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             } break;
             case EQUIPMENT_SLOT_END + 10: // Set info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 4, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 4, 0);
                 SendGossipMenuFor(player, sT->GetSetNpcText(), creature->GetGUID());
             } break;
     #endif
             case EQUIPMENT_SLOT_END + 9: // Transmog info
             {
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, sT->GetTransmogNpcText(), creature->GetGUID());
             } break;
             default: // Transmogrify
@@ -361,6 +723,7 @@ public:
     void ShowTransmogItems(Player* player, Creature* creature, uint8 slot, uint16 gossipPageNumber) // Only checks bags while can use an item from anywhere in inventory
     {
         WorldSession* session = player->GetSession();
+        LocaleConstant locale = session->GetSessionDbLocaleIndex();
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         bool sendGossip = true;
         bool hasSearchString;
@@ -394,17 +757,17 @@ public:
                 {
                     std::unordered_map<uint32, std::string>::iterator searchStringIterator = sT->searchStringByPlayer.find(player->GetGUID().GetCounter());
                     hasSearchString = !(searchStringIterator == sT->searchStringByPlayer.end());
-                    std::string searchDisplayValue(hasSearchString ? searchStringIterator->second : "Search....");
+                    std::string searchDisplayValue(hasSearchString ? searchStringIterator->second : GetLocaleText(locale, "search"));
                     // Offset values to add Search gossip item
                     if (pageNumber == 0)
                     {
                         if (hasSearchString)
                         {
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + "Searching for: " + searchDisplayValue, slot + 1, 0, "Search for what item?", 0, true);
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + GetLocaleText(locale, "searching for") + searchDisplayValue, slot + 1, 0, GetLocaleText(locale, "search_for_item"), 0, true);
                         }
                         else
                         {
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + "Search....", slot + 1, 0, "Search for what item?", 0, true);
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(30620, 30, 30, -18, 0) + GetLocaleText(locale, "search"), slot + 1, 0, GetLocaleText(locale, "search_for_item"), 0, true);
                         }
                     }
                     else
@@ -423,7 +786,7 @@ public:
                         else
                         {
                             // Add invisible item entry
-                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "Hide Slot", slot, UINT_MAX, "You are hiding the item in this slot.\nDo you wish to continue?\n\n" + lineEnd, 0, false);
+                            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/inv_misc_enggizmos_27:30:30:-18:0|t" + GetLocaleText(locale, "hide_slot"), slot, UINT_MAX, GetLocaleText(locale, "confirm_hide_item") + lineEnd, 0, false);
                         }
                     }
                     for (uint32 newItemEntryId : sT->collectionCache[accountId]) {
@@ -448,23 +811,23 @@ public:
                             break;
                         }
                         Item* newItem = allowedItems.at(i);
-                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetEntry(), GetLocaleText(locale, "confirm_use_item") + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
                     }
                 }
                 if (gossipPageNumber == EQUIPMENT_SLOT_END + 11)
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", EQUIPMENT_SLOT_END, slot);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetLocaleText(locale, "previous_page"), EQUIPMENT_SLOT_END, slot);
                     if (!lastPage)
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetLocaleText(locale, "next_page"), gossipPageNumber + 1, slot);
                     }
                 }
                 else if (gossipPageNumber > EQUIPMENT_SLOT_END + 11)
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Previous Page", gossipPageNumber - 1, slot);
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetLocaleText(locale, "previous_page"), gossipPageNumber - 1, slot);
                     if (!lastPage)
                     {
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", gossipPageNumber + 1, slot);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetLocaleText(locale, "next_page"), gossipPageNumber + 1, slot);
                     }
                 }
                 else if (!lastPage)
@@ -472,9 +835,9 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Next Page", EQUIPMENT_SLOT_END + 11, slot);
                 }
 
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t" + GetLocaleText(locale, "remove_transmog"), EQUIPMENT_SLOT_END + 3, slot, GetLocaleText(locale, "remove_transmog_slot"), 0, false);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t" + GetLocaleText(locale, "update_menu"), EQUIPMENT_SLOT_END, slot);
+                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
                 SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
             }
             else
@@ -492,7 +855,7 @@ public:
                     if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                         continue;
                     ++limit;
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), GetLocaleText(locale, "confirm_use_item") + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + lineEnd, price, false);
                 }
 
                 for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
@@ -512,16 +875,16 @@ public:
                         if (sT->GetFakeEntry(oldItem->GetGUID()) == newItem->GetEntry())
                             continue;
                         ++limit;
-                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), "Using this item for transmogrify will bind it to you and make it non-refundable and non-tradeable.\nDo you wish to continue?\n\n" + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
+                        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, sT->GetItemIcon(newItem->GetEntry(), 30, 30, -18, 0) + sT->GetItemLink(newItem, session), slot, newItem->GetGUID().GetCounter(), GetLocaleText(locale, "confirm_use_item") + sT->GetItemIcon(newItem->GetEntry(), 40, 40, -15, -10) + sT->GetItemLink(newItem, session) + ss.str(), price, false);
                     }
                 }
             }
         }
 
         if (sendGossip) {
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|tRemove transmogrification", EQUIPMENT_SLOT_END + 3, slot, "Remove transmogrification from the slot?", 0, false);
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|tUpdate menu", EQUIPMENT_SLOT_END, slot);
-            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|tBack...", EQUIPMENT_SLOT_END + 1, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t" + GetLocaleText(locale, "remove_transmog"), EQUIPMENT_SLOT_END + 3, slot, GetLocaleText(locale, "remove_transmog_slot"), 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t" + GetLocaleText(locale, "update_menu"), EQUIPMENT_SLOT_END, slot);
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
             SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
         }
     }
@@ -542,6 +905,7 @@ private:
 
     void AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
     {
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
         if (!sT->GetTrackUnusableItems() && !sT->SuitableForTransmogrification(player, itemTemplate))
             return;
         if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
@@ -556,7 +920,8 @@ private:
         if (sT->AddCollectedAppearance(accountId, itemId))
         {
             if (showChatMessage)
-                ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r has been added to your appearance collection.)", itemQuality.c_str(), itemId, itemName.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage( R"(|c%s|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r %s)", itemQuality.c_str(), itemId, itemName.c_str(), GetLocaleText(locale, "added_appearance"));
+
             CharacterDatabase.Execute( "INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
         }
     }
