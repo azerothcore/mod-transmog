@@ -34,7 +34,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HOWWORKS = {
     {LOCALE_frFR, "Comment fonctionne la transmogrification ?"},
     {LOCALE_deDE, "Wie funktioniert Transmogrifizierung?"},
     {LOCALE_zhCN, "变形术是如何运作的？"},
-    {LOCALE_zhTW, "การแปลงร่างทำงานอย่างไร"},
+    {LOCALE_zhTW, "幻化是如何運作的？"},
     {LOCALE_esES, "¿Cómo funciona la transfiguración?"},
     {LOCALE_esMX, "¿Cómo funciona la transfiguración?"},
     {LOCALE_ruRU, "Как работает трансмогрификация?"}
@@ -46,7 +46,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_MANAGESETS =
     {LOCALE_frFR, "Gérer les ensembles"},
     {LOCALE_deDE, "Sets verwalten"},
     {LOCALE_zhCN, "管理套装"},
-    {LOCALE_zhTW, "จัดการชุด"},
+    {LOCALE_zhTW, "管理套裝"},
     {LOCALE_esES, "Administrar conjuntos"},
     {LOCALE_esMX, "Administrar conjuntos"},
     {LOCALE_ruRU, "Управление комплектами"}
@@ -58,7 +58,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSM
     {LOCALE_frFR, "Supprimer toutes les transmogrifications"},
     {LOCALE_deDE, "Alle Transmogrifikationen entfernen"},
     {LOCALE_zhCN, "移除所有幻化"},
-    {LOCALE_zhTW, "ลบการแปลงร่างทั้งหมด"},
+    {LOCALE_zhTW, "移除所有幻化"},
     {LOCALE_esES, "Eliminar todas las transfiguraciones"},
     {LOCALE_esMX, "Eliminar todas las transfiguraciones"},
     {LOCALE_ruRU, "Удалить все трансмогрификации"}
@@ -70,7 +70,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSM
     {LOCALE_frFR, "Supprimer les transmogrifications de tous les objets équipés ?"},
     {LOCALE_deDE, "Transmogrifikationen von allen ausgerüsteten Gegenständen entfernen?"},
     {LOCALE_zhCN, "是否要从所有已装备的物品中移除幻化？"},
-    {LOCALE_zhTW, "ลบการแปลงร่างออกจากรายการที่ติดตั้งทั้งหมดหรือไม่"},
+    {LOCALE_zhTW, "從所有已裝備物品中移除幻化？"},
     {LOCALE_esES, "¿Eliminar las transfiguraciones de todos los objetos equipados?"},
     {LOCALE_esMX, "¿Eliminar las transfiguraciones de todos los objetos equipados?"},
     {LOCALE_ruRU, "Удалить трансмогрификации со всех экипированных предметов?"}
@@ -82,7 +82,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_UPDATEMENU =
     {LOCALE_frFR, "Mettre à jour le menu"},
     {LOCALE_deDE, "Menü aktualisieren"},
     {LOCALE_zhCN, "更新菜单"},
-    {LOCALE_zhTW, "อัพเดทเมนู"},
+    {LOCALE_zhTW, "更新選單"},
     {LOCALE_esES, "Actualizar menú"},
     {LOCALE_esMX, "Actualizar menú"},
     {LOCALE_ruRU, "Обновить меню"}
@@ -94,7 +94,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HOWSETSWORK 
     {LOCALE_frFR, "Comment fonctionnent les ensembles ?"},
     {LOCALE_deDE, "Wie funktionieren Sets?"},
     {LOCALE_zhCN, "套装是如何运作的？"},
-    {LOCALE_zhTW, "ชุดทำงานอย่างไร?"},
+    {LOCALE_zhTW, "套裝如何運作？"},
     {LOCALE_esES, "¿Cómo funcionan los conjuntos?"},
     {LOCALE_esMX, "¿Cómo funcionan los conjuntos?"},
     {LOCALE_ruRU, "Как работают комплекты?"}
@@ -106,7 +106,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SAVESET = {
     {LOCALE_frFR, "Sauvegarder l'ensemble"},
     {LOCALE_deDE, "Set speichern"},
     {LOCALE_zhCN, "保存套装"},
-    {LOCALE_zhTW, "บันทึกชุด"},
+    {LOCALE_zhTW, "儲存套裝"},
     {LOCALE_esES, "Guardar conjunto"},
     {LOCALE_esMX, "Guardar conjunto"},
     {LOCALE_ruRU, "Сохранить комплект"}
@@ -118,7 +118,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_BACK = {
     {LOCALE_frFR, "Retour..."},
     {LOCALE_deDE, "Zurück..."},
     {LOCALE_zhCN, "返回..."},
-    {LOCALE_zhTW, "บันทึกชุด"},
+    {LOCALE_zhTW, "返回..."},
     {LOCALE_esES, "Atrás..."},
     {LOCALE_esMX, "Atrás..."},
     {LOCALE_ruRU, "Назад..."}
@@ -130,7 +130,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_USESET = {
     {LOCALE_frFR, "Utiliser cet ensemble"},
     {LOCALE_deDE, "Dieses Set verwenden"},
     {LOCALE_zhCN, "使用此套装"},
-    {LOCALE_zhTW, "ใช้ชุดนี้"},
+    {LOCALE_zhTW, "使用此套裝"},
     {LOCALE_esES, "Usar este conjunto"},
     {LOCALE_esMX, "Usar este conjunto"},
     {LOCALE_ruRU, "Использовать этот комплект"}
@@ -142,7 +142,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_USES
     {LOCALE_frFR, "En utilisant cet ensemble pour la transmogrification, les objets transmogrifiés seront liés à votre personnage et deviendront non remboursables et non échangeables.\nVoulez-vous continuer ?\n\n"},
     {LOCALE_deDE, "Wenn du dieses Set für die Transmogrifikation verwendest, werden die transmogrifizierten Gegenstände an dich gebunden und können nicht erstattet oder gehandelt werden.\nMöchtest du fortfahren?\n\n"},
     {LOCALE_zhCN, "将此套装用于幻化将使幻化后的物品与您绑定，并使其不可退还和不可交易。\n您是否要继续？\n\n"},
-    {LOCALE_zhTW, "การใช้ชุดนี้สำหรับทรานส์โมกริฟายจะผูกมัดไอเท็มทรานส์โมกริฟายกับคุณ และทำให้ไม่สามารถคืนเงินและแลกเปลี่ยนไม่ได้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_zhTW, "使用此套裝進行幻化將使幻化後的物品與您綁定，並使其無法退款和無法交易。\n您是否希望繼續？\n\n"},
     {LOCALE_esES, "Usar este conjunto para transfigurar vinculará los objetos transfigurados a ti y los volverá no reembolsables y no intercambiables.\n¿Deseas continuar?\n\n"},
     {LOCALE_esMX, "Usar este conjunto para transfigurar vinculará los objetos transfigurados a ti y los volverá no reembolsables y no intercambiables.\n¿Deseas continuar?\n\n"},
     {LOCALE_ruRU, "Использование этого комплекта для трансмогрификации привяжет трансмогрифицированные предметы к вам и сделает их неподлежащими возврату и обмену.\nЖелаете продолжить?\n\n"}
@@ -154,7 +154,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_DELETESET = 
     {LOCALE_frFR, "Supprimer l'ensemble"},
     {LOCALE_deDE, "Set löschen"},
     {LOCALE_zhCN, "删除套装"},
-    {LOCALE_zhTW, "ลบชุด"},
+    {LOCALE_zhTW, "刪除套裝"},
     {LOCALE_esES, "Eliminar conjunto"},
     {LOCALE_esMX, "Eliminar conjunto"},
     {LOCALE_ruRU, "Удалить комплект"}
@@ -166,7 +166,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_DELE
     {LOCALE_frFR, "Êtes-vous sûr de vouloir supprimer "},
     {LOCALE_deDE, "Möchten Sie wirklich löschen "},
     {LOCALE_zhCN, "您确定要删除吗 "},
-    {LOCALE_zhTW, "คุณแน่ใจหรือว่าต้องการลบ "},
+    {LOCALE_zhTW, "您確定要刪除 "},
     {LOCALE_esES, "¿Estás seguro de que quieres eliminar "},
     {LOCALE_esMX, "¿Estás seguro de que quieres eliminar "},
     {LOCALE_ruRU, "Вы уверены, что хотите удалить "}
@@ -178,7 +178,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_INSERTSETNAM
     {LOCALE_frFR, "Insérer le nom de l'ensemble"},
     {LOCALE_deDE, "Set-Namen einfügen"},
     {LOCALE_zhCN, "插入套装名称"},
-    {LOCALE_zhTW, "ใส่ชื่อชุด"},
+    {LOCALE_zhTW, "輸入套裝名稱"},
     {LOCALE_esES, "Insertar nombre del conjunto"},
     {LOCALE_esMX, "Insertar nombre del conjunto"},
     {LOCALE_ruRU, "Введите имя комплекта"}
@@ -190,7 +190,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCH = {
     {LOCALE_frFR, "Rechercher..."},
     {LOCALE_deDE, "Suche..."},
     {LOCALE_zhCN, "搜索..."},
-    {LOCALE_zhTW, "ค้นหา...."},
+    {LOCALE_zhTW, "搜索..."},
     {LOCALE_esES, "Buscar..."},
     {LOCALE_esMX, "Buscar..."},
     {LOCALE_ruRU, "Поиск..."}
@@ -202,7 +202,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCHING_FO
     {LOCALE_frFR, "Recherche en cours: "},
     {LOCALE_deDE, "Suche nach: "},
     {LOCALE_zhCN, "正在搜索： "},
-    {LOCALE_zhTW, "ค้นหา: "},
+    {LOCALE_zhTW, "正在搜尋："},
     {LOCALE_esES, "Buscando:" },
     {LOCALE_esMX, "Buscando: "},
     {LOCALE_ruRU, "Поиск: "}
@@ -214,7 +214,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_SEARCH_FOR_I
     {LOCALE_frFR, "Rechercher quel objet ?"},
     {LOCALE_deDE, "Nach welchem Gegenstand suchen?"},
     {LOCALE_zhCN, "搜索哪个物品？"},
-    {LOCALE_zhTW, "ค้นหารายการอะไร"},
+    {LOCALE_zhTW, "搜索哪個物品？"},
     {LOCALE_esES, "¿Buscar un objeto?"},
     {LOCALE_esMX, "¿Buscar un objeto?"},
     {LOCALE_ruRU, "Поиск предмета:"}
@@ -226,7 +226,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_HIDE
     {LOCALE_frFR, "Vous masquez l'objet dans cet emplacement.\nVoulez-vous continuer ?\n\n"},
     {LOCALE_deDE, "Du versteckst das Item in diesem Slot.\nMöchtest du fortfahren?\n\n"},
     {LOCALE_zhCN, "您正在隐藏此槽中的物品。\n您是否要继续？\n\n"},
-    {LOCALE_zhTW, "คุณกำลังซ่อนรายการในช่องนี้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_zhTW, "您正在隱藏此槽中的物品。\n您是否希望繼續？\n\n"},
     {LOCALE_esES, "Estás ocultando el objeto en esta ranura.\n¿Deseas continuar?\n\n"},
     {LOCALE_esMX, "Estás ocultando el objeto en esta ranura.\n¿Deseas continuar?\n\n"},
     {LOCALE_ruRU, "Вы скрываете предмет в этом слоте.\nЖелаете продолжить?\n\n"}
@@ -238,7 +238,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_HIDESLOT = {
     {LOCALE_frFR, "Cacher l'emplacement"},
     {LOCALE_deDE, "Slot verbergen"},
     {LOCALE_zhCN, "隐藏槽位"},
-    {LOCALE_zhTW, "ซ่อนสล็อต"},
+    {LOCALE_zhTW, "隱藏槽位"},
     {LOCALE_esES, "Ocultar ranura"},
     {LOCALE_esMX, "Ocultar ranura"},
     {LOCALE_ruRU, "Скрыть слот"}
@@ -250,7 +250,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_REMOVETRANSM
     {LOCALE_frFR, "Supprimer la transmogrification de l'emplacement ?"},
     {LOCALE_deDE, "Transmogrifikation aus dem Slot entfernen?"},
     {LOCALE_zhCN, "是否要从该槽位中移除幻化？"},
-    {LOCALE_zhTW, "นำการแปลงร่างออกจากสล็อตหรือไม่"},
+    {LOCALE_zhTW, "從該槽位移除幻化？"},
     {LOCALE_esES, "¿Eliminar la transfiguración del espacio?"},
     {LOCALE_esMX, "¿Eliminar la transfiguración del espacio?"},
     {LOCALE_ruRU, "Удалить трансмогрификацию из ячейки?"}
@@ -262,7 +262,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_CONFIRM_USEI
     {LOCALE_frFR, "En utilisant cet objet pour la transmogrification, il sera lié à votre personnage et deviendra non remboursable et non échangeable.\nVoulez-vous continuer ?\n\n"},
     {LOCALE_deDE, "Wenn du diesen Gegenstand für die Transmogrifikation verwendest, wird er an dich gebunden und kann nicht erstattet oder gehandelt werden.\nMöchtest du fortfahren?\n\n"},
     {LOCALE_zhCN, "将此物品用于幻化将使其与您绑定，并使其不可退还和不可交易。\n您是否要继续？\n\n"},
-    {LOCALE_zhTW, "การใช้ไอเทมนี้เพื่อทรานส์โมกริฟายจะผูกมัดกับคุณและทำให้ไม่สามารถคืนเงินและแลกเปลี่ยนไม่ได้\nคุณต้องการดำเนินการต่อหรือไม่\n\n"},
+    {LOCALE_zhTW, "使用此物品進行幻化將使其與您綁定，並使其無法退款和無法交易。\n您是否希望繼續？\n\n"},
     {LOCALE_esES, "Usar este objeto para transfigurar lo vinculará a ti y lo volverá no reembolsable y no intercambiable.\n¿Deseas continuar?\n\n"},
     {LOCALE_esMX, "Usar este objeto para transfigurar lo vinculará a ti y lo volverá no reembolsable y no intercambiable.\n¿Deseas continuar?\n\n"},
     {LOCALE_ruRU, "Использование этого предмета для трансмогрификации привяжет его к вам и сделает его неподлежащим возврату и обмену.\nЖелаете продолжить?\n\n"}
@@ -274,7 +274,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_PREVIOUS_PAG
     {LOCALE_frFR, "Page précédente"},
     {LOCALE_deDE, "Vorherige Seite"},
     {LOCALE_zhCN, "上一页"},
-    {LOCALE_zhTW, "หน้าก่อนหน้า"},
+    {LOCALE_zhTW, "上一頁"},
     {LOCALE_esES, "Página anterior"},
     {LOCALE_esMX, "Página anterior"},
     {LOCALE_ruRU, "Предыдущая страница"}
@@ -286,7 +286,7 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_NEXT_PAGE = 
     {LOCALE_frFR, "Page suivante"},
     {LOCALE_deDE, "Nächste Seite"},
     {LOCALE_zhCN, "下一页"},
-    {LOCALE_zhTW, "หน้าต่อไป"},
+    {LOCALE_zhTW, "下一頁"},
     {LOCALE_esES, "Página siguiente"},
     {LOCALE_esMX, "Página siguiente"},
     {LOCALE_ruRU, "Следующая страница"}
@@ -298,87 +298,42 @@ const std::unordered_map<LocaleConstant, std::string> TRANSMOG_TEXT_ADDED_APPEAR
     {LOCALE_frFR, "a été ajouté(e) à votre collection d'apparences."},
     {LOCALE_deDE, "wurde deiner Transmog-Sammlung hinzugefügt."},
     {LOCALE_zhCN, "已添加到外观收藏中。"},
-    {LOCALE_zhTW, "ถูกเพิ่มในคอลเลกชันรูปลักษณ์ของคุณแล้ว"},
+    {LOCALE_zhTW, "已加入您的外觀收藏。"},
     {LOCALE_esES, "se ha añadido a tu colección de apariencias."},
     {LOCALE_esMX, "se ha agregado a tu colección de apariencias."},
     {LOCALE_ruRU, "был добавлен в вашу коллекцию обликов."}
 };
 
-std::string GetLocaleText(LocaleConstant locale, const std::string& titleType)
-{
-    const std::unordered_map<LocaleConstant, std::string>* textMap = nullptr;
+std::unordered_map<std::string, const std::unordered_map<LocaleConstant, std::string>*> textMaps = {
+    {"how_works", &TRANSMOG_TEXT_HOWWORKS},
+    {"manage_sets", &TRANSMOG_TEXT_MANAGESETS},
+    {"remove_transmog", &TRANSMOG_TEXT_REMOVETRANSMOG},
+    {"remove_transmog_ask", &TRANSMOG_TEXT_REMOVETRANSMOG_ASK},
+    {"update_menu", &TRANSMOG_TEXT_UPDATEMENU},
+    {"how_sets_work", &TRANSMOG_TEXT_HOWSETSWORK},
+    {"save_set", &TRANSMOG_TEXT_SAVESET},
+    {"back", &TRANSMOG_TEXT_BACK},
+    {"use_set", &TRANSMOG_TEXT_USESET},
+    {"confirm_use_set", &TRANSMOG_TEXT_CONFIRM_USESET},
+    {"delete_set", &TRANSMOG_TEXT_DELETESET},
+    {"confirm_delete_set", &TRANSMOG_TEXT_CONFIRM_DELETESET},
+    {"insert_set_name", &TRANSMOG_TEXT_INSERTSETNAME},
+    {"search", &TRANSMOG_TEXT_SEARCH},
+    {"searching_for", &TRANSMOG_TEXT_SEARCHING_FOR},
+    {"search_for_item", &TRANSMOG_TEXT_SEARCH_FOR_ITEM},
+    {"confirm_hide_item", &TRANSMOG_TEXT_CONFIRM_HIDE_ITEM},
+    {"hide_slot", &TRANSMOG_TEXT_HIDESLOT},
+    {"remove_transmog_slot", &TRANSMOG_TEXT_REMOVETRANSMOG_SLOT},
+    {"confirm_use_item", &TRANSMOG_TEXT_CONFIRM_USEITEM},
+    {"previous_page", &TRANSMOG_TEXT_PREVIOUS_PAGE},
+    {"next_page", &TRANSMOG_TEXT_NEXT_PAGE},
+    {"added_appearance", &TRANSMOG_TEXT_ADDED_APPEARANCE}
+};
 
-    if (titleType == "how_works") {
-        textMap = &TRANSMOG_TEXT_HOWWORKS;
-    }
-    else if (titleType == "manage_sets") {
-        textMap = &TRANSMOG_TEXT_MANAGESETS;
-    }
-    else if (titleType == "remove_transmog") {
-        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG;
-    }
-    else if (titleType == "remove_transmog_ask") {
-        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG_ASK;
-    }
-    else if (titleType == "update_menu") {
-        textMap = &TRANSMOG_TEXT_UPDATEMENU;
-    }
-    else if (titleType == "how_sets_work") {
-        textMap = &TRANSMOG_TEXT_HOWSETSWORK;
-    }
-    else if (titleType == "save_set") {
-        textMap = &TRANSMOG_TEXT_SAVESET;
-    }
-    else if (titleType == "back") {
-        textMap = &TRANSMOG_TEXT_BACK;
-    }
-    else if (titleType == "use_set") {
-        textMap = &TRANSMOG_TEXT_USESET;
-    }
-    else if (titleType == "confirm_use_set") {
-        textMap = &TRANSMOG_TEXT_CONFIRM_USESET;
-    }
-    else if (titleType == "delete_set") {
-        textMap = &TRANSMOG_TEXT_DELETESET;
-    }
-    else if (titleType == "confirm_delete_set") {
-        textMap = &TRANSMOG_TEXT_CONFIRM_DELETESET;
-    }
-    else if (titleType == "insert_set_name") {
-        textMap = &TRANSMOG_TEXT_INSERTSETNAME;
-    }
-    else if (titleType == "search") {
-        textMap = &TRANSMOG_TEXT_SEARCH;
-    }
-    else if (titleType == "searching_for") {
-        textMap = &TRANSMOG_TEXT_SEARCHING_FOR;
-    }
-    else if (titleType == "search_for_item") {
-        textMap = &TRANSMOG_TEXT_SEARCH_FOR_ITEM;
-    }
-    else if (titleType == "confirm_hide_item") {
-        textMap = &TRANSMOG_TEXT_CONFIRM_HIDE_ITEM;
-    }
-    else if (titleType == "hide_slot") {
-        textMap = &TRANSMOG_TEXT_HIDESLOT;
-    }
-    else if (titleType == "remove_transmog_slot") {
-        textMap = &TRANSMOG_TEXT_REMOVETRANSMOG_SLOT;
-    }
-    else if (titleType == "confirm_use_item") {
-        textMap = &TRANSMOG_TEXT_CONFIRM_USEITEM;
-    }
-    else if (titleType == "previous_page") {
-        textMap = &TRANSMOG_TEXT_PREVIOUS_PAGE;
-    }
-    else if (titleType == "next_page") {
-        textMap = &TRANSMOG_TEXT_NEXT_PAGE;
-    }
-    else if (titleType == "added_appearance") {
-        textMap = &TRANSMOG_TEXT_ADDED_APPEARANCE;
-    }
-
-    if (textMap) {
+std::string GetLocaleText(LocaleConstant locale, const std::string& titleType) {
+    auto textMapIt = textMaps.find(titleType);
+    if (textMapIt != textMaps.end()) {
+        const std::unordered_map<LocaleConstant, std::string>* textMap = textMapIt->second;
         auto it = textMap->find(locale);
         if (it != textMap->end()) {
             return it->second;
