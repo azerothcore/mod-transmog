@@ -12,7 +12,7 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALU
 (@Entry, 'frFR', @Name, "Transmogrificateur"),
 (@Entry, 'deDE', @Name, "Transmogrifier"),
 (@Entry, 'zhCN', @Name, "变形者"),
-(@Entry, 'zhTW', @Name, "ทรานส์โมกริฟไฟเออร์"),
+(@Entry, 'zhTW', @Name, "幻化大師"),
 (@Entry, 'esES', @Name, "Transfigurador"),
 (@Entry, 'esMX', @Name, "Transfigurador"),
 (@Entry, 'ruRU', @Name, "Трансмогрификатор");
