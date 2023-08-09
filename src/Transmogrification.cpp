@@ -114,28 +114,187 @@ void Transmogrification::UnloadPlayerSets(ObjectGuid pGUID)
 }
 #endif
 
-const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* /*session*/) const
+const char* Transmogrification::GetSlotName(uint8 slot, WorldSession* session) const
 {
     LOG_DEBUG("module", "Transmogrification::GetSlotName");
 
-    switch (slot)
-    {
-        case EQUIPMENT_SLOT_HEAD: return  "Head";// session->GetAcoreString(LANG_SLOT_NAME_HEAD);
-        case EQUIPMENT_SLOT_SHOULDERS: return  "Shoulders";// session->GetAcoreString(LANG_SLOT_NAME_SHOULDERS);
-        case EQUIPMENT_SLOT_BODY: return  "Shirt";// session->GetAcoreString(LANG_SLOT_NAME_BODY);
-        case EQUIPMENT_SLOT_CHEST: return  "Chest";// session->GetAcoreString(LANG_SLOT_NAME_CHEST);
-        case EQUIPMENT_SLOT_WAIST: return  "Waist";// session->GetAcoreString(LANG_SLOT_NAME_WAIST);
-        case EQUIPMENT_SLOT_LEGS: return  "Legs";// session->GetAcoreString(LANG_SLOT_NAME_LEGS);
-        case EQUIPMENT_SLOT_FEET: return  "Feet";// session->GetAcoreString(LANG_SLOT_NAME_FEET);
-        case EQUIPMENT_SLOT_WRISTS: return  "Wrists";// session->GetAcoreString(LANG_SLOT_NAME_WRISTS);
-        case EQUIPMENT_SLOT_HANDS: return  "Hands";// session->GetAcoreString(LANG_SLOT_NAME_HANDS);
-        case EQUIPMENT_SLOT_BACK: return  "Back";// session->GetAcoreString(LANG_SLOT_NAME_BACK);
-        case EQUIPMENT_SLOT_MAINHAND: return  "Main hand";// session->GetAcoreString(LANG_SLOT_NAME_MAINHAND);
-        case EQUIPMENT_SLOT_OFFHAND: return  "Off hand";// session->GetAcoreString(LANG_SLOT_NAME_OFFHAND);
-        case EQUIPMENT_SLOT_RANGED: return  "Ranged";// session->GetAcoreString(LANG_SLOT_NAME_RANGED);
-        case EQUIPMENT_SLOT_TABARD: return  "Tabard";// session->GetAcoreString(LANG_SLOT_NAME_TABARD);
-        default: return NULL;
+    LocaleConstant locale = session->GetSessionDbLocaleIndex();
+
+    std::unordered_map<uint8, const char*> defaultNames = {
+        { EQUIPMENT_SLOT_HEAD, "Head" }, // session->GetAcoreString(LANG_SLOT_NAME_HEAD);
+        { EQUIPMENT_SLOT_SHOULDERS, "Shoulders" }, // session->GetAcoreString(LANG_SLOT_NAME_SHOULDERS);
+        { EQUIPMENT_SLOT_BODY, "Shirt" }, // session->GetAcoreString(LANG_SLOT_NAME_BODY);
+        { EQUIPMENT_SLOT_CHEST, "Chest" }, // session->GetAcoreString(LANG_SLOT_NAME_CHEST);
+        { EQUIPMENT_SLOT_WAIST, "Waist" }, // session->GetAcoreString(LANG_SLOT_NAME_WAIST);
+        { EQUIPMENT_SLOT_LEGS, "Legs" }, // session->GetAcoreString(LANG_SLOT_NAME_LEGS);
+        { EQUIPMENT_SLOT_FEET, "Feet" }, // session->GetAcoreString(LANG_SLOT_NAME_FEET);
+        { EQUIPMENT_SLOT_WRISTS, "Wrists" }, // session->GetAcoreString(LANG_SLOT_NAME_WRISTS);
+        { EQUIPMENT_SLOT_HANDS, "Hands" }, // session->GetAcoreString(LANG_SLOT_NAME_HANDS);
+        { EQUIPMENT_SLOT_BACK, "Back" }, // session->GetAcoreString(LANG_SLOT_NAME_BACK);
+        { EQUIPMENT_SLOT_MAINHAND, "Main Hand" }, // session->GetAcoreString(LANG_SLOT_NAME_MAINHAND);
+        { EQUIPMENT_SLOT_OFFHAND, "Off Hand" }, // session->GetAcoreString(LANG_SLOT_NAME_OFFHAND);
+        { EQUIPMENT_SLOT_RANGED, "Ranged" }, // session->GetAcoreString(LANG_SLOT_NAME_RANGED);
+        { EQUIPMENT_SLOT_TABARD, "Tabard" }, // session->GetAcoreString(LANG_SLOT_NAME_TABARD);
+    };
+
+    std::unordered_map<uint8, std::unordered_map<LocaleConstant, const char*>> slotNames = {
+        { EQUIPMENT_SLOT_HEAD, {
+            { LOCALE_koKR, "머리" },
+            { LOCALE_frFR, "Tête" },
+            { LOCALE_deDE, "Kopf" },
+            { LOCALE_zhCN, "头部" },
+            { LOCALE_zhTW, "頭部" },
+            { LOCALE_esES, "Cabeza" },
+            { LOCALE_esMX, "Cabeza" },
+            { LOCALE_ruRU, "Голова" }
+        } },
+        { EQUIPMENT_SLOT_SHOULDERS, {
+            { LOCALE_koKR, "어깨" },
+            { LOCALE_frFR, "Épaules" },
+            { LOCALE_deDE, "Schultern" },
+            { LOCALE_zhCN, "肩部" },
+            { LOCALE_zhTW, "肩部" },
+            { LOCALE_esES, "Hombros" },
+            { LOCALE_esMX, "Hombros" },
+            { LOCALE_ruRU, "Плечи" }
+        } },
+        { EQUIPMENT_SLOT_BODY, {
+            { LOCALE_koKR, "셔츠" },
+            { LOCALE_frFR, "Chemise" },
+            { LOCALE_deDE, "Hemd" },
+            { LOCALE_zhCN, "衬衫" },
+            { LOCALE_zhTW, "襯衫" },
+            { LOCALE_esES, "Camisa" },
+            { LOCALE_esMX, "Camisa" },
+            { LOCALE_ruRU, "Рубашка" }
+        } },
+        { EQUIPMENT_SLOT_CHEST, {
+            { LOCALE_koKR, "가슴" },
+            { LOCALE_frFR, "Torse" },
+            { LOCALE_deDE, "Brust" },
+            { LOCALE_zhCN, "胸部" },
+            { LOCALE_zhTW, "胸部" },
+            { LOCALE_esES, "Pecho" },
+            { LOCALE_esMX, "Pecho" },
+            { LOCALE_ruRU, "Грудь" }
+        } },
+        { EQUIPMENT_SLOT_WAIST, {
+            { LOCALE_koKR, "허리" },
+            { LOCALE_frFR, "Taille" },
+            { LOCALE_deDE, "Taille" },
+            { LOCALE_zhCN, "腰部" },
+            { LOCALE_zhTW, "腰部" },
+            { LOCALE_esES, "Cintura" },
+            { LOCALE_esMX, "Cintura" },
+            { LOCALE_ruRU, "Пояс" }
+        } },
+        { EQUIPMENT_SLOT_LEGS, {
+            { LOCALE_koKR, "다리" },
+            { LOCALE_frFR, "Jambes" },
+            { LOCALE_deDE, "Beine" },
+            { LOCALE_zhCN, "腿部" },
+            { LOCALE_zhTW, "腿部" },
+            { LOCALE_esES, "Piernas" },
+            { LOCALE_esMX, "Piernas" },
+            { LOCALE_ruRU, "Ноги" }
+        } },
+        { EQUIPMENT_SLOT_FEET, {
+            { LOCALE_koKR, "발" },
+            { LOCALE_frFR, "Pieds" },
+            { LOCALE_deDE, "Füße" },
+            { LOCALE_zhCN, "脚" },
+            { LOCALE_zhTW, "เท้า" },
+            { LOCALE_esES, "Pies" },
+            { LOCALE_esMX, "Pies" },
+            { LOCALE_ruRU, "Ступни" }
+        } },
+        { EQUIPMENT_SLOT_WRISTS, {
+            { LOCALE_koKR, "손목" },
+            { LOCALE_frFR, "Poignets" },
+            { LOCALE_deDE, "Handgelenke" },
+            { LOCALE_zhCN, "腕部" },
+            { LOCALE_zhTW, "ข้อมือ" },
+            { LOCALE_esES, "Muñecas" },
+            { LOCALE_esMX, "Muñecas" },
+            { LOCALE_ruRU, "Запястья" }
+        } },
+        { EQUIPMENT_SLOT_HANDS, {
+            { LOCALE_koKR, "손" },
+            { LOCALE_frFR, "Mains" },
+            { LOCALE_deDE, "Hände" },
+            { LOCALE_zhCN, "手" },
+            { LOCALE_zhTW, "มือ" },
+            { LOCALE_esES, "Manos" },
+            { LOCALE_esMX, "Manos" },
+            { LOCALE_ruRU, "Кисти рук" }
+        } },
+        { EQUIPMENT_SLOT_BACK, {
+            { LOCALE_koKR, "등" },
+            { LOCALE_frFR, "Dos" },
+            { LOCALE_deDE, "Rücken" },
+            { LOCALE_zhCN, "背部" },
+            { LOCALE_zhTW, "หลัง" },
+            { LOCALE_esES, "Espalda" },
+            { LOCALE_esMX, "Espalda" },
+            { LOCALE_ruRU, "Спина" }
+        } },
+        { EQUIPMENT_SLOT_MAINHAND, {
+            { LOCALE_koKR, "주장비" },
+            { LOCALE_frFR, "Main droite" },
+            { LOCALE_deDE, "Haupthand" },
+            { LOCALE_zhCN, "主手" },
+            { LOCALE_zhTW, "มือหนึ่ง" },
+            { LOCALE_esES, "Mano derecha" },
+            { LOCALE_esMX, "Mano derecha" },
+            { LOCALE_ruRU, "Правая рука" }
+        } },
+        { EQUIPMENT_SLOT_OFFHAND, {
+            { LOCALE_koKR, "보조장비" },
+            { LOCALE_frFR, "Main gauche" },
+            { LOCALE_deDE, "Nebenhand" },
+            { LOCALE_zhCN, "副手" },
+            { LOCALE_zhTW, "มือสอง" },
+            { LOCALE_esES, "Mano izquierda" },
+            { LOCALE_esMX, "Mano izquierda" },
+            { LOCALE_ruRU, "Левая рука" }
+        } },
+        { EQUIPMENT_SLOT_RANGED, {
+            { LOCALE_koKR, "원거리" },
+            { LOCALE_frFR, "À distance" },
+            { LOCALE_deDE, "Distanz" },
+            { LOCALE_zhCN, "远程" },
+            { LOCALE_zhTW, "ระยะไกล" },
+            { LOCALE_esES, "A distancia" },
+            { LOCALE_esMX, "A distancia" },
+            { LOCALE_ruRU, "Дальний бой" }
+        } },
+        { EQUIPMENT_SLOT_TABARD, {
+            { LOCALE_koKR, "휘장" },
+            { LOCALE_frFR, "Tabard" },
+            { LOCALE_deDE, "Wappenrock" },
+            { LOCALE_zhCN, "战袍" },
+            { LOCALE_zhTW, "戰袍" },
+            { LOCALE_esES, "Tabardo" },
+            { LOCALE_esMX, "Tabardo" },
+            { LOCALE_ruRU, "Гербовая накидка" }
+        } },
+    };
+
+    auto it = slotNames.find(slot);
+    if (it != slotNames.end()) {
+        auto& namesByLocale = it->second;
+        auto nameIt = namesByLocale.find(locale);
+        if (nameIt != namesByLocale.end()) {
+            return nameIt->second;
+        }
     }
+
+    auto defaultIt = defaultNames.find(slot);
+    if (defaultIt != defaultNames.end()) {
+        return defaultIt->second;
+    }
+
+    return NULL;
 }
 
 std::string Transmogrification::GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const
