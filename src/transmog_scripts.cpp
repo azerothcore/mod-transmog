@@ -355,6 +355,15 @@ public:
         bool CanBeSeen(Player const* player) override
         {
             Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+
+            if (sT->IsPortableNPCEnabled)
+            {
+                if (TempSummon* summon = me->ToTempSummon())
+                {
+                    return summon->GetOwner() == player;
+                }
+            }
+
             return sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
         }
     };
@@ -836,7 +845,8 @@ public:
             }
         }
 
-        if (sendGossip) {
+        if (sendGossip)
+        {
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t" + GetLocaleText(locale, "remove_transmog"), EQUIPMENT_SLOT_END + 3, slot, GetLocaleText(locale, "remove_transmog_slot"), 0, false);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t" + GetLocaleText(locale, "update_menu"), EQUIPMENT_SLOT_END, slot);
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
@@ -943,6 +953,7 @@ public:
             ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemId);
             AddToDatabase(player, itemTemplate);
         }
+
         for (uint8 i = 0; i < QUEST_REWARDS_COUNT; ++i)
         {
             uint32 itemId = uint32(quest->RewardItemId[i]);

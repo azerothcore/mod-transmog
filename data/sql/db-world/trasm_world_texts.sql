@@ -45,9 +45,10 @@ VALUES
 (11115, 'Performing transmog appearance sync...', '형상변환 모양 동기화 수행 중...', 'Exécution de la synchronisation de l''apparence de transmogrification...', 'Synchronisierung des Transmog-Erscheinungsbilds wird durchgeführt ...', '正在执行 Transmog 外观同步...', '正在執行外觀同步變身操作...', 'Realizando sincronización de apariencia de transfiguración...', 'Realizando sincronización de apariencia de transfiguración...', 'Выполнение синхронизации внешнего вида Transmog...'),
 (11116, 'Appearance sync complete.', '전체 모양 동기화', 'Synchronisation complète de l''apparence', 'Vollständige Synchronisierung des Erscheinungsbilds', '完全外观同步', '外觀同步變身操作完成。', 'Sincronización de apariencia completa', 'Sincronización de apariencia completa', 'Полная синхронизация внешнего вида');
 
-DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog sync', 'transmog add set');
+DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog sync', 'transmog add set', 'transmog portable');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('transmog', 0, 'Syntax: .transmog <on/off>\nAllows seeing transmogrified items and the transmogrifier NPC.'),
 ('transmog add', 1, 'Syntax: .transmog add $player $item\nAdds an item to a player\'s appearance collection.'),
 ('transmog sync', 0, 'Syntax: .transmog sync\nSyncs transmog addon appearances with the server.'),
-('transmog add set', 1, 'Syntax: .transmog add set $player $itemSet\nAdds items of an item set to a player\'s appearance collection.');
+('transmog add set', 1, 'Syntax: .transmog add set $player $itemSet\nAdds items of an item set to a player\'s appearance collection.'),
+('transmog portable', 1, 'Syntax: .transmog portable \nSummons the Ethereal Warpweaver, a portable version of the transmogrification NPC.');
