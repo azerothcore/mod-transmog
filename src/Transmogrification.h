@@ -63,6 +63,11 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
     LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
 };
 
+enum TransmogSpells
+{
+    SPELL_SUMMON_ETHEREAL_WARPWEAVER = 2000100
+};
+
 class Transmogrification
 {
 public:
@@ -152,6 +157,7 @@ public:
     bool ResetRetroActiveAppearances;
 
     bool IsTransmogEnabled;
+    bool IsPortableNPCEnabled;
 
     bool IsAllowed(uint32 entry) const;
     bool IsNotAllowed(uint32 entry) const;

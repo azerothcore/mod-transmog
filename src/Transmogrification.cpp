@@ -1033,6 +1033,7 @@ void Transmogrification::LoadConfig(bool reload)
     ResetRetroActiveAppearances = sConfigMgr->GetOption<bool>("Transmogrification.ResetRetroActiveAppearancesFlag", false);
 
     IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
+    IsPortableNPCEnabled = sConfigMgr->GetOption<bool>("Transmogrification.EnablePortable", true);
 
     if (!sObjectMgr->GetItemTemplate(TokenEntry))
     {

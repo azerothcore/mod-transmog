@@ -40,9 +40,10 @@ public:
 
         static ChatCommandTable transmogTable =
         {
-            { "add", addCollectionTable },
-            { "",    HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
-            { "sync",    HandleSyncTransMogCommand, SEC_PLAYER,    Console::No },
+            { "add",      addCollectionTable                                        },
+            { "",         HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
+            { "sync",     HandleSyncTransMogCommand,     SEC_PLAYER,    Console::No },
+            { "portable", HandleTransmogPortableCommand, SEC_MODERATOR, Console::No },
         };
 
         static ChatCommandTable commandTable =
@@ -285,6 +286,22 @@ public:
 
         return true;
     }
+
+    static bool HandleTransmogPortableCommand(ChatHandler* handler)
+    {
+        if (!sTransmogrification->IsPortableNPCEnabled)
+        {
+            handler->GetPlayer()->SendSystemMessage("The portable transmogrification NPC is disabled.");
+            handler->SetSentErrorMessage(true);
+            return true;
+        }
+
+        if (Player* player = PlayerIdentifier::FromSelf(handler)->GetConnectedPlayer())
+        {
+            player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
+        }
+        return true;
+    };
 };
 
 void AddSC_transmog_commandscript()
