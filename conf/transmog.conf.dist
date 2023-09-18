@@ -55,9 +55,12 @@
 #        Description: A list of item entries that are NOT allowed for transmogrification
 #                     Example: "25 35674 5623"
 #        Default:    ""
+#
+#    Transmogrification.EnablePortable
+#        Description: Enables / Disables the portable transmogrification NPC.
+#        Default:    1
 
 Transmogrification.Enable = 1
-Transmogrification.EnablePortable = 1
 Transmogrification.UseCollectionSystem = 1
 Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.TrackUnusableItems = 1
@@ -69,6 +72,8 @@ Transmogrification.TransmogNpcText = 601083
 
 Transmogrification.Allowed = ""
 Transmogrification.NotAllowed = ""
+
+Transmogrification.EnablePortable = 1
 
 #
 #    COPPER COST
