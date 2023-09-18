@@ -57,6 +57,7 @@
 #        Default:    ""
 
 Transmogrification.Enable = 1
+Transmogrification.EnablePortable = 1
 Transmogrification.UseCollectionSystem = 1
 Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.TrackUnusableItems = 1
