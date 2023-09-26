@@ -143,6 +143,12 @@ public:
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
         std::string itemName = itemTemplate->Name1;
+
+        // get locale item name
+        int loc_idex = target->GetSession()->GetSessionDbLocaleIndex();
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
+            ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
+
         std::string playerName = player->GetName();
         std::string nameLink = handler->playerLink(playerName);
 
