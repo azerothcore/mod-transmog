@@ -878,6 +878,12 @@ private:
         uint32 itemId = itemTemplate->ItemId;
         uint32 accountId = player->GetSession()->GetAccountId();
         std::string itemName = itemTemplate -> Name1;
+
+        // get locale item name
+        int loc_idex = player->GetSession()->GetSessionDbLocaleIndex();
+        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
+            ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
+
         std::stringstream tempStream;
         tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
         std::string itemQuality = tempStream.str();
