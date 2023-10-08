@@ -364,7 +364,7 @@ public:
                 }
             }
 
-            return sTransmogrification->IsEnabled() && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value;
+            return sTransmogrification->IsEnabled() && (target && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
         }
     };
 
