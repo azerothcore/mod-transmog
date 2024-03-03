@@ -257,4 +257,20 @@ Transmogrification.SetCostModifier = 3.0
 Transmogrification.SetCopperCost = 0
 
 #
+#    TRANSMOG PLUS
+#
+#    Transmogrification.EnablePlus
+#        Description: Enables/Disables TransmogPlus.
+#        Default:     0
+#
+#    Transmogrification.MembershipLevels
+#        Description: Membership levels ID from acore_cms_subscriptions.
+#        Example:     Transmogrification.MembershipLevels = "1,2,3"
+#        Default:     ""
+#
+
+Transmogrification.EnablePlus = 0
+Transmogrification.MembershipLevels = ""
+
+#
 ###################################################################################################

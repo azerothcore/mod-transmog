@@ -1,6 +1,7 @@
 #include "Transmogrification.h"
 #include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "Tokenize.h"
 
 Transmogrification* Transmogrification::instance()
 {
@@ -721,7 +722,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!IsItemTransmogrifiable(proto))
+    if (!IsItemTransmogrifiable(proto, player->GetGUID().GetCounter()))
         return false;
 
     //[AZTH] Yehonal
@@ -781,10 +782,10 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!IsItemTransmogrifiable(proto))
+    auto playerGuid = guid.GetCounter();
+    if (!IsItemTransmogrifiable(proto, playerGuid))
         return false;
 
-    auto playerGuid = guid.GetCounter();
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
     if (!playerData)
         return false;
@@ -854,7 +855,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     return true;
 }
 
-bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto) const
+bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid::LowType playerGuid) const
 {
     if (!proto)
         return false;
@@ -865,7 +866,7 @@ bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto) const
     if (!AllowFishingPoles && proto->Class == ITEM_CLASS_WEAPON && proto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
         return false;
 
-    if (!IsAllowedQuality(proto->Quality)) // (proto->Quality == ITEM_QUALITY_LEGENDARY)
+    if (!IsAllowedQuality(proto->Quality, playerGuid)) // (proto->Quality == ITEM_QUALITY_LEGENDARY)
         return false;
 
     // If World Event is not active, prevent using event dependant items
@@ -918,12 +919,12 @@ bool Transmogrification::IsNotAllowed(uint32 entry) const
     return NotAllowed.find(entry) != NotAllowed.end();
 }
 
-bool Transmogrification::IsAllowedQuality(uint32 quality) const
+bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid::LowType playerGuid) const
 {
     switch (quality)
     {
-        case ITEM_QUALITY_POOR: return AllowPoor;
-        case ITEM_QUALITY_NORMAL: return AllowCommon;
+        case ITEM_QUALITY_POOR: return AllowPoor || isPlusEligible(playerGuid);
+        case ITEM_QUALITY_NORMAL: return AllowCommon || isPlusEligible(playerGuid);
         case ITEM_QUALITY_UNCOMMON: return AllowUncommon;
         case ITEM_QUALITY_RARE: return AllowRare;
         case ITEM_QUALITY_EPIC: return AllowEpic;
@@ -1039,6 +1040,12 @@ void Transmogrification::LoadConfig(bool reload)
     {
         TokenEntry = 49426;
     }
+
+    IsTransmogPlusEnabled = sConfigMgr->GetOption<bool>("Transmogrification.EnablePlus", false);
+    std::string stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevels", "");
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
+        MembershipIds.push_back(Acore::StringTo<uint32>(itr).value());
+    }
 }
 
 void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans /*= nullptr*/)
@@ -1055,6 +1062,37 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         (*trans)->Append("DELETE FROM custom_transmogrification WHERE GUID = {}", itemLowGuid);
     else
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
+}
+
+bool Transmogrification::isPlusEligible(ObjectGuid::LowType playerGuid) const {
+    if (!IsTransmogPlusEnabled) {
+        return false;
+    }
+
+    if (MembershipIds.size() == 0) {
+        return false;
+    }
+
+    QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", playerGuid);
+
+    if (result) {
+
+        uint32 accountId = (*result)[0].Get<uint32>();
+        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+
+        if (resultAcc) {
+            const uint32 membershipLevel = (*resultAcc)[0].Get<uint32>();
+            for (const auto& itr : MembershipIds)
+            {
+                if (itr == membershipLevel) {
+                    return true;
+                }
+            }
+
+        }
+    }
+
+    return false;
 }
 
 bool Transmogrification::GetEnableTransmogInfo() const
