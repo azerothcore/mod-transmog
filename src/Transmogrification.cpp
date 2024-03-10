@@ -1053,6 +1053,11 @@ void Transmogrification::LoadConfig(bool reload)
     for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
         MembershipIdsLegendary.push_back(Acore::StringTo<uint32>(itr).value());
     }
+
+    stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevelsPet", "");
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
+        MembershipIdsPet.push_back(Acore::StringTo<uint32>(itr).value());
+    }
 }
 
 void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans /*= nullptr*/)
@@ -1069,6 +1074,21 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         (*trans)->Append("DELETE FROM custom_transmogrification WHERE GUID = {}", itemLowGuid);
     else
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
+}
+
+uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const {
+    QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", playerGuid);
+
+    if (result) {
+        uint32 accountId = (*result)[0].Get<uint32>();
+        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+
+        if (resultAcc) {
+            return (*resultAcc)[0].Get<uint32>();
+        }
+    }
+
+    return 0;
 }
 
 bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const {
@@ -1120,19 +1140,25 @@ bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid)
     return false;
 }
 
-uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const {
-    QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", playerGuid);
 
-    if (result) {
-        uint32 accountId = (*result)[0].Get<uint32>();
-        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid::LowType playerGuid) const {
+    if (MembershipIdsPet.size() == 0) {
+        return false;
+    }
 
-        if (resultAcc) {
-            return (*resultAcc)[0].Get<uint32>();
+    const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
+    if (membershipLevel == 0) {
+        return false;
+    }
+
+    for (const auto& itr : MembershipIdsPet)
+    {
+        if (itr == membershipLevel) {
+            return true;
         }
     }
 
-    return 0;
+    return false;
 }
 
 bool Transmogrification::GetEnableTransmogInfo() const

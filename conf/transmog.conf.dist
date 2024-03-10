@@ -270,13 +270,19 @@ Transmogrification.SetCopperCost = 0
 #
 #    Transmogrification.MembershipLevelsLegendary
 #        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for legendary items
-#        Example:     Transmogrification.MembershipLevels = "1,2,3"
+#        Example:     Transmogrification.MembershipLevelsLegendary = "1,2,3"
+#        Default:     ""
+#
+#    Transmogrification.MembershipLevelsPet
+#        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for transmog pet
+#        Example:     Transmogrification.MembershipLevelsPet = "1,2,3"
 #        Default:     ""
 #
 
 Transmogrification.EnablePlus = 0
 Transmogrification.MembershipLevels = ""
 Transmogrification.MembershipLevelsLegendary = ""
+Transmogrification.MembershipLevelsPet = ""
 
 #
 ###################################################################################################

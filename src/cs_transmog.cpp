@@ -43,7 +43,7 @@ public:
             { "add",      addCollectionTable                                        },
             { "",         HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
             { "sync",     HandleSyncTransMogCommand,     SEC_PLAYER,    Console::No },
-            { "portable", HandleTransmogPortableCommand, SEC_MODERATOR, Console::No },
+            { "portable", HandleTransmogPortableCommand, SEC_PLAYER,    Console::No },
         };
 
         static ChatCommandTable commandTable =
@@ -304,8 +304,22 @@ public:
 
         if (Player* player = PlayerIdentifier::FromSelf(handler)->GetConnectedPlayer())
         {
+
+            if (sTransmogrification->IsTransmogPlusEnabled) {
+                ObjectGuid::LowType playerGuid = player->GetGUID().GetCounter();
+                if (sTransmogrification->isTransmogPlusPetEligible(playerGuid)) {
+                    player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
+                    return true;
+                }
+            }
+
+            if (player->GetSession()->GetSecurity() < SEC_MODERATOR) {
+                return true;
+            }
+
             player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
         }
+
         return true;
     };
 };

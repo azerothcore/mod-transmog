@@ -216,9 +216,12 @@ public:
     bool IsTransmogPlusEnabled;
     std::vector<uint32> MembershipIds;
     std::vector<uint32> MembershipIdsLegendary;
+    std::vector<uint32> MembershipIdsPet;
+
+    uint32 getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const;
     bool isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const;
     bool isPlusLegendaryEligible(ObjectGuid::LowType playerGuid) const;
-    uint32 getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const;
+    bool isTransmogPlusPetEligible(ObjectGuid::LowType playerGuid) const;
 };
 #define sTransmogrification Transmogrification::instance()
 
