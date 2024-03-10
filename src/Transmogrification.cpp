@@ -1083,33 +1083,28 @@ uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid::LowType playerGu
         uint32 accountId = (*result)[0].Get<uint32>();
         QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
 
-        if (resultAcc) {
+        if (resultAcc)
             return (*resultAcc)[0].Get<uint32>();
-        }
     }
 
     return 0;
 }
 
 bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const {
-    if (!IsTransmogPlusEnabled) {
+    if (!IsTransmogPlusEnabled)
         return false;
-    }
 
-    if (MembershipIds.size() == 0) {
+    if (MembershipIds.size() == 0)
         return false;
-    }
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0) {
+    if (membershipLevel == 0)
         return false;
-    }
 
     for (const auto& itr : MembershipIds)
     {
-        if (itr == membershipLevel) {
+        if (itr == membershipLevel)
             return true;
-        }
     }
 
     return false;
@@ -1117,24 +1112,20 @@ bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid)
 
 
 bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid) const {
-    if (!IsTransmogPlusEnabled) {
+    if (!IsTransmogPlusEnabled)
         return false;
-    }
 
-    if (MembershipIdsLegendary.size() == 0) {
+    if (MembershipIdsLegendary.size() == 0)
         return false;
-    }
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0) {
+    if (membershipLevel == 0)
         return false;
-    }
 
     for (const auto& itr : MembershipIdsLegendary)
     {
-        if (itr == membershipLevel) {
+        if (itr == membershipLevel)
             return true;
-        }
     }
 
     return false;
@@ -1142,20 +1133,17 @@ bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid)
 
 
 bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid::LowType playerGuid) const {
-    if (MembershipIdsPet.size() == 0) {
+    if (MembershipIdsPet.size() == 0)
         return false;
-    }
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0) {
+    if (membershipLevel == 0)
         return false;
-    }
 
     for (const auto& itr : MembershipIdsPet)
     {
-        if (itr == membershipLevel) {
+        if (itr == membershipLevel)
             return true;
-        }
     }
 
     return false;
