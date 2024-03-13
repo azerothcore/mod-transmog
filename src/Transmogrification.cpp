@@ -722,7 +722,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!IsItemTransmogrifiable(proto, player->GetGUID().GetCounter()))
+    if (!IsItemTransmogrifiable(proto, player->GetGUID()))
         return false;
 
     //[AZTH] Yehonal
@@ -782,10 +782,10 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (IsAllowed(proto->ItemId))
         return true;
 
-    auto playerGuid = guid.GetCounter();
-    if (!IsItemTransmogrifiable(proto, playerGuid))
+    if (!IsItemTransmogrifiable(proto, guid))
         return false;
 
+    auto playerGuid = guid.GetCounter();
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
     if (!playerData)
         return false;
@@ -855,7 +855,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     return true;
 }
 
-bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid::LowType playerGuid) const
+bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid const &playerGuid) const
 {
     if (!proto)
         return false;
@@ -919,7 +919,7 @@ bool Transmogrification::IsNotAllowed(uint32 entry) const
     return NotAllowed.find(entry) != NotAllowed.end();
 }
 
-bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid::LowType playerGuid) const
+bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid const &playerGuid) const
 {
     switch (quality)
     {
@@ -1076,21 +1076,21 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
 }
 
-uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const {
-    QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", playerGuid);
+uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGuid) const {
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
+    if (!playerData)
+        return 0;
 
-    if (result) {
-        uint32 accountId = (*result)[0].Get<uint32>();
-        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+    uint32 accountId = playerData->AccountId;
+    QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
 
-        if (resultAcc)
-            return (*resultAcc)[0].Get<uint32>();
-    }
+    if (resultAcc)
+        return (*resultAcc)[0].Get<uint32>();
 
     return 0;
 }
 
-bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const {
+bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid const &playerGuid) const {
     if (!IsTransmogPlusEnabled)
         return false;
 
@@ -1111,7 +1111,7 @@ bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid)
 }
 
 
-bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid) const {
+bool Transmogrification::isPlusLegendaryEligible(ObjectGuid const & playerGuid) const {
     if (!IsTransmogPlusEnabled)
         return false;
 
@@ -1132,7 +1132,7 @@ bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid)
 }
 
 
-bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid::LowType playerGuid) const {
+bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid const & playerGuid) const {
     if (MembershipIdsPet.size() == 0)
         return false;
 

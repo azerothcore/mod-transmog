@@ -306,8 +306,7 @@ public:
         {
 
             if (sTransmogrification->IsTransmogPlusEnabled) {
-                ObjectGuid::LowType playerGuid = player->GetGUID().GetCounter();
-                if (sTransmogrification->isTransmogPlusPetEligible(playerGuid)) {
+                if (sTransmogrification->isTransmogPlusPetEligible(player->GetGUID())) {
                     player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
                     return true;
                 }

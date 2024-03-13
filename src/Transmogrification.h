@@ -161,7 +161,7 @@ public:
 
     bool IsAllowed(uint32 entry) const;
     bool IsNotAllowed(uint32 entry) const;
-    bool IsAllowedQuality(uint32 quality, ObjectGuid::LowType playerGuid) const;
+    bool IsAllowedQuality(uint32 quality, ObjectGuid const & playerGuid) const;
     bool IsRangedWeapon(uint32 Class, uint32 SubClass) const;
     bool CanNeverTransmog(ItemTemplate const* itemTemplate);
 
@@ -184,7 +184,7 @@ public:
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     bool SuitableForTransmogrification(ObjectGuid guid, ItemTemplate const* proto) const;
-    bool IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid::LowType playerGuid) const;
+    bool IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid const &playerGuid) const;
     uint32 GetSpecialPrice(ItemTemplate const* proto) const;
 
     void DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans = nullptr);
@@ -218,10 +218,10 @@ public:
     std::vector<uint32> MembershipIdsLegendary;
     std::vector<uint32> MembershipIdsPet;
 
-    uint32 getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const;
-    bool isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const;
-    bool isPlusLegendaryEligible(ObjectGuid::LowType playerGuid) const;
-    bool isTransmogPlusPetEligible(ObjectGuid::LowType playerGuid) const;
+    uint32 getPlayerMembershipLevel(ObjectGuid const & playerGuid) const;
+    bool isPlusWhiteGreyEligible(ObjectGuid const & playerGuid) const;
+    bool isPlusLegendaryEligible(ObjectGuid const & playerGuid) const;
+    bool isTransmogPlusPetEligible(ObjectGuid const & playerGuid) const;
 };
 #define sTransmogrification Transmogrification::instance()
 
