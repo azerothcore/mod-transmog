@@ -722,7 +722,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (IsAllowed(proto->ItemId))
         return true;
 
-    if (!IsItemTransmogrifiable(proto, player->GetGUID().GetCounter()))
+    if (!IsItemTransmogrifiable(proto, player->GetGUID()))
         return false;
 
     //[AZTH] Yehonal
@@ -782,10 +782,10 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     if (IsAllowed(proto->ItemId))
         return true;
 
-    auto playerGuid = guid.GetCounter();
-    if (!IsItemTransmogrifiable(proto, playerGuid))
+    if (!IsItemTransmogrifiable(proto, guid))
         return false;
 
+    auto playerGuid = guid.GetCounter();
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
     if (!playerData)
         return false;
@@ -855,7 +855,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
     return true;
 }
 
-bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid::LowType playerGuid) const
+bool Transmogrification::IsItemTransmogrifiable(ItemTemplate const* proto, ObjectGuid const &playerGuid) const
 {
     if (!proto)
         return false;
@@ -919,7 +919,7 @@ bool Transmogrification::IsNotAllowed(uint32 entry) const
     return NotAllowed.find(entry) != NotAllowed.end();
 }
 
-bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid::LowType playerGuid) const
+bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid const &playerGuid) const
 {
     switch (quality)
     {
@@ -1053,6 +1053,11 @@ void Transmogrification::LoadConfig(bool reload)
     for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
         MembershipIdsLegendary.push_back(Acore::StringTo<uint32>(itr).value());
     }
+
+    stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevelsPet", "");
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
+        MembershipIdsPet.push_back(Acore::StringTo<uint32>(itr).value());
+    }
 }
 
 void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans /*= nullptr*/)
@@ -1071,68 +1076,77 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
 }
 
-bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid::LowType playerGuid) const {
-    if (!IsTransmogPlusEnabled) {
-        return false;
-    }
+uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGuid) const {
+    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
+    if (!playerData)
+        return 0;
 
-    if (MembershipIds.size() == 0) {
+    uint32 accountId = playerData->AccountId;
+    QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+
+    if (resultAcc)
+        return (*resultAcc)[0].Get<uint32>();
+
+    return 0;
+}
+
+bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid const &playerGuid) const {
+    if (!IsTransmogPlusEnabled)
         return false;
-    }
+
+    if (MembershipIds.size() == 0)
+        return false;
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0) {
+    if (membershipLevel == 0)
         return false;
-    }
 
     for (const auto& itr : MembershipIds)
     {
-        if (itr == membershipLevel) {
+        if (itr == membershipLevel)
             return true;
-        }
     }
 
     return false;
 }
 
 
-bool Transmogrification::isPlusLegendaryEligible(ObjectGuid::LowType playerGuid) const {
-    if (!IsTransmogPlusEnabled) {
+bool Transmogrification::isPlusLegendaryEligible(ObjectGuid const & playerGuid) const {
+    if (!IsTransmogPlusEnabled)
         return false;
-    }
 
-    if (MembershipIdsLegendary.size() == 0) {
+    if (MembershipIdsLegendary.size() == 0)
         return false;
-    }
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0) {
+    if (membershipLevel == 0)
         return false;
-    }
 
     for (const auto& itr : MembershipIdsLegendary)
     {
-        if (itr == membershipLevel) {
+        if (itr == membershipLevel)
             return true;
-        }
     }
 
     return false;
 }
 
-uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid::LowType playerGuid) const {
-    QueryResult result = CharacterDatabase.Query("SELECT `account` FROM `characters` WHERE `guid` = {}", playerGuid);
 
-    if (result) {
-        uint32 accountId = (*result)[0].Get<uint32>();
-        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid const & playerGuid) const {
+    if (MembershipIdsPet.size() == 0)
+        return false;
 
-        if (resultAcc) {
-            return (*resultAcc)[0].Get<uint32>();
-        }
+    const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
+    if (membershipLevel == 0)
+        return false;
+
+    for (const auto& itr : MembershipIdsPet)
+    {
+        if (itr == membershipLevel)
+            return true;
     }
 
-    return 0;
+    return false;
 }
 
 bool Transmogrification::GetEnableTransmogInfo() const
