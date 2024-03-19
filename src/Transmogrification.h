@@ -63,11 +63,6 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
     LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
 };
 
-enum TransmogSpells
-{
-    SPELL_SUMMON_ETHEREAL_WARPWEAVER = 2000100
-};
-
 class Transmogrification
 {
 public:
@@ -101,6 +96,8 @@ public:
     uint8 MaxSets;
     float SetCostModifier;
     int32 SetCopperCost;
+
+    uint32 PetSpellId;
 
     bool GetEnableSets() const;
     uint8 GetMaxSets() const;

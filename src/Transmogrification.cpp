@@ -1058,6 +1058,8 @@ void Transmogrification::LoadConfig(bool reload)
     for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
         MembershipIdsPet.push_back(Acore::StringTo<uint32>(itr).value());
     }
+
+    PetSpellId = sConfigMgr->GetOption<uint32>("Transmogrification.PetSpellId", 2000100);
 }
 
 void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans /*= nullptr*/)
