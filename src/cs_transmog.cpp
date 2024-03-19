@@ -307,7 +307,7 @@ public:
 
             if (sTransmogrification->IsTransmogPlusEnabled) {
                 if (sTransmogrification->isTransmogPlusPetEligible(player->GetGUID())) {
-                    player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
+                    player->CastSpell((Unit*)nullptr, sTransmogrification->PetSpellId, true);
                     return true;
                 }
             }
@@ -316,7 +316,7 @@ public:
                 return true;
             }
 
-            player->CastSpell((Unit*)nullptr, SPELL_SUMMON_ETHEREAL_WARPWEAVER, true);
+            player->CastSpell((Unit*)nullptr, sTransmogrification->PetSpellId, true);
         }
 
         return true;

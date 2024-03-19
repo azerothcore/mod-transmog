@@ -956,6 +956,8 @@ void Transmogrification::LoadConfig(bool reload)
     SetCostModifier = sConfigMgr->GetOption<float>("Transmogrification.SetCostModifier", 3.0f);
     SetCopperCost = sConfigMgr->GetOption<int32>("Transmogrification.SetCopperCost", 0);
 
+    PetSpellId = sConfigMgr->GetOption<uint32>("Transmogrification.PetSpellId", 2000100);
+
     if (MaxSets > MAX_OPTIONS)
         MaxSets = MAX_OPTIONS;
 
