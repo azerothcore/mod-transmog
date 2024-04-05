@@ -1118,7 +1118,7 @@ class unit_transmog_script : public UnitScript
 public:
     unit_transmog_script() : UnitScript("unit_transmog_script") { }
 
-    bool ShouldTrackValuesUpdatePosByIndex(Unit const* unit, uint8 updateType, uint16 index) override
+    bool ShouldTrackValuesUpdatePosByIndex(Unit const* unit, uint8 /*updateType*/, uint16 index) override
     {
         if (unit->IsPlayer() && index >= PLAYER_VISIBLE_ITEM_1_ENTRYID && index <= PLAYER_VISIBLE_ITEM_19_ENTRYID && (index & 1))
             return true;
