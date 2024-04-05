@@ -1118,13 +1118,13 @@ class unit_transmog_script : public UnitScript
 public:
     unit_transmog_script() : UnitScript("unit_transmog_script") { }
 
-    bool OnBuildValuesUpdate(Unit const* unit, uint8 /*updateType*/, ByteBuffer& fieldBuffer, Player* target, uint16 index) override
+    bool IsCustomBuildValuesUpdate(Unit const* unit, uint8 /*updateType*/, ByteBuffer& fieldBuffer, Player const* target, uint16 index) override
     {
         if (unit->IsPlayer() && index >= PLAYER_VISIBLE_ITEM_1_ENTRYID && index <= PLAYER_VISIBLE_ITEM_19_ENTRYID && (index & 1))
         {
             if (Item* item = unit->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, ((index - PLAYER_VISIBLE_ITEM_1_ENTRYID) / 2U)))
             {
-                if (!sTransmogrification->IsEnabled() || target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
+                if (!sTransmogrification->IsEnabled() || const_cast<Player*>(target)->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value)
                 {
                     fieldBuffer << item->GetEntry();
                     return true;
