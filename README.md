@@ -39,13 +39,9 @@ git clone https://github.com/azerothcore/mod-transmog.git
 
 or you can manually [download the module](https://github.com/azerothcore/mod-transmog/archive/master.zip), unzip the Transmog folder and place it under the `azerothcore/modules` directory.
 
-### 2) Import the SQL to the right Database (auth, world or characters)
+### 2) Re-run cmake and launch a clean build of AzerothCore
 
-Import the SQL manually to the right Database (auth, world or characters) or with the `db_assembler.sh` (if `include.sh` provided).
-
-### 3) Re-run cmake and launch a clean build of AzerothCore
-
-### 4) Place transmog npc
+### 3) Place transmog npc
 
 With a gm account goto the location you want to add the npc and use this command:
 
