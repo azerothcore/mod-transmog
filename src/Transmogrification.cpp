@@ -389,7 +389,7 @@ std::string Transmogrification::GetItemLink(Item* item, WorldSession* session) c
         item->GetEnchantmentId(SOCK_ENCHANTMENT_SLOT_3) << ":" <<
         item->GetEnchantmentId(BONUS_ENCHANTMENT_SLOT) << ":" <<
         item->GetItemRandomPropertyId() << ":" << item->GetItemSuffixFactor() << ":" <<
-//        (uint32)item->GetOwner()->getLevel() << "|h[" << name << "]|h|r";
+//        (uint32)item->GetOwner()->GetLevel() << "|h[" << name << "]|h|r";
         (uint32)0 << "|h[" << name << "]|h|r";
 
     return oss.str();
@@ -760,7 +760,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
             return false;
     }
 
-    if (!IgnoreReqLevel && player->getLevel() < proto->RequiredLevel)
+    if (!IgnoreReqLevel && player->GetLevel() < proto->RequiredLevel)
         return false;
 
     if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !player->HasSpell(proto->RequiredSpell))
