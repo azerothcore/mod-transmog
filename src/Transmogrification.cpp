@@ -902,7 +902,7 @@ bool Transmogrification::TierAvailable(Player *player, int playerGuid, uint32 ti
     if (!player && !playerGuid) return false;
     if (!IsTieredArmorSubclass(tier)) return false;
 
-    uint32 playerHighest;
+    uint32 playerHighest = ITEM_SUBCLASS_ARMOR_CLOTH;
     if (player)
         playerHighest = GetHighestAvailableForPlayer(player);
     else if (playerGuid)
