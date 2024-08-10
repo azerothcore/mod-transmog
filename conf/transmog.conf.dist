@@ -88,7 +88,7 @@ Transmogrification.EnablePortable = 1
 #
 #    For custom gold cost set ScaledCostModifier to 0.0 and CopperCost to what ever cost you want
 
-Transmogrification.ScaledCostModifier = 0
+Transmogrification.ScaledCostModifier = 1.0
 Transmogrification.CopperCost = 0
 
 #
@@ -205,21 +205,21 @@ Transmogrification.TokenAmount = 1
 #        Description: Ignore stat count > 0 requirement for source items
 #        Default:    0
 
-Transmogrification.AllowPoor = 1
-Transmogrification.AllowCommon = 1
+Transmogrification.AllowPoor = 0
+Transmogrification.AllowCommon = 0
 Transmogrification.AllowUncommon = 1
 Transmogrification.AllowRare = 1
 Transmogrification.AllowEpic = 1
-Transmogrification.AllowLegendary = 1
-Transmogrification.AllowArtifact = 1
+Transmogrification.AllowLegendary = 0
+Transmogrification.AllowArtifact = 0
 Transmogrification.AllowHeirloom = 1
 Transmogrification.AllowTradeable = 0
 
 Transmogrification.AllowMixedArmorTypes = 0
 Transmogrification.AllowLowerTiers = 0
 Transmogrification.AllowMixedOffhandArmorTypes = 0
-Transmogrification.AllowMixedWeaponTypes = 1
-Transmogrification.AllowMixedWeaponHandedness = 1
+Transmogrification.AllowMixedWeaponTypes = 0
+Transmogrification.AllowMixedWeaponHandedness = 0
 Transmogrification.AllowFishingPoles = 0
 
 Transmogrification.IgnoreReqRace = 0
@@ -263,7 +263,7 @@ Transmogrification.MaxSets = 10
 Transmogrification.EnableSetInfo = 1
 Transmogrification.SetNpcText = 601084
 
-Transmogrification.SetCostModifier = 0
+Transmogrification.SetCostModifier = 3.0
 Transmogrification.SetCopperCost = 0
 
 #
