@@ -63,6 +63,30 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
     LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
 };
 
+enum ArmorClassSpellIDs
+{
+    SPELL_PLATE   = 750,
+    SPELL_MAIL    = 8737,
+    SPELL_LEATHER = 9077,
+    SPELL_CLOTH   = 9078
+};
+
+const uint32 AllArmorSpellIds[4] =
+{
+    SPELL_PLATE,
+    SPELL_MAIL,
+    SPELL_LEATHER,
+    SPELL_CLOTH
+};
+
+const uint32 AllArmorTiers[4] =
+{
+    ITEM_SUBCLASS_ARMOR_PLATE,
+    ITEM_SUBCLASS_ARMOR_MAIL,
+    ITEM_SUBCLASS_ARMOR_LEATHER,
+    ITEM_SUBCLASS_ARMOR_CLOTH
+};
+
 class Transmogrification
 {
 public:
@@ -134,6 +158,8 @@ public:
     bool AllowTradeable;
 
     bool AllowMixedArmorTypes;
+    bool AllowLowerTiers;
+    bool AllowMixedOffhandArmorTypes;
     bool AllowMixedWeaponHandedness;
     bool AllowFishingPoles;
 
@@ -193,6 +219,8 @@ public:
     uint32 GetTokenAmount() const;
 
     bool GetAllowMixedArmorTypes() const;
+    bool GetAllowLowerTiers() const;
+    bool GetAllowMixedOffhandArmorTypes() const;
     uint8 GetAllowMixedWeaponTypes() const;
 
     // Config
@@ -208,6 +236,14 @@ public:
     bool EnableRetroActiveAppearances() const;
     bool EnableResetRetroActiveAppearances() const;
     [[nodiscard]] bool IsEnabled() const;
+
+    bool IsOffhandArmorSubclass(uint32 subclass) const;
+    bool IsTieredArmorSubclass(uint32 subclass) const;
+
+    uint32 GetHighestAvailableForPlayer(Player* player) const;
+    uint32 GetHighestAvailableForPlayer(int playerGuid) const;
+
+    bool TierAvailable(Player* player, int playerGuid, uint32 tierSpell) const;
 
     // Transmog Plus
     bool IsTransmogPlusEnabled;
