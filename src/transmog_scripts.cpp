@@ -21,6 +21,7 @@ Cant transmogrify rediculus items // Foereaper: would be fun to stab people with
 */
 #include <unordered_map>
 #include "Transmogrification.h"
+#include "Chat.h"
 #include "ScriptedCreature.h"
 #include "ItemTemplate.h"
 #include "DatabaseEnv.h"
@@ -442,7 +443,7 @@ public:
                     CharacterDatabase.CommitTransaction(trans);
                 }
                 else
-                    session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
+                    ChatHandler(session).SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
                 OnGossipHello(player, creature);
             } break;
             case EQUIPMENT_SLOT_END + 3: // Remove Transmogrification from single item
@@ -455,7 +456,7 @@ public:
                         session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
                     }
                     else
-                        session->SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
+                        ChatHandler(session).SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
                 }
                 OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, action);
             } break;
@@ -582,7 +583,7 @@ public:
                     if (res == LANG_ERR_TRANSMOG_OK)
                         session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                     else
-                        session->SendNotification(res);
+                        ChatHandler(session).SendNotification(res);
                 }
                 else
                 {
@@ -590,7 +591,7 @@ public:
                     if (res == LANG_ERR_TRANSMOG_OK)
                         session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
                     else
-                        session->SendNotification(res);
+                        ChatHandler(session).SendNotification(res);
                 }
                 // OnGossipSelect(player, creature, EQUIPMENT_SLOT_END, sender);
                 // ShowTransmogItems(player, creature, sender);
