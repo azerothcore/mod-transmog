@@ -644,7 +644,7 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
                     {
                         return false;
                     }
-                    if (isValidTierCheck && (!IsTieredArmorSubclass(source->SubClass) || !TierAvailable(player, NULL, source->SubClass)))
+                    if (isValidTierCheck && (!IsTieredArmorSubclass(source->SubClass) || !TierAvailable(player, 0, source->SubClass)))
                     {
                         return false;
                     }
@@ -719,10 +719,8 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
         ))
             return false;
 
-        // Rewrite of below
         if (source->Class == ITEM_CLASS_ARMOR)
         {
-            //if (AllowMixedOffhandArmorTypes && ((source->InventoryType == INVTYPE_SHIELD || source->InventoryType == INVTYPE_HOLDABLE) && (target->InventoryType == INVTYPE_SHIELD || target->InventoryType == INVTYPE_HOLDABLE)))
             if (AllowMixedOffhandArmorTypes && ((source->InventoryType == INVTYPE_SHIELD || source->InventoryType == INVTYPE_HOLDABLE) && (target->InventoryType == INVTYPE_SHIELD || target->InventoryType == INVTYPE_HOLDABLE)))
                 return true;
 
@@ -799,7 +797,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
     if (!IgnoreReqLevel && player->GetLevel() < proto->RequiredLevel)
         return false;
 
-    if (AllowLowerTiers && TierAvailable(player, NULL, proto->SubClass))
+    if (AllowLowerTiers && TierAvailable(player, 0, proto->SubClass))
         return true;
 
     if (!IgnoreReqSpell && proto->RequiredSpell != 0 && !player->HasSpell(proto->RequiredSpell))
