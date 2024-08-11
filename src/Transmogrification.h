@@ -237,13 +237,16 @@ public:
     bool EnableResetRetroActiveAppearances() const;
     [[nodiscard]] bool IsEnabled() const;
 
-    bool IsOffhandArmorSubclass(uint32 subclass) const;
+    bool IsValidOffhandArmor(uint32 subclass, uint32 invType) const;
     bool IsTieredArmorSubclass(uint32 subclass) const;
 
     uint32 GetHighestAvailableForPlayer(Player* player) const;
     uint32 GetHighestAvailableForPlayer(int playerGuid) const;
 
     bool TierAvailable(Player* player, int playerGuid, uint32 tierSpell) const;
+    
+    bool IsInvTypeMismatchAllowed (const ItemTemplate *source, const ItemTemplate *target) const;
+    bool IsSubclassMismatchAllowed (Player *player, const ItemTemplate *source, const ItemTemplate *target) const;
 
     // Transmog Plus
     bool IsTransmogPlusEnabled;

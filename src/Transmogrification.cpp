@@ -625,116 +625,109 @@ bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplat
     if (IsRangedWeapon(source->Class, source->SubClass) != IsRangedWeapon(target->Class, target->SubClass))
         return false;
 
-    if (source->SubClass != target->SubClass && !IsRangedWeapon(target->Class, target->SubClass))
-    {
-        if (!IsAllowed(source->ItemId))
-        {
-            if (source->Class == ITEM_CLASS_ARMOR)
-            {
-                if (!AllowMixedArmorTypes)
-                {
-                    bool isValidTierCheck = AllowLowerTiers && IsTieredArmorSubclass(target->SubClass);
-                    bool isValidOffhandCheck = AllowMixedOffhandArmorTypes && IsOffhandArmorSubclass(target->SubClass);
+    if (source->SubClass != target->SubClass && !IsSubclassMismatchAllowed(player, source, target))
+        return false;
 
-                    if (!isValidTierCheck && !isValidOffhandCheck)
-                    {
-                        return false;
-                    }
-                    if (isValidOffhandCheck && !IsOffhandArmorSubclass(source->SubClass))
-                    {
-                        return false;
-                    }
-                    if (isValidTierCheck && (!IsTieredArmorSubclass(source->SubClass) || !TierAvailable(player, 0, source->SubClass)))
-                    {
-                        return false;
-                    }
-                }
-            }
-            else if (source->Class == ITEM_CLASS_WEAPON)
-            {
-                if (AllowMixedWeaponTypes == MIXED_WEAPONS_STRICT)
-                {
-                    return false;
-                }
-                if (AllowMixedWeaponTypes == MIXED_WEAPONS_MODERN)
-                {
-                    switch (source->SubClass)
-                    {
-                        case ITEM_SUBCLASS_WEAPON_WAND:
-                        case ITEM_SUBCLASS_WEAPON_DAGGER:
-                        case ITEM_SUBCLASS_WEAPON_FIST:
-                            return false;
-                        case ITEM_SUBCLASS_WEAPON_AXE:
-                        case ITEM_SUBCLASS_WEAPON_SWORD:
-                        case ITEM_SUBCLASS_WEAPON_MACE:
-                            if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD)
-                            {
-                                return false;
-                            }
-                            break;
-                        case ITEM_SUBCLASS_WEAPON_AXE2:
-                        case ITEM_SUBCLASS_WEAPON_SWORD2:
-                        case ITEM_SUBCLASS_WEAPON_MACE2:
-                        case ITEM_SUBCLASS_WEAPON_STAFF:
-                        case ITEM_SUBCLASS_WEAPON_POLEARM:
-                            if (target->SubClass != ITEM_SUBCLASS_WEAPON_MACE2 &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_AXE2 &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_STAFF &&
-                                target->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM)
-                            {
-                                return false;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-        }
-    }
-
-    if (source->InventoryType != target->InventoryType)
-    {
-
-        // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
-        if (!AllowMixedWeaponHandedness && AllowMixedWeaponTypes != MIXED_WEAPONS_LOOSE)
-        {
-            if ((source->InventoryType == INVTYPE_WEAPONMAINHAND && target->InventoryType != INVTYPE_WEAPONMAINHAND) ||
-                (source->InventoryType == INVTYPE_WEAPONOFFHAND && target->InventoryType != INVTYPE_WEAPONOFFHAND))
-            {
-                return false;
-            }
-
-        }
-
-        if (source->Class == ITEM_CLASS_WEAPON && !(IsRangedWeapon(target->Class, target->SubClass) ||
-            (
-                // [AZTH] Yehonal: fixed weapon check
-                (target->InventoryType == INVTYPE_WEAPON || target->InventoryType == INVTYPE_2HWEAPON || target->InventoryType == INVTYPE_WEAPONMAINHAND || target->InventoryType == INVTYPE_WEAPONOFFHAND)
-                && (source->InventoryType == INVTYPE_WEAPON || source->InventoryType == INVTYPE_2HWEAPON || source->InventoryType == INVTYPE_WEAPONMAINHAND || source->InventoryType == INVTYPE_WEAPONOFFHAND)
-            )
-        ))
-            return false;
-
-        if (source->Class == ITEM_CLASS_ARMOR)
-        {
-            if (AllowMixedOffhandArmorTypes && ((source->InventoryType == INVTYPE_SHIELD || source->InventoryType == INVTYPE_HOLDABLE) && (target->InventoryType == INVTYPE_SHIELD || target->InventoryType == INVTYPE_HOLDABLE)))
-                return true;
-
-            if (!((source->InventoryType == INVTYPE_CHEST || source->InventoryType == INVTYPE_ROBE) && (target->InventoryType == INVTYPE_CHEST || target->InventoryType == INVTYPE_ROBE)))
-                return false;
-        }
-    }
+    if (source->InventoryType != target->InventoryType && !IsInvTypeMismatchAllowed(source, target))
+        return false;
 
     return true;
 }
 
-bool Transmogrification::IsOffhandArmorSubclass(uint32 subclass) const
+bool Transmogrification::IsSubclassMismatchAllowed(Player *player, const ItemTemplate *source, const ItemTemplate *target) const
 {
-    return subclass == ITEM_SUBCLASS_ARMOR_BUCKLER || subclass == ITEM_SUBCLASS_ARMOR_MISC || subclass == ITEM_SUBCLASS_ARMOR_SHIELD;
+    if (IsAllowed(source->ItemId)) return true;
+    
+    uint32 sourceType  = source->InventoryType;
+    uint32 targetType  = target->InventoryType;
+    uint32 sourceClass = source->Class;
+    uint32 targetClass = target->Class;
+    uint32 sourceSub   = source->SubClass;
+    uint32 targetSub   = target->SubClass;
+    
+    if (targetClass == ITEM_CLASS_WEAPON)
+    {
+        if (IsRangedWeapon(sourceClass, sourceSub))
+            return true;
+            
+        if (AllowMixedWeaponTypes == MIXED_WEAPONS_MODERN)
+        {
+            switch (targetSub)
+            {
+                case ITEM_SUBCLASS_WEAPON_AXE:
+                case ITEM_SUBCLASS_WEAPON_SWORD:
+                case ITEM_SUBCLASS_WEAPON_MACE:
+                    if (sourceSub == ITEM_SUBCLASS_WEAPON_AXE   || 
+                        sourceSub == ITEM_SUBCLASS_WEAPON_SWORD || 
+                        sourceSub == ITEM_SUBCLASS_WEAPON_MACE   )
+                        return true;
+                    break;
+                case ITEM_SUBCLASS_WEAPON_AXE2:
+                case ITEM_SUBCLASS_WEAPON_SWORD2:
+                case ITEM_SUBCLASS_WEAPON_MACE2:
+                case ITEM_SUBCLASS_WEAPON_STAFF:
+                case ITEM_SUBCLASS_WEAPON_POLEARM:
+                    if (sourceSub == ITEM_SUBCLASS_WEAPON_AXE2   || 
+                        sourceSub == ITEM_SUBCLASS_WEAPON_SWORD2 || 
+                        sourceSub == ITEM_SUBCLASS_WEAPON_MACE2  ||
+                        sourceSub == ITEM_SUBCLASS_WEAPON_STAFF  ||
+                        sourceSub == ITEM_SUBCLASS_WEAPON_POLEARM )
+                        return true;
+                    break;        
+            }
+        }
+    }
+    else if (targetClass == ITEM_CLASS_ARMOR)
+    {
+        if (AllowMixedArmorTypes)
+            return true;
+        if (AllowLowerTiers && IsTieredArmorSubclass(targetSub) && TierAvailable(player, 0, sourceSub)) 
+            return true;
+        if (AllowMixedOffhandArmorTypes && IsValidOffhandArmor(targetSub, targetType) && IsValidOffhandArmor(sourceSub, sourceType))
+            return true;
+        //Fix for #147, allow misc subclass sources if the types (e.g Helm and Helm) match. https://github.com/azerothcore/mod-transmog/issues/147
+        if (sourceSub == ITEM_SUBCLASS_ARMOR_MISC)
+            return sourceType == targetType;
+    }
+    
+    return false;
+}
+
+bool Transmogrification::IsInvTypeMismatchAllowed(const ItemTemplate *source, const ItemTemplate *target) const
+{    
+    uint32 sourceType  = source->InventoryType;
+    uint32 targetType  = target->InventoryType;
+    uint32 sourceClass = source->Class;
+    uint32 targetClass = target->Class;
+    uint32 sourceSub   = source->SubClass;
+    uint32 targetSub   = target->SubClass;
+
+    if (targetClass == ITEM_CLASS_WEAPON)
+    {
+        if (IsRangedWeapon(sourceClass, sourceSub))
+            return true;
+            
+        // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
+        if (targetType == INVTYPE_WEAPONMAINHAND || targetType == INVTYPE_WEAPONOFFHAND)
+        {
+            if (sourceType == INVTYPE_WEAPONMAINHAND || sourceType == INVTYPE_WEAPONOFFHAND)
+                return (AllowMixedWeaponHandedness || AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE);
+        }
+    }
+    else if (targetClass == ITEM_CLASS_ARMOR)
+    {
+        if (AllowMixedOffhandArmorTypes && IsValidOffhandArmor(targetSub, targetType) && IsValidOffhandArmor(sourceSub, sourceType))
+            return true;
+        if (targetType == INVTYPE_CHEST || targetType == INVTYPE_ROBE)
+            return sourceType == INVTYPE_CHEST || sourceType == INVTYPE_ROBE;
+    }
+    
+    return false;
+}
+
+bool Transmogrification::IsValidOffhandArmor(uint32 subclass, uint32 invType) const
+{
+    return subclass == ITEM_SUBCLASS_ARMOR_BUCKLER || (subclass == ITEM_SUBCLASS_ARMOR_MISC && invType == INVTYPE_HOLDABLE) || subclass == ITEM_SUBCLASS_ARMOR_SHIELD;
 }
 
 bool Transmogrification::IsTieredArmorSubclass(uint32 subclass) const
