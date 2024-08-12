@@ -685,7 +685,6 @@ bool Transmogrification::IsSubclassMismatchAllowed(Player *player, const ItemTem
             return true;
         if (AllowMixedOffhandArmorTypes && IsValidOffhandArmor(targetSub, targetType) && IsValidOffhandArmor(sourceSub, sourceType))
             return true;
-        //Fix for #147, allow misc subclass sources if the types (e.g Helm and Helm) match. https://github.com/azerothcore/mod-transmog/issues/147
         if (sourceSub == ITEM_SUBCLASS_ARMOR_MISC)
             return sourceType == targetType;
     }
