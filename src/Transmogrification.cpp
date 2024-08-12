@@ -713,6 +713,8 @@ bool Transmogrification::IsInvTypeMismatchAllowed(const ItemTemplate *source, co
         // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
         if (targetType == INVTYPE_WEAPONMAINHAND || targetType == INVTYPE_WEAPONOFFHAND)
         {
+            if (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE)
+                return true;
             if (sourceType == INVTYPE_WEAPONMAINHAND || sourceType == INVTYPE_WEAPONOFFHAND)
                 return (AllowMixedWeaponHandedness || AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE);
         }
