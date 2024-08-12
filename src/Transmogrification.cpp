@@ -676,6 +676,10 @@ bool Transmogrification::IsSubclassMismatchAllowed(Player *player, const ItemTem
                     break;        
             }
         }
+        else if (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE)
+        {
+            return true;
+        }
     }
     else if (targetClass == ITEM_CLASS_ARMOR)
     {
