@@ -87,6 +87,13 @@ const uint32 AllArmorTiers[4] =
     ITEM_SUBCLASS_ARMOR_CLOTH
 };
 
+enum PlusFeatures
+{
+    PLUS_FEATURE_GREY_ITEMS,
+    PLUS_FEATURE_LEGENDARY_ITEMS,
+    PLUS_FEATURE_PET
+};
+
 class Transmogrification
 {
 public:
@@ -97,6 +104,8 @@ public:
     typedef std::unordered_map<ObjectGuid, transmog2Data> transmogMap;
     typedef std::unordered_map<uint32, std::vector<uint32>> collectionCacheMap;
     typedef std::unordered_map<uint32, std::string> searchStringMap;
+    typedef std::unordered_map<uint32, std::vector<uint32>> transmogPlusData;
+    transmogPlusData plusDataMap;
     transmogMap entryMap; // entryMap[pGUID][iGUID] = entry
     transmogData dataMap; // dataMap[iGUID] = pGUID
     collectionCacheMap collectionCache;
@@ -250,14 +259,9 @@ public:
 
     // Transmog Plus
     bool IsTransmogPlusEnabled;
-    std::vector<uint32> MembershipIds;
-    std::vector<uint32> MembershipIdsLegendary;
-    std::vector<uint32> MembershipIdsPet;
-
+    [[nodiscard]] bool IsPlusFeatureEligible(ObjectGuid const& playerGuid, uint32 feature) const;
     uint32 getPlayerMembershipLevel(ObjectGuid const & playerGuid) const;
-    bool isPlusWhiteGreyEligible(ObjectGuid const & playerGuid) const;
-    bool isPlusLegendaryEligible(ObjectGuid const & playerGuid) const;
-    bool isTransmogPlusPetEligible(ObjectGuid const & playerGuid) const;
+
 };
 #define sTransmogrification Transmogrification::instance()
 
