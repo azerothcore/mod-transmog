@@ -91,7 +91,8 @@ enum PlusFeatures
 {
     PLUS_FEATURE_GREY_ITEMS,
     PLUS_FEATURE_LEGENDARY_ITEMS,
-    PLUS_FEATURE_PET
+    PLUS_FEATURE_PET,
+    PLUS_FEATURE_SKIP_LEVEL_REQ
 };
 
 class Transmogrification
