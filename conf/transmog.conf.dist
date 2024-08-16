@@ -288,6 +288,11 @@ Transmogrification.SetCopperCost = 0
 #        Example:     Transmogrification.MembershipLevelsPet = "1,2,3"
 #        Default:     ""
 #
+#    Transmogrification.MembershipLevelsSkipLevelReq
+#        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for skipping level checks when transmogfrifying
+#        Example:     Transmogrification.MembershipLevelsSkipLevelReq = "1,2,3"
+#        Default:     ""
+#
 #    Transmogrification.PetSpellId
 #        Description: The ID used by the transmog pet in the spell_dbc table
 #        Example:     Transmogrification.PetSpellId = 2000100
@@ -298,6 +303,7 @@ Transmogrification.EnablePlus = 0
 Transmogrification.MembershipLevels = ""
 Transmogrification.MembershipLevelsLegendary = ""
 Transmogrification.MembershipLevelsPet = ""
+Transmogrification.MembershipLevelsSkipLevelReq = ""
 Transmogrification.PetSpellId = 2000100
 
 #

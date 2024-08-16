@@ -792,7 +792,7 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
             return false;
     }
 
-    if (!IgnoreReqLevel && player->GetLevel() < proto->RequiredLevel)
+    if (!IgnoreReqLevel && IsPlusFeatureEligible(player->GetGUID(), PLUS_FEATURE_SKIP_LEVEL_REQ) && player->GetLevel() < proto->RequiredLevel)
         return false;
 
     if (AllowLowerTiers && TierAvailable(player, 0, proto->SubClass))
@@ -881,7 +881,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
             return false;
     }
 
-    if (!IgnoreReqLevel && playerLevel < proto->RequiredLevel)
+    if (!IgnoreReqLevel && IsPlusFeatureEligible(guid, PLUS_FEATURE_SKIP_LEVEL_REQ) && playerLevel < proto->RequiredLevel)
         return false;
 
     if (AllowLowerTiers && TierAvailable(NULL, playerGuid, proto->SubClass))
@@ -1152,6 +1152,12 @@ void Transmogrification::LoadConfig(bool reload)
     for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false))
     {
         plusDataMap[PLUS_FEATURE_PET].push_back(Acore::StringTo<uint32>(itr).value());
+    }
+
+    stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevelsSkipLevelReq", "");
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false))
+    {
+        plusDataMap[PLUS_FEATURE_SKIP_LEVEL_REQ].push_back(Acore::StringTo<uint32>(itr).value());
     }
 
     PetSpellId = sConfigMgr->GetOption<uint32>("Transmogrification.PetSpellId", 2000100);
