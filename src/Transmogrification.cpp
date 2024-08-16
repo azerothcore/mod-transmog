@@ -1011,12 +1011,12 @@ bool Transmogrification::IsAllowedQuality(uint32 quality, ObjectGuid const &play
 {
     switch (quality)
     {
-        case ITEM_QUALITY_POOR: return AllowPoor || isPlusWhiteGreyEligible(playerGuid);
-        case ITEM_QUALITY_NORMAL: return AllowCommon || isPlusWhiteGreyEligible(playerGuid);
+        case ITEM_QUALITY_POOR: return AllowPoor || IsPlusFeatureEligible(playerGuid, PLUS_FEATURE_GREY_ITEMS);
+        case ITEM_QUALITY_NORMAL: return AllowCommon || IsPlusFeatureEligible(playerGuid, PLUS_FEATURE_GREY_ITEMS);
         case ITEM_QUALITY_UNCOMMON: return AllowUncommon;
         case ITEM_QUALITY_RARE: return AllowRare;
         case ITEM_QUALITY_EPIC: return AllowEpic;
-        case ITEM_QUALITY_LEGENDARY: return AllowLegendary || isPlusLegendaryEligible(playerGuid);
+        case ITEM_QUALITY_LEGENDARY: return AllowLegendary || IsPlusFeatureEligible(playerGuid, PLUS_FEATURE_LEGENDARY_ITEMS);
         case ITEM_QUALITY_ARTIFACT: return AllowArtifact;
         case ITEM_QUALITY_HEIRLOOM: return AllowHeirloom;
         default: return false;
@@ -1134,19 +1134,24 @@ void Transmogrification::LoadConfig(bool reload)
     /* TransmogPlus */
     IsTransmogPlusEnabled = sConfigMgr->GetOption<bool>("Transmogrification.EnablePlus", false);
 
+    plusDataMap.clear();
+
     std::string stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevels", "");
-    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
-        MembershipIds.push_back(Acore::StringTo<uint32>(itr).value());
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false))
+    {
+        plusDataMap[PLUS_FEATURE_GREY_ITEMS].push_back(Acore::StringTo<uint32>(itr).value());
     }
 
     stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevelsLegendary", "");
-    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
-        MembershipIdsLegendary.push_back(Acore::StringTo<uint32>(itr).value());
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false))
+    {
+        plusDataMap[PLUS_FEATURE_LEGENDARY_ITEMS].push_back(Acore::StringTo<uint32>(itr).value());
     }
 
     stringMembershipIds = sConfigMgr->GetOption<std::string>("Transmogrification.MembershipLevelsPet", "");
-    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false)) {
-        MembershipIdsPet.push_back(Acore::StringTo<uint32>(itr).value());
+    for (auto& itr : Acore::Tokenize(stringMembershipIds, ',', false))
+    {
+        plusDataMap[PLUS_FEATURE_PET].push_back(Acore::StringTo<uint32>(itr).value());
     }
 
     PetSpellId = sConfigMgr->GetOption<uint32>("Transmogrification.PetSpellId", 2000100);
@@ -1168,7 +1173,8 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
 }
 
-uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGuid) const {
+uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGuid) const
+{
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
     if (!playerData)
         return 0;
@@ -1182,59 +1188,24 @@ uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGui
     return 0;
 }
 
-bool Transmogrification::isPlusWhiteGreyEligible(ObjectGuid const &playerGuid) const {
+bool Transmogrification::IsPlusFeatureEligible(ObjectGuid const &playerGuid, uint32 feature) const
+{
     if (!IsTransmogPlusEnabled)
         return false;
 
-    if (MembershipIds.size() == 0)
+    auto it = plusDataMap.find(feature);
+    if (it == plusDataMap.end() || it->second.empty())
         return false;
 
     const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0)
+
+    if (!membershipLevel)
         return false;
 
-    for (const auto& itr : MembershipIds)
+    const auto& membershipLevels = it->second;
+    for (const auto& level : membershipLevels)
     {
-        if (itr == membershipLevel)
-            return true;
-    }
-
-    return false;
-}
-
-
-bool Transmogrification::isPlusLegendaryEligible(ObjectGuid const & playerGuid) const {
-    if (!IsTransmogPlusEnabled)
-        return false;
-
-    if (MembershipIdsLegendary.size() == 0)
-        return false;
-
-    const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0)
-        return false;
-
-    for (const auto& itr : MembershipIdsLegendary)
-    {
-        if (itr == membershipLevel)
-            return true;
-    }
-
-    return false;
-}
-
-
-bool Transmogrification::isTransmogPlusPetEligible(ObjectGuid const & playerGuid) const {
-    if (MembershipIdsPet.size() == 0)
-        return false;
-
-    const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
-    if (membershipLevel == 0)
-        return false;
-
-    for (const auto& itr : MembershipIdsPet)
-    {
-        if (itr == membershipLevel)
+        if (level == membershipLevel)
             return true;
     }
 

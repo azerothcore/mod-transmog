@@ -307,16 +307,15 @@ public:
         if (Player* player = PlayerIdentifier::FromSelf(handler)->GetConnectedPlayer())
         {
 
-            if (sTransmogrification->IsTransmogPlusEnabled) {
-                if (sTransmogrification->isTransmogPlusPetEligible(player->GetGUID())) {
+            if (sTransmogrification->IsTransmogPlusEnabled)
+                if (sTransmogrification->IsPlusFeatureEligible(player->GetGUID(), PLUS_FEATURE_PET))
+                {
                     player->CastSpell((Unit*)nullptr, sTransmogrification->PetSpellId, true);
                     return true;
                 }
-            }
 
-            if (player->GetSession()->GetSecurity() < SEC_MODERATOR) {
+            if (player->GetSession()->GetSecurity() < SEC_MODERATOR)
                 return true;
-            }
 
             player->CastSpell((Unit*)nullptr, sTransmogrification->PetSpellId, true);
         }
