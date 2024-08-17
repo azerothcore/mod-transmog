@@ -887,7 +887,7 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
             return false;
     }
 
-    if (!IgnoreLevelRequirement(guid) && IsPlusFeatureEligible(guid, PLUS_FEATURE_SKIP_LEVEL_REQ) && playerLevel < proto->RequiredLevel)
+    if (!IgnoreLevelRequirement(guid) && playerLevel < proto->RequiredLevel)
         return false;
 
     if (AllowLowerTiers && TierAvailable(NULL, playerGuid, proto->SubClass))
