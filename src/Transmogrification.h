@@ -263,6 +263,8 @@ public:
     [[nodiscard]] bool IsPlusFeatureEligible(ObjectGuid const& playerGuid, uint32 feature) const;
     uint32 getPlayerMembershipLevel(ObjectGuid const & playerGuid) const;
 
+    [[nodiscard]] bool IgnoreLevelRequirement(ObjectGuid const& playerGuid) const { return IgnoreReqLevel || IsPlusFeatureEligible(playerGuid, PLUS_FEATURE_SKIP_LEVEL_REQ); }
+
 };
 #define sTransmogrification Transmogrification::instance()
 
