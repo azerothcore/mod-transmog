@@ -717,6 +717,12 @@ bool Transmogrification::IsInvTypeMismatchAllowed(const ItemTemplate *source, co
                 return true;
             if (sourceType == INVTYPE_WEAPONMAINHAND || sourceType == INVTYPE_WEAPONOFFHAND)
                 return (AllowMixedWeaponHandedness || AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE);
+            if (sourceType == INVTYPE_WEAPON)
+                return true;
+        }
+        else if (targetType == INVTYPE_WEAPON)
+        {
+            return sourceType == INVTYPE_WEAPONMAINHAND || (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE && sourceType == INVTYPE_WEAPONOFFHAND);
         }
     }
     else if (targetClass == ITEM_CLASS_ARMOR)
