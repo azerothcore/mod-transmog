@@ -20,6 +20,7 @@
 #
 #    Transmogrification.UseVendorInterface
 #        Description: Enables/Disables the use of a fake vendor interface for item selection.
+#                     There are (optional) custom items available for Hide Item and Remove Transmog if data/sql/db-world/tasm_world_VendorItems.sql is imported.
 #                     If enabled, players can select items from a vendor menu, complete with ctrl-click previews.
 #                     If disabled, players will use the gossip menu to select items and will not have access to previews.
 #        Default:     0

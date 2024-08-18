@@ -333,8 +333,10 @@ std::unordered_map<std::string, const std::unordered_map<LocaleConstant, std::st
     {"added_appearance", &TRANSMOG_TEXT_ADDED_APPEARANCE}
 };
 
-const uint32 HIDE_ITEM_VENDOR_ID   = 9172; //Invisibility potion
-const uint32 REMOVE_TMOG_VENDOR_ID = 1049; //Tablet of Purge
+const uint32 FALLBACK_HIDE_ITEM_VENDOR_ID   = 9172; //Invisibility potion
+const uint32 FALLBACK_REMOVE_TMOG_VENDOR_ID = 1049; //Tablet of Purge
+const uint32 CUSTOM_HIDE_ITEM_VENDOR_ID     = 57575;//Custom Hide Item item
+const uint32 CUSTOM_REMOVE_TMOG_VENDOR_ID   = 57576;//Custom Remove Transmog item
 const uint32 TMOG_VENDOR_CREATURE_ID = 190010;
 
 std::string GetLocaleText(LocaleConstant locale, const std::string& titleType) {
@@ -524,6 +526,7 @@ public:
         {
             case EQUIPMENT_SLOT_END: // Show items you can use
                 sT->selectionCache[player->GetGUID()] = action;
+
                 if (sT->GetUseVendorInterface())
                     ShowTransmogItemsInFakeVendor(player, creature, action);
                 else
@@ -874,17 +877,28 @@ public:
     static std::vector<ItemTemplate const*> GetSpoofedVendorItems (Item* target)
     {
         std::vector<ItemTemplate const*> spoofedItems;
-        if (sT->AllowHiddenTransmog)
+        uint32 existingTransmog = sT->GetFakeEntry(target->GetGUID());
+        if (sT->AllowHiddenTransmog && !existingTransmog)
         {
-            ItemTemplate const* _hideSlotButton = sObjectMgr->GetItemTemplate(HIDE_ITEM_VENDOR_ID);
+            ItemTemplate const* _hideSlotButton = sObjectMgr->GetItemTemplate(CUSTOM_HIDE_ITEM_VENDOR_ID);
             if (_hideSlotButton)
                 spoofedItems.push_back(_hideSlotButton);
+            else
+            {
+                _hideSlotButton = sObjectMgr->GetItemTemplate(FALLBACK_HIDE_ITEM_VENDOR_ID);
+                spoofedItems.push_back(_hideSlotButton);
+            }
         }
-        if (sT->GetFakeEntry(target->GetGUID()))
+        if (existingTransmog)
         {
-            ItemTemplate const* _removeTransmogButton = sObjectMgr->GetItemTemplate(REMOVE_TMOG_VENDOR_ID);
+            ItemTemplate const* _removeTransmogButton = sObjectMgr->GetItemTemplate(CUSTOM_REMOVE_TMOG_VENDOR_ID);
             if (_removeTransmogButton)
                 spoofedItems.push_back(_removeTransmogButton);
+            else
+            {
+                _removeTransmogButton = sObjectMgr->GetItemTemplate(FALLBACK_REMOVE_TMOG_VENDOR_ID);
+                spoofedItems.push_back(_removeTransmogButton);
+            }
         }
         return spoofedItems;
     }
@@ -893,7 +907,8 @@ public:
     {
         switch (itemId)
         {
-            case HIDE_ITEM_VENDOR_ID:
+            case CUSTOM_HIDE_ITEM_VENDOR_ID:
+            case FALLBACK_HIDE_ITEM_VENDOR_ID:
                 return sT->HiddenTransmogIsFree ? 0 : sT->GetSpecialPrice(target);
             default:
                 return 0;
@@ -1154,11 +1169,11 @@ public:
         if (vendor->GetEntry() != TMOG_VENDOR_CREATURE_ID) return;
         uint8 slot = sT->selectionCache[player->GetGUID()];
 
-        if (itemEntry == HIDE_ITEM_VENDOR_ID)
+        if (itemEntry == CUSTOM_HIDE_ITEM_VENDOR_ID || itemEntry == FALLBACK_HIDE_ITEM_VENDOR_ID)
         {
             PerformTransmogrification(player, UINT_MAX, 0);
         }
-        else if (itemEntry == REMOVE_TMOG_VENDOR_ID)
+        else if (itemEntry == CUSTOM_REMOVE_TMOG_VENDOR_ID || itemEntry == FALLBACK_REMOVE_TMOG_VENDOR_ID)
         {
             RemoveTransmogrification(player);
         }
