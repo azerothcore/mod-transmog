@@ -696,6 +696,8 @@ bool Transmogrification::IsSubclassMismatchAllowed(Player *player, const ItemTem
         {
             return true;
         }
+        if (sourceSub == ITEM_SUBCLASS_WEAPON_MISC)
+            return sourceType == targetType;
     }
     else if (targetClass == ITEM_CLASS_ARMOR)
     {
@@ -780,7 +782,8 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
         return false;
 
     //[AZTH] Yehonal
-    if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
+    uint32 subclassSkill = proto->GetSkill();
+    if (proto->SubClass > 0 && subclassSkill && player->GetSkillValue(proto->GetSkill()) == 0)
     {
         if (proto->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
         {
