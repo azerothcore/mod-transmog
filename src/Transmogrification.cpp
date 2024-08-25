@@ -521,6 +521,22 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
 
     if (hidden_transmog)
     {
+        cost = GetSpecialPrice(itemTransmogrified->GetTemplate());
+        cost *= ScaledCostModifier;
+        cost += CopperCost;
+
+        if (!HiddenTransmogIsFree && cost)
+        {
+            if (cost < 0)
+                LOG_DEBUG("module", "Transmogrification::Transmogrify - {} ({}) transmogrification invalid cost (non negative, amount {}). Transmogrified {} with {}",
+                    player->GetName(), player->GetGUID().ToString(), -cost, itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
+            else
+            {
+                if (!player->HasEnoughMoney(cost))
+                    return LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY;
+                player->ModifyMoney(-cost, false);
+            }
+        }
         SetFakeEntry(player, HIDDEN_ITEM_ID, slot, itemTransmogrified); // newEntry
         return LANG_ERR_TRANSMOG_OK;
     }
@@ -680,6 +696,8 @@ bool Transmogrification::IsSubclassMismatchAllowed(Player *player, const ItemTem
         {
             return true;
         }
+        if (sourceSub == ITEM_SUBCLASS_WEAPON_MISC)
+            return sourceType == targetType;
     }
     else if (targetClass == ITEM_CLASS_ARMOR)
     {
@@ -764,7 +782,8 @@ bool Transmogrification::SuitableForTransmogrification(Player* player, ItemTempl
         return false;
 
     //[AZTH] Yehonal
-    if (proto->SubClass > 0 && player->GetSkillValue(proto->GetSkill()) == 0)
+    uint32 subclassSkill = proto->GetSkill();
+    if (proto->SubClass > 0 && subclassSkill && player->GetSkillValue(proto->GetSkill()) == 0)
     {
         if (proto->Class == ITEM_CLASS_ARMOR && !AllowMixedArmorTypes)
         {
@@ -1124,7 +1143,9 @@ void Transmogrification::LoadConfig(bool reload)
     IgnoreReqEvent = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqEvent", false);
     IgnoreReqStats = sConfigMgr->GetOption<bool>("Transmogrification.IgnoreReqStats", false);
     UseCollectionSystem = sConfigMgr->GetOption<bool>("Transmogrification.UseCollectionSystem", true);
+    UseVendorInterface = sConfigMgr->GetOption<bool>("Transmogrification.UseVendorInterface", false);
     AllowHiddenTransmog = sConfigMgr->GetOption<bool>("Transmogrification.AllowHiddenTransmog", true);
+    HiddenTransmogIsFree = sConfigMgr->GetOption<bool>("Transmogrification.HiddenTransmogIsFree", true);
     TrackUnusableItems = sConfigMgr->GetOption<bool>("Transmogrification.TrackUnusableItems", true);
     RetroActiveAppearances = sConfigMgr->GetOption<bool>("Transmogrification.RetroActiveAppearances", true);
     ResetRetroActiveAppearances = sConfigMgr->GetOption<bool>("Transmogrification.ResetRetroActiveAppearancesFlag", false);
@@ -1280,12 +1301,18 @@ bool Transmogrification::GetUseCollectionSystem() const
 {
     return UseCollectionSystem;
 };
-
+bool Transmogrification::GetUseVendorInterface() const
+{
+    return UseVendorInterface;
+}
 bool Transmogrification::GetAllowHiddenTransmog() const
 {
     return AllowHiddenTransmog;
 }
-
+bool Transmogrification::GetHiddenTransmogIsFree() const
+{
+    return HiddenTransmogIsFree;
+}
 bool Transmogrification::GetAllowTradeable() const
 {
     return AllowTradeable;

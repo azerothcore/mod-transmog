@@ -18,9 +18,22 @@
 #                     If disabled, players must have an item in their bags to use as a transmogrification appearance source.
 #        Default:     1
 #
+#    Transmogrification.UseVendorInterface
+#        Description: Enables/Disables the use of a fake vendor interface for item selection.
+#                     There are (optional) custom items available for Hide Item and Remove Transmog if data/sql/db-world/tasm_world_VendorItems.sql is imported.
+#                     If enabled, players can select items from a vendor menu, complete with ctrl-click previews.
+#                     If disabled, players will use the gossip menu to select items and will not have access to previews.
+#        Default:     0
+#
 #    Transmogrification.AllowHiddenTransmog
 #        Description: Enables/Disables the hiding of equipment through transmog
 #                     If enabled, players can select an "invisible" appearance for items at the transmog vendor
+#        Default:     1
+#
+#    Transmogrification.HiddenTransmogIsFree
+#        Description: Enables/Disables free hiding of items through the transmog system.
+#                     If enabled, players can hide pieces of equipment for free.
+#                     If disabled, players will be charged the standard transmog price (affected by all modifiers) to hide an item.
 #        Default:     1
 #
 #    Transmogrification.TrackUnusableItems
@@ -62,7 +75,9 @@
 
 Transmogrification.Enable = 1
 Transmogrification.UseCollectionSystem = 1
+Transmogrification.UseVendorInterface = 0
 Transmogrification.AllowHiddenTransmog = 1
+Transmogrification.HiddenTransmogIsFree = 1
 Transmogrification.TrackUnusableItems = 1
 Transmogrification.RetroActiveAppearances = 1
 Transmogrification.ResetRetroActiveAppearancesFlag = 0
