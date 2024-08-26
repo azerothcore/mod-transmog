@@ -337,7 +337,6 @@ const uint32 FALLBACK_HIDE_ITEM_VENDOR_ID   = 9172; //Invisibility potion
 const uint32 FALLBACK_REMOVE_TMOG_VENDOR_ID = 1049; //Tablet of Purge
 const uint32 CUSTOM_HIDE_ITEM_VENDOR_ID     = 57575;//Custom Hide Item item
 const uint32 CUSTOM_REMOVE_TMOG_VENDOR_ID   = 57576;//Custom Remove Transmog item
-const uint32 TMOG_VENDOR_CREATURE_ID = 190010;
 
 std::string GetLocaleText(LocaleConstant locale, const std::string& titleType) {
     auto textMapIt = textMaps.find(titleType);
@@ -1165,8 +1164,12 @@ public:
     void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 /*vendorslot*/, uint32& itemEntry, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) override
     {
         Creature* vendor = player->GetMap()->GetCreature(vendorguid);
-        if (!vendor) return;
-        if (vendor->GetEntry() != TMOG_VENDOR_CREATURE_ID) return;
+        if (!vendor)
+            return;
+
+        if (!sT->IsTransmogVendor(vendor->GetEntry()))
+            return;
+
         uint8 slot = sT->selectionCache[player->GetGUID()];
 
         if (itemEntry == CUSTOM_HIDE_ITEM_VENDOR_ID || itemEntry == FALLBACK_HIDE_ITEM_VENDOR_ID)

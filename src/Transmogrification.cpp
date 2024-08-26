@@ -1,6 +1,7 @@
 #include "Transmogrification.h"
 #include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "SpellMgr.h"
 #include "Tokenize.h"
 
 Transmogrification* Transmogrification::instance()
@@ -1188,6 +1189,9 @@ void Transmogrification::LoadConfig(bool reload)
     }
 
     PetSpellId = sConfigMgr->GetOption<uint32>("Transmogrification.PetSpellId", 2000100);
+
+    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(PetSpellId))
+        PetEntry = spellInfo->Effects[EFFECT_0].MiscValue;
 }
 
 void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, CharacterDatabaseTransaction* trans /*= nullptr*/)
