@@ -728,20 +728,20 @@ bool Transmogrification::IsInvTypeMismatchAllowed(const ItemTemplate *source, co
     {
         if (IsRangedWeapon(sourceClass, sourceSub))
             return true;
-            
+                    
         // Main-hand to offhand restrictions - see https://wowpedia.fandom.com/wiki/Transmogrification
-        if (targetType == INVTYPE_WEAPONMAINHAND || targetType == INVTYPE_WEAPONOFFHAND)
+        if (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE)
+            return true;
+        else if (targetType == INVTYPE_WEAPONMAINHAND || targetType == INVTYPE_WEAPONOFFHAND)
         {
-            if (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE)
-                return true;
             if (sourceType == INVTYPE_WEAPONMAINHAND || sourceType == INVTYPE_WEAPONOFFHAND)
-                return (AllowMixedWeaponHandedness || AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE);
+                return AllowMixedWeaponHandedness;
             if (sourceType == INVTYPE_WEAPON)
                 return true;
         }
         else if (targetType == INVTYPE_WEAPON)
         {
-            return sourceType == INVTYPE_WEAPONMAINHAND || (AllowMixedWeaponTypes == MIXED_WEAPONS_LOOSE && sourceType == INVTYPE_WEAPONOFFHAND);
+            return sourceType == INVTYPE_WEAPONMAINHAND || (AllowMixedWeaponHandedness && sourceType == INVTYPE_WEAPONOFFHAND);
         }
     }
     else if (targetClass == ITEM_CLASS_ARMOR)
