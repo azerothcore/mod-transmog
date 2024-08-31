@@ -886,10 +886,10 @@ bool Transmogrification::SuitableForTransmogrification(ObjectGuid guid, ItemTemp
         }
     }
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && playerTeamId != TEAM_HORDE)
+    if (proto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && playerTeamId != TEAM_HORDE)
         return false;
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && playerTeamId != TEAM_ALLIANCE)
+    if (proto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && playerTeamId != TEAM_ALLIANCE)
         return false;
 
     if (!IgnoreReqClass && (proto->AllowableClass & playerClassMask) == 0)
