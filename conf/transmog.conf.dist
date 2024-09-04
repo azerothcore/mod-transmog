@@ -72,6 +72,15 @@
 #    Transmogrification.EnablePortable
 #        Description: Enables / Disables the portable transmogrification NPC.
 #        Default:    1
+#
+#    Transmogrification.EnableSortByQualityAndName
+#        Description: Enables / Disables the sorting of the items by quality and then by names
+#        Default:    1
+#
+#    Transmogrification.AcoreWorldName
+#        Description: it is required for the sorting feature
+#        Default:    'acore_world'
+#
 
 Transmogrification.Enable = 1
 Transmogrification.UseCollectionSystem = 1
@@ -89,6 +98,9 @@ Transmogrification.Allowed = ""
 Transmogrification.NotAllowed = ""
 
 Transmogrification.EnablePortable = 1
+
+Transmogrification.EnableSortByQualityAndName = 1
+Transmogrification.AcoreWorldName = "acore_world"
 
 #
 #    COPPER COST
@@ -219,6 +231,7 @@ Transmogrification.TokenAmount = 1
 #    Transmogrification.IgnoreReqStats
 #        Description: Ignore stat count > 0 requirement for source items
 #        Default:    0
+
 
 Transmogrification.AllowPoor = 0
 Transmogrification.AllowCommon = 0
