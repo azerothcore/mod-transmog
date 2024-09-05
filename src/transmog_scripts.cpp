@@ -1215,9 +1215,7 @@ public:
         {
             LOG_INFO("module", "Loading transmog appearance collection cache....");
             uint32 collectedAppearanceCount = 0;
-
             QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances");
-
             if (result)
             {
                 do
