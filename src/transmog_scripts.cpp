@@ -374,6 +374,15 @@ bool ValidForTransmog (Player* player, Item* target, Item* source, bool hasSearc
     return true;
 }
 
+bool CmpTmog (Item* i1, Item* i2)
+{
+    const ItemTemplate* i1t = i1->GetTemplate();
+    const ItemTemplate* i2t = i2->GetTemplate();
+    const int q1 = 7-i1t->Quality;
+    const int q2 = 7-i2t->Quality;
+    return std::tie(q1, i1t->Name1) < std::tie(q2, i2t->Name1);
+}
+
 std::vector<Item*> GetValidTransmogs (Player* player, Item* target, bool hasSearch, std::string searchTerm)
 {
     std::vector<Item*> allowedItems;
@@ -415,6 +424,11 @@ std::vector<Item*> GetValidTransmogs (Player* player, Item* target, bool hasSear
             }
         }
     }
+
+    if (sConfigMgr->GetOption<bool>("Transmogrification.EnableSortByQualityAndName", true)) {
+        sort(allowedItems.begin(), allowedItems.end(), CmpTmog);
+    }
+
     return allowedItems;
 }
 
@@ -1202,15 +1216,7 @@ public:
             LOG_INFO("module", "Loading transmog appearance collection cache....");
             uint32 collectedAppearanceCount = 0;
 
-
-            std::string query = "SELECT account_id, item_template_id FROM custom_unlocked_appearances";
-
-            if (sConfigMgr->GetOption<bool>("Transmogrification.EnableSortByQualityAndName", true)) {
-                const std::string acore_world_name = sConfigMgr->GetOption<std::string>("Transmogrification.AcoreWorldName", "acore_world");
-                query = "SELECT custom_unlocked_appearances.account_id, custom_unlocked_appearances.item_template_id, " + acore_world_name + ".item_template.name, " + acore_world_name + ".item_template.Quality FROM custom_unlocked_appearances INNER JOIN " + acore_world_name + ".item_template ON custom_unlocked_appearances.item_template_id=" + acore_world_name + ".item_template.entry ORDER BY " + acore_world_name + ".item_template.Quality DESC, " + acore_world_name + ".item_template.name ASC;";
-            }
-
-            QueryResult result = CharacterDatabase.Query(query);
+            QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances");
 
             if (result)
             {

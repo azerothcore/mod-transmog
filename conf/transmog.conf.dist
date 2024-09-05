@@ -77,10 +77,6 @@
 #        Description: Enables / Disables the sorting of the items by quality and then by names
 #        Default:    1
 #
-#    Transmogrification.AcoreWorldName
-#        Description: it is required for the sorting feature
-#        Default:    'acore_world'
-#
 
 Transmogrification.Enable = 1
 Transmogrification.UseCollectionSystem = 1
@@ -100,7 +96,6 @@ Transmogrification.NotAllowed = ""
 Transmogrification.EnablePortable = 1
 
 Transmogrification.EnableSortByQualityAndName = 1
-Transmogrification.AcoreWorldName = "acore_world"
 
 #
 #    COPPER COST
