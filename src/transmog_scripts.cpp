@@ -364,7 +364,7 @@ bool ValidForTransmog (Player* player, Item* target, Item* source, bool hasSearc
     if (!target || !source || !player) return false;
     ItemTemplate const* targetTemplate = target->GetTemplate();
     ItemTemplate const* sourceTemplate = source->GetTemplate();
-    
+
     if (!sT->CanTransmogrifyItemWithItem(player, targetTemplate, sourceTemplate))
         return false;
     if (sT->GetFakeEntry(target->GetGUID()) == source->GetEntry())
@@ -374,17 +374,26 @@ bool ValidForTransmog (Player* player, Item* target, Item* source, bool hasSearc
     return true;
 }
 
+bool CmpTmog (Item* i1, Item* i2)
+{
+    const ItemTemplate* i1t = i1->GetTemplate();
+    const ItemTemplate* i2t = i2->GetTemplate();
+    const int q1 = 7-i1t->Quality;
+    const int q2 = 7-i2t->Quality;
+    return std::tie(q1, i1t->Name1) < std::tie(q2, i2t->Name1);
+}
+
 std::vector<Item*> GetValidTransmogs (Player* player, Item* target, bool hasSearch, std::string searchTerm)
 {
     std::vector<Item*> allowedItems;
     if (!target) return allowedItems;
-    
+
     if (sT->GetUseCollectionSystem())
     {
         uint32 accountId = player->GetSession()->GetAccountId();
         if (sT->collectionCache.find(accountId) == sT->collectionCache.end())
             return allowedItems;
-        
+
         for (uint32 itemId : sT->collectionCache[accountId])
         {
             if (!sObjectMgr->GetItemTemplate(itemId))
@@ -415,6 +424,11 @@ std::vector<Item*> GetValidTransmogs (Player* player, Item* target, bool hasSear
             }
         }
     }
+
+    if (sConfigMgr->GetOption<bool>("Transmogrification.EnableSortByQualityAndName", true)) {
+        sort(allowedItems.begin(), allowedItems.end(), CmpTmog);
+    }
+
     return allowedItems;
 }
 
@@ -775,7 +789,7 @@ public:
         LocaleConstant locale = session->GetSessionDbLocaleIndex();
         Item* oldItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
         bool hasSearchString;
-        
+
         uint16 pageNumber = 0;
         uint32 startValue = 0;
         uint32 endValue = MAX_OPTIONS - 4;
@@ -786,7 +800,7 @@ public:
             startValue = (pageNumber * (MAX_OPTIONS - 2));
             endValue = (pageNumber + 1) * (MAX_OPTIONS - 2) - 1;
         }
-        
+
         if (oldItem)
         {
             uint32 price = GetTransmogPrice(oldItem->GetTemplate());
@@ -800,7 +814,7 @@ public:
             hasSearchString = !(searchStringIterator == sT->searchStringByPlayer.end());
             std::string searchDisplayValue(hasSearchString ? searchStringIterator->second : GetLocaleText(locale, "search"));
             std::vector<Item*> allowedItems = GetValidTransmogs(player, oldItem, hasSearchString, searchDisplayValue);
-            
+
             if (allowedItems.size() > 0)
             {
                 lastPage = false;
@@ -872,7 +886,7 @@ public:
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t" + GetLocaleText(locale, "back"), EQUIPMENT_SLOT_END + 1, 0);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
     }
-    
+
     static std::vector<ItemTemplate const*> GetSpoofedVendorItems (Item* target)
     {
         std::vector<ItemTemplate const*> spoofedItems;
@@ -913,7 +927,7 @@ public:
                 return 0;
         }
     }
-    
+
     static void EncodeItemToPacket (WorldPacket& data, ItemTemplate const* proto, uint8& slot, uint32 price)
     {
         data << uint32(slot + 1);
@@ -926,7 +940,7 @@ public:
         data << uint32(0);
         slot++;
     }
-    
+
     //The actual vendor options are handled in the player script below, OnBeforeBuyItemFromVendor
     static void ShowTransmogItemsInFakeVendor (Player* player, Creature* creature, uint8 slot)
     {
@@ -938,26 +952,26 @@ public:
             return;
         }
         ItemTemplate const* targetTemplate = targetItem->GetTemplate();
-        
+
         std::vector<Item*> itemList = GetValidTransmogs(player, targetItem, false, "");
         std::vector<ItemTemplate const*> spoofedItems = GetSpoofedVendorItems(targetItem);
-        
+
         uint32 itemCount = itemList.size();
         uint32 spoofCount = spoofedItems.size();
         uint32 totalItems = itemCount + spoofCount;
         uint32 price = GetTransmogPrice(targetItem->GetTemplate());
-        
-        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + totalItems * 8 * 4);    
+
+        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + totalItems * 8 * 4);
         data << uint64(creature->GetGUID().GetRawValue());
-        
+
         uint8 count = 0;
         size_t count_pos = data.wpos();
         data << uint8(count);
-        
+
         for (uint32 i = 0; i < spoofCount && count < MAX_VENDOR_ITEMS; ++i)
         {
             EncodeItemToPacket (
-                data, spoofedItems[i], count, 
+                data, spoofedItems[i], count,
                 GetSpoofedItemPrice(spoofedItems[i]->ItemId, targetTemplate)
             );
         }
@@ -966,7 +980,7 @@ public:
             ItemTemplate const* _proto = itemList[i]->GetTemplate();
             if (_proto) EncodeItemToPacket(data, _proto, count, price);
         }
-        
+
         data.put(count_pos, count);
         player->GetSession()->SendPacket(&data);
     }
@@ -1154,13 +1168,13 @@ public:
             sT->dataMap.erase(it->first);
         sT->entryMap.erase(pGUID);
         sT->selectionCache.erase(pGUID);
-        
+
 #ifdef PRESETS
         if (sT->GetEnableSets())
             sT->UnloadPlayerSets(pGUID);
 #endif
     }
-    
+
     void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 /*vendorslot*/, uint32& itemEntry, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) override
     {
         Creature* vendor = player->GetMap()->GetCreature(vendorguid);
