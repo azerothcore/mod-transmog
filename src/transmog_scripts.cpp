@@ -1120,13 +1120,11 @@ public:
     void OnLogin(Player* player) override
     {
         if (sT->EnableResetRetroActiveAppearances())
-        {
             player->UpdatePlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK, 0);
-        }
+
         if (sT->EnableRetroActiveAppearances() && !(player->GetPlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK).value))
-        {
             CheckRetroActiveQuestAppearances(player);
-        }
+
         ObjectGuid playerGUID = player->GetGUID();
         sT->entryMap.erase(playerGUID);
         QueryResult result = CharacterDatabase.Query("SELECT GUID, FakeEntry FROM custom_transmogrification WHERE Owner = {}", player->GetGUID().GetCounter());
@@ -1141,11 +1139,6 @@ public:
                     sT->dataMap[itemGUID] = playerGUID;
                     sT->entryMap[playerGUID][itemGUID] = fakeEntry;
                 }
-                else
-                {
-                    //sLog->outError(LOG_FILTER_SQL, "Item entry (Entry: {}, itemGUID: {}, playerGUID: {}) does not exist, ignoring.", fakeEntry, GUID_LOPART(itemGUID), player->GetGUIDLow());
-                    // CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE FakeEntry = {}", fakeEntry);
-                }
             } while (result->NextRow());
 
             for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
@@ -1154,6 +1147,16 @@ public:
                     player->SetVisibleItemSlot(slot, item);
             }
         }
+
+        uint32 accountId = 0;
+
+        if (player->GetSession())
+            accountId = player->GetSession()->GetAccountId();
+
+        QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
+
+        if (resultAcc)
+            player->UpdatePlayerSetting("mod-transmog", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, (*resultAcc)[0].Get<uint32>());
 
 #ifdef PRESETS
         if (sT->GetEnableSets())

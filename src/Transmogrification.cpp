@@ -1214,21 +1214,6 @@ void Transmogrification::DeleteFakeFromDB(ObjectGuid::LowType itemLowGuid, Chara
         CharacterDatabase.Execute("DELETE FROM custom_transmogrification WHERE GUID = {}", itemGUID.GetCounter());
 }
 
-uint32 Transmogrification::getPlayerMembershipLevel(ObjectGuid const & playerGuid) const
-{
-    CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(playerGuid);
-    if (!playerData)
-        return 0;
-
-    uint32 accountId = playerData->AccountId;
-    QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
-
-    if (resultAcc)
-        return (*resultAcc)[0].Get<uint32>();
-
-    return 0;
-}
-
 bool Transmogrification::IsPlusFeatureEligible(ObjectGuid const &playerGuid, uint32 feature) const
 {
     if (!IsTransmogPlusEnabled)
@@ -1238,7 +1223,12 @@ bool Transmogrification::IsPlusFeatureEligible(ObjectGuid const &playerGuid, uin
     if (it == plusDataMap.end() || it->second.empty())
         return false;
 
-    const auto membershipLevel = getPlayerMembershipLevel(playerGuid);
+    Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid);
+
+    if (!player)
+        return false;
+
+    const auto membershipLevel = GetPlayerMembershipLevel(player);
 
     if (!membershipLevel)
         return false;
