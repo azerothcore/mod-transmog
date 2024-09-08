@@ -1148,7 +1148,8 @@ public:
             }
         }
 
-        if (sConfigMgr->GetOption<bool>("Transmogrification.EnablePlus", false)) {
+        if (sConfigMgr->GetOption<bool>("Transmogrification.EnablePlus", false))
+        {
             uint32 accountId = 0;
 
             if (player->GetSession())
