@@ -1156,9 +1156,7 @@ public:
                 accountId = player->GetSession()->GetAccountId();
 
             QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
-
-            if (resultAcc)
-                player->UpdatePlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, (*resultAcc)[0].Get<uint32>());
+            player->UpdatePlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, resultAcc ? (*resultAcc)[0].Get<uint32>() : 0);
         }
 
 #ifdef PRESETS
