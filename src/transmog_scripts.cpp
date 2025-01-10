@@ -538,13 +538,20 @@ public:
         switch (sender)
         {
             case EQUIPMENT_SLOT_END: // Show items you can use
+            {
                 sT->selectionCache[player->GetGUID()] = action;
 
-                if (sT->GetUseVendorInterface() || player->GetPlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE).IsEnabled())
-                    ShowTransmogItemsInFakeVendor(player, creature, action);
-                else
+                bool useVendorInterface = player->GetPlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE).IsEnabled();
+
+                if (sT->GetUseVendorInterface())
+                    useVendorInterface ? ShowTransmogItemsInFakeVendor(player, creature, action) :
                     ShowTransmogItemsInGossipMenu(player, creature, action, sender);
+                else
+                    useVendorInterface ? ShowTransmogItemsInGossipMenu(player, creature, action, sender) :
+                    ShowTransmogItemsInFakeVendor(player, creature, action);
+
                 break;
+            }
             case EQUIPMENT_SLOT_END + 1: // Main menu
                 OnGossipHello(player, creature);
                 break;
