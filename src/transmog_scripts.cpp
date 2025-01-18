@@ -543,12 +543,10 @@ public:
 
                 bool useVendorInterface = player->GetPlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE).IsEnabled();
 
-                if (sT->GetUseVendorInterface())
-                    useVendorInterface ? ShowTransmogItemsInFakeVendor(player, creature, action) :
-                    ShowTransmogItemsInGossipMenu(player, creature, action, sender);
-                else
-                    useVendorInterface ? ShowTransmogItemsInGossipMenu(player, creature, action, sender) :
+                if (sT->GetUseVendorInterface() || useVendorInterface)
                     ShowTransmogItemsInFakeVendor(player, creature, action);
+                else
+                    ShowTransmogItemsInGossipMenu(player, creature, action, sender);
 
                 break;
             }
