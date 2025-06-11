@@ -327,7 +327,7 @@ Transmogrification.MembershipLevels = ""
 Transmogrification.MembershipLevelsLegendary = ""
 Transmogrification.MembershipLevelsPet = ""
 Transmogrification.MembershipLevelsSkipLevelReq = ""
-Transmogrification.PetSpellId = 2000100
+Transmogrification.PetSpellId = 200100
 
 #
 ###################################################################################################
