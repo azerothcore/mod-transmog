@@ -1,8 +1,11 @@
 # Transmog Module
 
-- Latest Transmog build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-transmog/workflows/core-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/mod-transmog)
+> [!WARNING]  
+> If you used the old-subscription system for TransmogPlus option before this [commit](https://github.com/azerothcore/mod-transmog/commit/8237df6f88d40d1d83a6f11b86a7187f99f57c99), please update your mod-transmog module to the latest revision and also download the new module [mod-acore-subscriptions](https://github.com/azerothcore/mod-acore-subscriptions).
 
-This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature, it's based on [Rochet2 Transmog Script](http://rochet2.github.io/Transmogrification.html) 
+- Latest Transmog build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-transmog/actions/workflows/core_build.yml/badge.svg)](https://github.com/azerothcore/mod-transmog/actions)
+
+This is a module for [AzerothCore](http://www.azerothcore.org) that adds **Transmog**rification feature, it's based on [Rochet2 Transmog Script](http://rochet2.github.io/Transmogrification.html) 
 
 ## Important notes
 
