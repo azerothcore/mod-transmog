@@ -1,6 +1,6 @@
 # Transmog Module
 
-- Latest Transmog build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-transmog/workflows/core-build/badge.svg?branch=master&event=push)](https://github.com/azerothcore/mod-transmog)
+- Latest Transmog build status with azerothcore: [![Build Status](https://github.com/azerothcore/mod-transmog/actions/workflows/core_build.yml/badge.svg)](https://github.com/azerothcore/mod-transmog/actions)
 
 This is a module for [AzerothCore](http://www.azerothcore.org) that adds transmog feature, it's based on [Rochet2 Transmog Script](http://rochet2.github.io/Transmogrification.html) 
 
