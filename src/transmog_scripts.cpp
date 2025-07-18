@@ -1164,17 +1164,6 @@ public:
             }
         }
 
-        if (sConfigMgr->GetOption<bool>("Transmogrification.EnablePlus", false))
-        {
-            uint32 accountId = 0;
-
-            if (player->GetSession())
-                accountId = player->GetSession()->GetAccountId();
-
-            QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
-            player->UpdatePlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, resultAcc ? (*resultAcc)[0].Get<uint32>() : 0);
-        }
-
 #ifdef PRESETS
         if (sT->GetEnableSets())
             sT->LoadPlayerSets(playerGUID);
