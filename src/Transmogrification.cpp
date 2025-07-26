@@ -1229,6 +1229,9 @@ bool Transmogrification::IsPlusFeatureEligible(ObjectGuid const &playerGuid, uin
     if (!player)
         return false;
 
+    if (player->IsGameMaster())
+        return true; // GM can use all features
+
     const auto membershipLevel = GetPlayerMembershipLevel(player);
 
     if (!membershipLevel)
