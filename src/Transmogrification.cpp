@@ -1261,9 +1261,8 @@ void Transmogrification::LoadCollections()
                 uint32 accountId = (*result)[0].Get<uint32>();
                 uint32 itemId = (*result)[1].Get<uint32>();
                 if (sTransmogrification->AddCollectedAppearance(accountId, itemId))
-                {
                     collectedAppearanceCount++;
-                }
+
             } while (result->NextRow());
         }
 
