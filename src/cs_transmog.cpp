@@ -317,7 +317,7 @@ public:
         return true;
     }
 
-    static bool HandleReloadTransmogConfig(ChatHandler* handler, bool hide)
+    static bool HandleReloadTransmogConfig(ChatHandler* handler)
     {
         sTransmogrification->LoadConfig(true);
         handler->SendSysMessage("Transmog configs reloaded.");
