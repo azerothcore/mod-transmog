@@ -41,11 +41,12 @@ public:
 
         static ChatCommandTable transmogTable =
         {
-            { "add",       addCollectionTable                                        },
-            { "",          HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
-            { "sync",      HandleSyncTransMogCommand,     SEC_PLAYER,    Console::No },
-            { "portable",  HandleTransmogPortableCommand, SEC_PLAYER,    Console::No },
-            { "interface", HandleInterfaceOption,         SEC_PLAYER,    Console::No }
+            { "add",       addCollectionTable                                            },
+            { "",          HandleDisableTransMogVisual,   SEC_PLAYER,        Console::No },
+            { "sync",      HandleSyncTransMogCommand,     SEC_PLAYER,        Console::No },
+            { "portable",  HandleTransmogPortableCommand, SEC_PLAYER,        Console::No },
+            { "interface", HandleInterfaceOption,         SEC_PLAYER,        Console::No },
+            { "reload",    HandleReloadTransmogConfig,    SEC_ADMINISTRATOR, Console::Yes}
         };
 
         static ChatCommandTable commandTable =
@@ -313,6 +314,15 @@ public:
     {
         handler->GetPlayer()->UpdatePlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE, enable);
         handler->SendSysMessage(enable ? LANG_CMD_TRANSMOG_VENDOR_INTERFACE_ENABLE : LANG_CMD_TRANSMOG_VENDOR_INTERFACE_DISABLE);
+        return true;
+    }
+
+    static bool HandleReloadTransmogConfig(ChatHandler* handler, bool hide)
+    {
+        sTransmogrification->LoadConfig(true);
+        handler->SendSysMessage("Transmog configs reloaded.");
+        sTransmogrification->LoadCollections();
+        handler->SendSysMessage("Transmog collections reloaded.");
         return true;
     }
 };

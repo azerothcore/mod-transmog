@@ -1222,26 +1222,8 @@ public:
 
     void OnAfterConfigLoad(bool reload) override
     {
-        sT->LoadConfig(reload);
-        if (sT->GetUseCollectionSystem())
-        {
-            LOG_INFO("module", "Loading transmog appearance collection cache....");
-            uint32 collectedAppearanceCount = 0;
-            QueryResult result = CharacterDatabase.Query("SELECT account_id, item_template_id FROM custom_unlocked_appearances");
-            if (result)
-            {
-                do
-                {
-                    uint32 accountId = (*result)[0].Get<uint32>();
-                    uint32 itemId = (*result)[1].Get<uint32>();
-                    if (sT->AddCollectedAppearance(accountId, itemId))
-                    {
-                        collectedAppearanceCount++;
-                    }
-                } while (result->NextRow());
-            }
-            LOG_INFO("module", "Loaded {} collected appearances into cache", collectedAppearanceCount);
-        }
+        if (!reload)
+            sT->LoadCollections();
     }
 
     void OnStartup() override

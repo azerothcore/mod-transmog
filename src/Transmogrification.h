@@ -149,6 +149,7 @@ public:
 
     void LoadPlayerSets(ObjectGuid pGUID);
     void UnloadPlayerSets(ObjectGuid pGUID);
+    void LoadCollections();
 #endif
 
     bool EnableTransmogInfo;
