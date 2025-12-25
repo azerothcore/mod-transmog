@@ -1216,15 +1216,8 @@ class WS_Transmogrification : public WorldScript
 {
 public:
     WS_Transmogrification() : WorldScript("WS_Transmogrification", {
-        WORLDHOOK_ON_AFTER_CONFIG_LOAD,
         WORLDHOOK_ON_STARTUP
     }) { }
-
-    void OnAfterConfigLoad(bool reload) override
-    {
-        if (!reload)
-            sT->LoadCollections();
-    }
 
     void OnStartup() override
     {
@@ -1237,6 +1230,8 @@ public:
         // Dont delete even if player has more presets than should
         CharacterDatabase.Execute("DELETE FROM `custom_transmogrification_sets` WHERE NOT EXISTS(SELECT 1 FROM characters WHERE characters.guid = custom_transmogrification_sets.Owner)");
 #endif
+
+        sT->LoadCollections();
     }
 };
 
