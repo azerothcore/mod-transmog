@@ -465,22 +465,15 @@ void Transmogrification::SetFakeEntry(Player* player, uint32 newEntry, uint8 /*s
 
 bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
 {
-    if (collectionCache.find(accountId)  == collectionCache.end())
+    if (!collectionCache.contains(accountId))
     {
-        collectionCache.insert({accountId, {itemId}});
+        collectionCache.insert({ accountId, {itemId} });
         return true;
     }
-    if (std::find(collectionCache[accountId].begin(), collectionCache[accountId].end(), itemId) == collectionCache[accountId].end())
-    {
-        collectionCache[accountId].push_back(itemId);
 
-        if (!sConfigMgr->GetOption<bool>("Transmogrification.EnableSortByQualityAndName", true)) {
-            std::sort(collectionCache[accountId].begin(), collectionCache[accountId].end());
-        }
-
-        return true;
-    }
-    return false;
+    auto res = collectionCache[accountId].insert(itemId);
+    bool inserted = res.second;
+    return inserted;
 }
 
 TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
