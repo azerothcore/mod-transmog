@@ -481,6 +481,13 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 ite
     {
         return Transmogrify(player, nullptr, slot, no_cost, true);
     }
+
+    if (!sObjectMgr->GetItemTemplate(itemEntry))
+    {
+        LOG_ERROR("module", "Transmogrification::Transmogrify - Player ({}) tried to transmogrify with an invalid item entry ({}).", player->GetGUID().ToString(), itemEntry);
+        return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
+    }
+
     Item* itemTransmogrifier = Item::CreateItem(itemEntry, 1, 0);
     return Transmogrify(player, itemTransmogrifier, slot, no_cost, false);
 }
