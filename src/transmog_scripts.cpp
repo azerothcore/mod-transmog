@@ -994,13 +994,34 @@ public:
 class PS_Transmogrification : public PlayerScript
 {
 private:
-    void AddToDatabase(Player* player, Item* item)
+    void AddToDatabase(Player* player, Item* item, bool fromVendorSell = false)
     {
-        if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) && !sTransmogrification->GetAllowTradeable())
+        if (!item)
             return;
+
+        ItemTemplate const* itemTemplate = item->GetTemplate();
+        if (!itemTemplate)
+            return;
+
         if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
             return;
-        ItemTemplate const* itemTemplate = item->GetTemplate();
+
+        if (!fromVendorSell)
+        {
+            if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) && !sTransmogrification->GetAllowTradeable())
+                return;
+
+            if (!item->IsSoulBound())
+            {
+                ItemBondingType bonding = static_cast<ItemBondingType>(itemTemplate->Bonding);
+
+                // BOE/BWU blocked on acquire (learn on equip or vendor-sell)
+                if (bonding == ItemBondingType::BIND_WHEN_EQUIPPED ||
+                    bonding == ItemBondingType::BIND_WHEN_USE)
+                    return;
+            }
+        }
+
         AddToDatabase(player, itemTemplate);
     }
 
@@ -1047,6 +1068,7 @@ public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify", {
         PLAYERHOOK_ON_EQUIP,
         PLAYERHOOK_ON_LOOT_ITEM,
+        PLAYERHOOK_ON_STORE_NEW_ITEM,
         PLAYERHOOK_ON_CREATE_ITEM,
         PLAYERHOOK_ON_AFTER_STORE_OR_EQUIP_NEW_ITEM,
         PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
@@ -1054,13 +1076,15 @@ public:
         PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY,
         PLAYERHOOK_ON_LOGIN,
         PLAYERHOOK_ON_LOGOUT,
-        PLAYERHOOK_ON_BEFORE_BUY_ITEM_FROM_VENDOR
+        PLAYERHOOK_ON_BEFORE_BUY_ITEM_FROM_VENDOR,
+        PLAYERHOOK_CAN_SELL_ITEM
     }) { }
 
     void OnPlayerEquip(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
     {
         if (!sT->GetUseCollectionSystem())
             return;
+
         AddToDatabase(player, it);
     }
 
@@ -1068,30 +1092,40 @@ public:
     {
         if (!sT->GetUseCollectionSystem() || !item || typeid(*item) != typeid(Item))
             return;
-        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
-        {
-            AddToDatabase(player, item);
-        }
+
+        AddToDatabase(player, item);
+    }
+
+    void OnPlayerStoreNewItem(Player* player, Item* item, uint32 /*count*/) override
+    {
+        if (!sT->GetUseCollectionSystem() || !item)
+            return;
+
+        AddToDatabase(player, item);
     }
 
     void OnPlayerCreateItem(Player* player, Item* item, uint32 /*count*/) override
     {
-        if (!sT->GetUseCollectionSystem())
+        if (!sT->GetUseCollectionSystem() || !item)
             return;
-        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
-        {
-            AddToDatabase(player, item);
-        }
+
+        AddToDatabase(player, item);
     }
 
     void OnPlayerAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
     {
-        if (!sT->GetUseCollectionSystem())
+        if (!sT->GetUseCollectionSystem() || !item)
             return;
-        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
-        {
-            AddToDatabase(player, item);
-        }
+
+        AddToDatabase(player, item);
+    }
+
+    bool OnPlayerCanSellItem(Player* player, Item* item, Creature* /*creature*/) override
+    {
+        if (sT->GetUseCollectionSystem() && item)
+            AddToDatabase(player, item, true);
+
+        return true;
     }
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
