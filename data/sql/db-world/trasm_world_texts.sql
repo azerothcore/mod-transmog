@@ -24,7 +24,7 @@ INSERT INTO `npc_text_locale` (`ID`, `Locale`, `Text0_0`) VALUES
 (@TEXT_ID+1, 'ruRU', 'Вы можете сохранять свои собственные наборы для трансмогрификации.\r\n\r\nЧтобы сохранить, сначала вы должны трансмогрифицировать свои экипированные предметы.\r\nЗатем, когда вы перейдете в меню управления наборами и перейдете в меню сохранения набора,\r\nвсе предметы которые вы преобразовали, отображаются так, что вы видите, что вы сохраняете.\r\nЕсли вы считаете, что набор в порядке, вы можете нажать, чтобы сохранить набор и назвать его по своему желанию.\r\n\r\nЧтобы использовать набор, можно щелкнуть сохраненный набор в меню управления набором, а затем выбрать использовать набор.\r\nЕсли в наборе есть трансмогрификация предмета, который уже трансмогрифицирован, старая трансмогрификация теряется.\r\nОбратите внимание, что те же ограничения на трансмогрификацию применяются, когда пытается использовать набор, как при обычной трансмогрификации.\r\n\r\nЧтобы удалить набор, вы можете перейти в меню набора и выбрать удалить набор.');
 
 SET @STRING_ENTRY := 11100;
-DELETE FROM `acore_string` WHERE `entry` BETWEEN @STRING_ENTRY AND @STRING_ENTRY+18;
+DELETE FROM `acore_string` WHERE `entry` BETWEEN @STRING_ENTRY AND @STRING_ENTRY+21;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`)
 VALUES
 (11100, 'Item successfully transmogrified.', '성공적으로 형상변환된 아이템', 'Objet transmogrifié avec succès', 'Gegenstand erfolgreich transmogrifiziert', '物品变形成功', '物品變身成功。', 'Objeto transfigurado con éxito', 'Objeto transfigurado con éxito', 'Предмет успешно трансмогрифицирован'),
@@ -45,13 +45,41 @@ VALUES
 (11115, 'Performing transmog appearance sync...', '형상변환 모양 동기화 수행 중...', 'Exécution de la synchronisation de l''apparence de transmogrification...', 'Synchronisierung des Transmog-Erscheinungsbilds wird durchgeführt ...', '正在执行 Transmog 外观同步...', '正在執行外觀同步變身操作...', 'Realizando sincronización de apariencia de transfiguración...', 'Realizando sincronización de apariencia de transfiguración...', 'Выполнение синхронизации внешнего вида Transmog...'),
 (11116, 'Appearance sync complete.', '전체 모양 동기화', 'Synchronisation complète de l''apparence', 'Vollständige Synchronisierung des Erscheinungsbilds', '完全外观同步', '外觀同步變身操作完成。', 'Sincronización de apariencia completa', 'Sincronización de apariencia completa', 'Полная синхронизация внешнего вида'),
 (11117, 'The transmog NPC will now display available appearances as a vendor interface, allowing preview. \nDISCLAIMER: If you have too many appearances, some will not be displayed due to a client limitation. In that case, disable this option.', '', '', '', '', '', '', '', ''),
-(11118, 'The transmog NPC will now display available apperances as gossip list.', '', '', '', '', '', '', '', '');
+(11118, 'The transmog NPC will now display available apperances as gossip list.', '', '', '', '', '', '', '', ''),
+(11119, '|cFF4DB3FFSet bonuses won''t appear in the item tooltip while transmogrified, but they are still fully active.\nTo stop seeing this notice, type |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF.|r',
+    '|cFF4DB3FF변형 중에는 아이템 툴팁에 세트 보너스가 표시되지 않지만, 여전히 완전히 활성화되어 있습니다.\n이 알림을 중지하려면 |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF 을 입력하세요.|r',
+    '|cFF4DB3FFLes bonus de set n''apparaîtront pas dans l''info-bulle de l''objet lors de la transmogrification, mais ils restent pleinement actifs.\nPour arrêter d''afficher cette notice, tapez |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF.|r',
+    '|cFF4DB3FFSetboni werden in der Gegenstandsbeschreibung während der Transmogrifizierung nicht angezeigt, sind aber weiterhin voll aktiv.\nUm diesen Hinweis zu deaktivieren, gib |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF ein.|r',
+    '|cFF4DB3FF幻化后物品提示中不会显示套装加成，但套装加成仍然完全有效。\n若要停止显示此提示，请输入 |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF。|r',
+    '|cFF4DB3FF幻化後物品提示中不會顯示套裝加成，但套裝加成仍然完全有效。\n若要停止顯示此提示，請輸入 |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF。|r',
+    '|cFF4DB3FFLas bonificaciones de conjunto no aparecerán en la descripción del objeto mientras esté transfigurado, pero siguen activas.\nPara dejar de ver este aviso, escribe |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF.|r',
+    '|cFF4DB3FFLas bonificaciones de conjunto no aparecerán en la descripción del objeto mientras esté transfigurado, pero siguen activas.\nPara dejar de ver este aviso, escribe |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF.|r',
+    '|cFF4DB3FFБонусы набора не будут отображаться в подсказке предмета при трансмогрификации, но они по-прежнему полностью активны.\nЧтобы скрыть это уведомление, введите |cFFFFFFFF.transmog disclaimer off|cFF4DB3FF.|r'),
+(11120, 'Set bonus disclaimer enabled.',
+    '세트 보너스 알림이 활성화되었습니다.',
+    'Avertissement de bonus de set activé.',
+    'Setbonus-Hinweis aktiviert.',
+    '套装加成提示已启用。',
+    '套裝加成提示已啟用。',
+    'Aviso de bonificación de conjunto activado.',
+    'Aviso de bonificación de conjunto activado.',
+    'Уведомление о бонусах набора включено.'),
+(11121, 'Set bonus disclaimer disabled.',
+    '세트 보너스 알림이 비활성화되었습니다.',
+    'Avertissement de bonus de set désactivé.',
+    'Setbonus-Hinweis deaktiviert.',
+    '套装加成提示已禁用。',
+    '套裝加成提示已禁用。',
+    'Aviso de bonificación de conjunto desactivado.',
+    'Aviso de bonificación de conjunto desactivado.',
+    'Уведомление о бонусах набора отключено.');
 
-DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog sync', 'transmog add set', 'transmog portable', 'transmog interface');
+DELETE FROM `command` WHERE `name` IN ('transmog', 'transmog add', 'transmog sync', 'transmog add set', 'transmog portable', 'transmog interface', 'transmog disclaimer');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('transmog', 0, 'Syntax: .transmog <on/off>\nAllows seeing transmogrified items and the transmogrifier NPC.'),
 ('transmog add', 1, 'Syntax: .transmog add $player $item\nAdds an item to a player\'s appearance collection.'),
 ('transmog sync', 0, 'Syntax: .transmog sync\nSyncs transmog addon appearances with the server.'),
 ('transmog add set', 1, 'Syntax: .transmog add set $player $itemSet\nAdds items of an item set to a player\'s appearance collection.'),
 ('transmog portable', 1, 'Syntax: .transmog portable \nSummons the Ethereal Warpweaver, a portable version of the transmogrification NPC.'),
-('transmog interface', 1, 'Syntax: .transmog interface <on/off>\nEnables transmogrifier "vendor" interface, allowing appearance previews.\nDISCLAIMER: If you have too many appearances, some will not be displayed due to a client limitation. In that case, disable this option.');
+('transmog interface', 1, 'Syntax: .transmog interface <on/off>\nEnables transmogrifier "vendor" interface, allowing appearance previews.\nDISCLAIMER: If you have too many appearances, some will not be displayed due to a client limitation. In that case, disable this option.'),
+('transmog disclaimer', 0, 'Syntax: .transmog disclaimer <on/off>\nToggles the set bonus disclaimer notice shown when transmogrifying set items.');

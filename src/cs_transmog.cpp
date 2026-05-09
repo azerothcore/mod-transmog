@@ -41,12 +41,13 @@ public:
 
         static ChatCommandTable transmogTable =
         {
-            { "add",       addCollectionTable                                            },
-            { "",          HandleDisableTransMogVisual,   SEC_PLAYER,        Console::No },
-            { "sync",      HandleSyncTransMogCommand,     SEC_PLAYER,        Console::No },
-            { "portable",  HandleTransmogPortableCommand, SEC_PLAYER,        Console::No },
-            { "interface", HandleInterfaceOption,         SEC_PLAYER,        Console::No },
-            { "reload",    HandleReloadTransmogConfig,    SEC_ADMINISTRATOR, Console::Yes}
+            { "add",        addCollectionTable                                            },
+            { "",           HandleDisableTransMogVisual,   SEC_PLAYER,        Console::No },
+            { "sync",       HandleSyncTransMogCommand,     SEC_PLAYER,        Console::No },
+            { "portable",   HandleTransmogPortableCommand, SEC_PLAYER,        Console::No },
+            { "interface",  HandleInterfaceOption,         SEC_PLAYER,        Console::No },
+            { "disclaimer", HandleDisclaimerOption,        SEC_PLAYER,        Console::No },
+            { "reload",     HandleReloadTransmogConfig,    SEC_ADMINISTRATOR, Console::Yes}
         };
 
         static ChatCommandTable commandTable =
@@ -314,6 +315,22 @@ public:
     {
         handler->GetPlayer()->UpdatePlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE, enable);
         handler->SendSysMessage(enable ? LANG_CMD_TRANSMOG_VENDOR_INTERFACE_ENABLE : LANG_CMD_TRANSMOG_VENDOR_INTERFACE_DISABLE);
+        return true;
+    }
+
+    static bool HandleDisclaimerOption(ChatHandler* handler, bool enable)
+    {
+        Player* player = handler->GetPlayer();
+        if (enable)
+        {
+            player->UpdatePlayerSetting("mod-transmog", SETTING_HIDE_SET_DISCLAIMER, 0);
+            handler->SendSysMessage(LANG_CMD_TRANSMOG_DISCLAIMER_ON);
+        }
+        else
+        {
+            player->UpdatePlayerSetting("mod-transmog", SETTING_HIDE_SET_DISCLAIMER, 1);
+            handler->SendSysMessage(LANG_CMD_TRANSMOG_DISCLAIMER_OFF);
+        }
         return true;
     }
 

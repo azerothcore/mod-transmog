@@ -443,7 +443,19 @@ void PerformTransmogrification (Player* player, uint32 itemEntry, uint32 cost)
     }
     TransmogAcoreStrings res = sT->Transmogrify(player, itemEntry, slot);
     if (res == LANG_ERR_TRANSMOG_OK)
-        session->SendAreaTriggerMessage("{}",GTS(LANG_ERR_TRANSMOG_OK));
+    {
+        session->SendAreaTriggerMessage("{}", GTS(LANG_ERR_TRANSMOG_OK));
+
+        if (sT->ShowSetDisclaimer &&
+            !player->GetPlayerSetting("mod-transmog", SETTING_HIDE_SET_DISCLAIMER).value)
+        {
+            if (Item* destItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            {
+                if (destItem->GetTemplate()->ItemSet)
+                    ChatHandler(session).SendSysMessage(LANG_TRANSMOG_SET_DISCLAIMER);
+            }
+        }
+    }
     else
         ChatHandler(session).SendNotification(res);
 }

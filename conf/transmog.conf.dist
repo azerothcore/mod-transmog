@@ -12,6 +12,12 @@
 #                     Players won't be able to see any transmogrified item while disabled, however, database data remains intact.
 #        Default:     1
 #
+#    Transmogrification.ShowSetDisclaimer
+#        Description: If enabled, players receive a chat notice when transmogrifying an item that belongs to a set,
+#                     explaining that set bonuses remain active even though the tooltip won't reflect them.
+#                     Players can suppress the notice per-character with: .transmog disclaimer off
+#        Default:     0
+#
 #    Transmogrification.UseCollectionSystem
 #        Description: Enables/Disables Legion-style appearance collection system.
 #                     If enabled, players can use the appearance of any item equipped or rewarded from a completed quest.
@@ -79,6 +85,7 @@
 #
 
 Transmogrification.Enable = 1
+Transmogrification.ShowSetDisclaimer = 0
 Transmogrification.UseCollectionSystem = 1
 Transmogrification.UseVendorInterface = 0
 Transmogrification.AllowHiddenTransmog = 1

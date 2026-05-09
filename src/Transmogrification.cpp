@@ -1158,6 +1158,7 @@ void Transmogrification::LoadConfig(bool reload)
 
     IsTransmogEnabled = sConfigMgr->GetOption<bool>("Transmogrification.Enable", true);
     IsPortableNPCEnabled = sConfigMgr->GetOption<bool>("Transmogrification.EnablePortable", true);
+    ShowSetDisclaimer = sConfigMgr->GetOption<bool>("Transmogrification.ShowSetDisclaimer", false);
 
     if (!sObjectMgr->GetItemTemplate(TokenEntry))
     {
