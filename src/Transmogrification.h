@@ -44,35 +44,57 @@ enum MixedWeaponSettings
     MIXED_WEAPONS_LOOSE  = 2
 };
 
-enum TransmogAcoreStrings // Language.h might have same entries, appears when executing SQL, change if needed
+enum TransmogStrings : uint32
 {
-    LANG_ERR_TRANSMOG_OK = 11100, // change this
-    LANG_ERR_TRANSMOG_INVALID_SLOT,
-    LANG_ERR_TRANSMOG_INVALID_SRC_ENTRY,
-    LANG_ERR_TRANSMOG_MISSING_SRC_ITEM,
-    LANG_ERR_TRANSMOG_MISSING_DEST_ITEM,
-    LANG_ERR_TRANSMOG_INVALID_ITEMS,
-    LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY,
-    LANG_ERR_TRANSMOG_NOT_ENOUGH_TOKENS,
-
-    LANG_ERR_UNTRANSMOG_OK,
-    LANG_ERR_UNTRANSMOG_NO_TRANSMOGS,
-
-#ifdef PRESETS
-    LANG_PRESET_ERR_INVALID_NAME,
-#endif
-    LANG_CMD_TRANSMOG_SHOW = 11111,
-    LANG_CMD_TRANSMOG_HIDE = 11112,
-    LANG_CMD_TRANSMOG_ADD_UNSUITABLE = 11113,
-    LANG_CMD_TRANSMOG_ADD_FORBIDDEN = 11114,
-    LANG_CMD_TRANSMOG_BEGIN_SYNC = 11115,
-    LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
-    LANG_CMD_TRANSMOG_VENDOR_INTERFACE_ENABLE = 11117,
-    LANG_CMD_TRANSMOG_VENDOR_INTERFACE_DISABLE = 11118,
-
-    LANG_TRANSMOG_SET_DISCLAIMER     = 11119,
-    LANG_CMD_TRANSMOG_DISCLAIMER_ON  = 11120,
-    LANG_CMD_TRANSMOG_DISCLAIMER_OFF = 11121
+    // Transmog result strings
+    LANG_TRANSMOG_OK                           = 1,
+    LANG_TRANSMOG_INVALID_SLOT                 = 2,
+    LANG_TRANSMOG_INVALID_SRC_ENTRY            = 3,
+    LANG_TRANSMOG_MISSING_SRC_ITEM             = 4,
+    LANG_TRANSMOG_MISSING_DEST_ITEM            = 5,
+    LANG_TRANSMOG_INVALID_ITEMS                = 6,
+    LANG_TRANSMOG_NOT_ENOUGH_MONEY             = 7,
+    LANG_TRANSMOG_NOT_ENOUGH_TOKENS            = 8,
+    LANG_TRANSMOG_UNTRANSMOG_OK                = 9,
+    LANG_TRANSMOG_UNTRANSMOG_NO_TRANSMOGS      = 10,
+    LANG_TRANSMOG_PRESET_ERR_INVALID_NAME      = 11,
+    // Command strings
+    LANG_TRANSMOG_CMD_SHOW                     = 12,
+    LANG_TRANSMOG_CMD_HIDE                     = 13,
+    LANG_TRANSMOG_CMD_ADD_UNSUITABLE           = 14,
+    LANG_TRANSMOG_CMD_ADD_FORBIDDEN            = 15,
+    LANG_TRANSMOG_CMD_BEGIN_SYNC               = 16,
+    LANG_TRANSMOG_CMD_COMPLETE_SYNC            = 17,
+    LANG_TRANSMOG_CMD_VENDOR_INTERFACE_ENABLE  = 18,
+    LANG_TRANSMOG_CMD_VENDOR_INTERFACE_DISABLE = 19,
+    // Gossip/UI strings
+    LANG_TRANSMOG_HOWWORKS                     = 20,
+    LANG_TRANSMOG_MANAGESETS                   = 21,
+    LANG_TRANSMOG_REMOVETRANSMOG               = 22,
+    LANG_TRANSMOG_REMOVETRANSMOG_ASK           = 23,
+    LANG_TRANSMOG_UPDATEMENU                   = 24,
+    LANG_TRANSMOG_HOWSETSWORK                  = 25,
+    LANG_TRANSMOG_SAVESET                      = 26,
+    LANG_TRANSMOG_BACK                         = 27,
+    LANG_TRANSMOG_USESET                       = 28,
+    LANG_TRANSMOG_CONFIRM_USESET               = 29,
+    LANG_TRANSMOG_DELETESET                    = 30,
+    LANG_TRANSMOG_CONFIRM_DELETESET            = 31,
+    LANG_TRANSMOG_INSERTSETNAME                = 32,
+    LANG_TRANSMOG_SEARCH                       = 33,
+    LANG_TRANSMOG_SEARCHING_FOR                = 34,
+    LANG_TRANSMOG_SEARCH_FOR_ITEM              = 35,
+    LANG_TRANSMOG_CONFIRM_HIDE_ITEM            = 36,
+    LANG_TRANSMOG_HIDESLOT                     = 37,
+    LANG_TRANSMOG_REMOVETRANSMOG_SLOT          = 38,
+    LANG_TRANSMOG_CONFIRM_USEITEM              = 39,
+    LANG_TRANSMOG_PREVIOUS_PAGE                = 40,
+    LANG_TRANSMOG_NEXT_PAGE                    = 41,
+    LANG_TRANSMOG_ADDED_APPEARANCE             = 42,
+    // Disclaimer strings
+    LANG_TRANSMOG_SET_DISCLAIMER               = 43,
+    LANG_TRANSMOG_CMD_DISCLAIMER_ON            = 44,
+    LANG_TRANSMOG_CMD_DISCLAIMER_OFF           = 45,
 };
 
 enum ArmorClassSpellIDs
@@ -232,9 +254,9 @@ public:
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
     bool AddCollectedAppearance(uint32 accountId, uint32 itemId);
 
-    TransmogAcoreStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
-    TransmogAcoreStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
-    TransmogAcoreStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
+    TransmogStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
+    TransmogStrings Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost = false, bool hidden_transmog = false);
     bool CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* destination, ItemTemplate const* source) const;
     bool SuitableForTransmogrification(Player* player, ItemTemplate const* proto) const;
     bool SuitableForTransmogrification(ObjectGuid guid, ItemTemplate const* proto) const;

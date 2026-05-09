@@ -476,7 +476,7 @@ bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
     return inserted;
 }
 
-TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
+TransmogStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {
     if (itemEntry == UINT_MAX) // Hidden transmog
     {
         return Transmogrify(player, nullptr, slot, no_cost, true);
@@ -485,14 +485,14 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, uint32 ite
     if (!sObjectMgr->GetItemTemplate(itemEntry))
     {
         LOG_ERROR("module", "Transmogrification::Transmogrify - Player ({}) tried to transmogrify with an invalid item entry ({}).", player->GetGUID().ToString(), itemEntry);
-        return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
+        return LANG_TRANSMOG_MISSING_SRC_ITEM;
     }
 
     Item* itemTransmogrifier = Item::CreateItem(itemEntry, 1, 0);
     return Transmogrify(player, itemTransmogrifier, slot, no_cost, false);
 }
 
-TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost) {
+TransmogStrings Transmogrification::Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost) {
     Item* itemTransmogrifier = NULL;
     // guid of the transmogrifier item, if it's not 0
     if (itemGUID)
@@ -501,20 +501,20 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, ObjectGuid
         if (!itemTransmogrifier)
         {
             //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify with an invalid item (lowguid: {}).", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGUID));
-            return LANG_ERR_TRANSMOG_MISSING_SRC_ITEM;
+            return LANG_TRANSMOG_MISSING_SRC_ITEM;
         }
     }
     return Transmogrify(player, itemTransmogrifier, slot, no_cost, false);
 }
 
-TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost, bool hidden_transmog)
+TransmogStrings Transmogrification::Transmogrify(Player* player, Item* itemTransmogrifier, uint8 slot, /*uint32 newEntry, */bool no_cost, bool hidden_transmog)
 {
     int32 cost = 0;
     // slot of the transmogrified item
     if (slot >= EQUIPMENT_SLOT_END)
     {
         // TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify an item (lowguid: {}) with a wrong slot ({}) when transmogrifying items.", player->GetGUIDLow(), player->GetName(), GUID_LOPART(itemGUID), slot);
-        return LANG_ERR_TRANSMOG_INVALID_SLOT;
+        return LANG_TRANSMOG_INVALID_SLOT;
     }
 
     // transmogrified item
@@ -522,7 +522,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
     if (!itemTransmogrified)
     {
         //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) tried to transmogrify an invalid item in a valid slot (slot: {}).", player->GetGUIDLow(), player->GetName(), slot);
-        return LANG_ERR_TRANSMOG_MISSING_DEST_ITEM;
+        return LANG_TRANSMOG_MISSING_DEST_ITEM;
     }
 
     if (hidden_transmog)
@@ -539,12 +539,12 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
             else
             {
                 if (!player->HasEnoughMoney(cost))
-                    return LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY;
+                    return LANG_TRANSMOG_NOT_ENOUGH_MONEY;
                 player->ModifyMoney(-cost, false);
             }
         }
         SetFakeEntry(player, HIDDEN_ITEM_ID, slot, itemTransmogrified); // newEntry
-        return LANG_ERR_TRANSMOG_OK;
+        return LANG_TRANSMOG_OK;
     }
 
     if (!itemTransmogrifier) // reset look newEntry
@@ -557,7 +557,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
         if (!CanTransmogrifyItemWithItem(player, itemTransmogrified->GetTemplate(), itemTransmogrifier->GetTemplate()))
         {
             //TC_LOG_DEBUG(LOG_FILTER_NETWORKIO, "WORLD: HandleTransmogrifyItems - Player (GUID: {}, name: {}) failed CanTransmogrifyItemWithItem ({} with {}).", player->GetGUIDLow(), player->GetName(), itemTransmogrified->GetEntry(), itemTransmogrifier->GetEntry());
-            return LANG_ERR_TRANSMOG_INVALID_ITEMS;
+            return LANG_TRANSMOG_INVALID_ITEMS;
         }
 
         if (!no_cost)
@@ -567,7 +567,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
                 if (player->HasItemCount(TokenEntry, TokenAmount))
                     player->DestroyItemCount(TokenEntry, TokenAmount, true);
                 else
-                    return LANG_ERR_TRANSMOG_NOT_ENOUGH_TOKENS;
+                    return LANG_TRANSMOG_NOT_ENOUGH_TOKENS;
             }
 
             cost = GetSpecialPrice(itemTransmogrified->GetTemplate());
@@ -582,7 +582,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
                 else
                 {
                     if (!player->HasEnoughMoney(cost))
-                        return LANG_ERR_TRANSMOG_NOT_ENOUGH_MONEY;
+                        return LANG_TRANSMOG_NOT_ENOUGH_MONEY;
                     player->ModifyMoney(-cost, false);
                 }
             }
@@ -605,7 +605,7 @@ TransmogAcoreStrings Transmogrification::Transmogrify(Player* player, Item* item
         itemTransmogrifier->ClearSoulboundTradeable(player);
     }
 
-    return LANG_ERR_TRANSMOG_OK;
+    return LANG_TRANSMOG_OK;
 }
 
 bool Transmogrification::CanTransmogrifyItemWithItem(Player* player, ItemTemplate const* target, ItemTemplate const* source) const
