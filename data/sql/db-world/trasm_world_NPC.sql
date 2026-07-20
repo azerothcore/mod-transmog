@@ -1,6 +1,6 @@
 SET
 @Entry = 190010,
-@Name = "Warpweaver";
+@Name = "比尔盖幻";
 DELETE FROM `creature_template` WHERE `entry` = @Entry;
 
 INSERT INTO `creature_template` (`entry`, `name`, `subname`, `IconName`, `gossip_menu_id`, `minlevel`, `maxlevel`, `exp`, `faction`, `npcflag`, `rank`, `dmgschool`, `BaseAttackTime`, `RangeAttackTime`, `unit_class`, `unit_flags`, `type`, `type_flags`, `lootid`, `pickpocketloot`, `skinloot`, `AIName`, `MovementType`, `HoverHeight`, `RacialLeader`, `movementId`, `RegenHealth`, `CreatureImmunitiesId`, `flags_extra`, `ScriptName`) VALUES
@@ -15,7 +15,7 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALU
 (@Entry, 'koKR', @Name, "변형기"),
 (@Entry, 'frFR', @Name, "Transmogrificateur"),
 (@Entry, 'deDE', @Name, "Transmogrifier"),
-(@Entry, 'zhCN', @Name, "变形者"),
+(@Entry, 'zhCN', @Name, "幻化大師"),
 (@Entry, 'zhTW', @Name, "幻化大師"),
 (@Entry, 'esES', @Name, "Transfigurador"),
 (@Entry, 'esMX', @Name, "Transfigurador"),
