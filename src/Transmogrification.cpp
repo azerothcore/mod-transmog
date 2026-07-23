@@ -479,6 +479,8 @@ bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
 
 void Transmogrification::AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
 {
+    if (!player || !itemTemplate)
+        return;
     if (!GetTrackUnusableItems() && !SuitableForTransmogrification(player, itemTemplate))
         return;
     if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
