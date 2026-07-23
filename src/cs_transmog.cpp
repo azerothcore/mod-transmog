@@ -459,16 +459,29 @@ public:
             if (bag == 0)
             {
                 // Backpack: WoW slot 1 maps to INVENTORY_SLOT_ITEM_START.
-                if (wowSlot <= INVENTORY_SLOT_ITEM_END - INVENTORY_SLOT_ITEM_START)
-                    item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + wowSlot - 1);
+                uint8 maxSlots = INVENTORY_SLOT_ITEM_END - INVENTORY_SLOT_ITEM_START;
+                if (wowSlot > maxSlots)
+                {
+                    handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_INVALID_SLOT);
+                    handler->SetSentErrorMessage(true);
+                    return true;
+                }
+
+                item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + wowSlot - 1);
             }
             else
             {
                 // Equipped bag: WoW bag 1-4 maps to INVENTORY_SLOT_BAG_START + (bag - 1).
                 uint8 bagPos = INVENTORY_SLOT_BAG_START + (bag - 1);
-                if (Bag* pBag = player->GetBagByPos(bagPos))
-                    if (wowSlot <= pBag->GetBagSize())
-                        item = player->GetItemByPos(bagPos, wowSlot - 1);
+                Bag* pBag = player->GetBagByPos(bagPos);
+                if (!pBag || wowSlot > pBag->GetBagSize())
+                {
+                    handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_INVALID_SLOT);
+                    handler->SetSentErrorMessage(true);
+                    return true;
+                }
+
+                item = player->GetItemByPos(bagPos, wowSlot - 1);
             }
 
             if (!item)
