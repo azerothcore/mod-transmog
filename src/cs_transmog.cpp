@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Bag.h"
 #include "Chat.h"
+#include "DatabaseEnv.h"
+#include "Item.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "Transmogrification.h"
-#include "Tokenize.h"
-#include "DatabaseEnv.h"
 #include "SpellMgr.h"
+#include "Transmogrification.h"
 
 using namespace Acore::ChatCommands;
 
@@ -46,6 +47,7 @@ public:
             { "",           HandleDisableTransMogVisual,   SEC_PLAYER,        Console::No  },
             { "sync",       HandleSyncTransMogCommand,     SEC_PLAYER,        Console::No  },
             { "portable",   HandleTransmogPortableCommand, SEC_PLAYER,        Console::No  },
+            { "claim",      HandleClaimCommand,            SEC_PLAYER,        Console::No  },
             { "interface",  HandleInterfaceOption,         SEC_PLAYER,        Console::No  },
             { "disclaimer", HandleDisclaimerOption,        SEC_PLAYER,        Console::No  },
             { "reload",     HandleReloadTransmogConfig,    SEC_ADMINISTRATOR, Console::Yes }
@@ -311,6 +313,187 @@ public:
         player->CastSpell((Unit*)nullptr, sTransmogrification->PetSpellId, true);
         return true;
     };
+
+    enum class ClaimResult
+    {
+        Claimed,
+        AlreadyOwned,
+        Unsuitable
+    };
+
+    // Binds the item to the player, strips its refundable/BoP-tradeable flags and unlocks its
+    // appearance in the account collection. Sends no feedback of its own; the caller decides what to
+    // report. AddToDatabase shows the per-item "new appearance" message when the appearance is new.
+    static ClaimResult TryClaimItem(Player* player, Item* item)
+    {
+        ItemTemplate const* itemTemplate = item->GetTemplate();
+
+        // Only allow claiming if the character could actually equip the item.
+        if (!sTransmogrification->SuitableForTransmogrification(player, itemTemplate))
+            return ClaimResult::Unsuitable;
+
+        uint32 accountId = player->GetSession()->GetAccountId();
+        auto accIt = sTransmogrification->collectionCache.find(accountId);
+        if (accIt != sTransmogrification->collectionCache.end() && accIt->second.contains(itemTemplate->ItemId))
+            return ClaimResult::AlreadyOwned;
+
+        // Claim the physical item: bind it to the player and drop the refundable/BoP-tradeable flags
+        // so the appearance can't be collected and then refunded to a vendor or traded away.
+        item->SetOwnerGUID(player->GetGUID());
+        item->SetNotRefundable(player);
+        if (!sTransmogrification->GetAllowTradeable())
+            item->ClearSoulboundTradeable(player);
+        item->SetBinding(true);
+        item->SetState(ITEM_CHANGED, player);
+
+        // Unlock the appearance and show the "added to your appearance collection" message (LANG_TRANSMOG_ADDED_APPEARANCE).
+        sTransmogrification->AddToDatabase(player, itemTemplate);
+        return ClaimResult::Claimed;
+    }
+
+    // Claims item appearances held in the player's bags without having to equip them. Forms:
+    //   .transmog claim [item link]  - first instance of that item in the player's bags
+    //   .transmog claim <bag> <slot> - WoW client numbering: bag 0 = backpack, 1-4 = equipped bags,
+    //                                  slots start at 1 (matches GetContainerItemInfo).
+    //   .transmog claim all          - every unknown, claimable appearance in the player's bags
+    static bool HandleClaimCommand(ChatHandler* handler, Variant<Hyperlink<Acore::Hyperlinks::LinkTags::item>, EXACT_SEQUENCE("all"), uint8> claimArg, Optional<uint8> slotArg)
+    {
+        if (!sTransmogrification->GetUseCollectionSystem())
+        {
+            handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_DISABLED);
+            handler->SetSentErrorMessage(true);
+            return true;
+        }
+
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        // .transmog claim all - sweep every item in the backpack and equipped bags.
+        if (claimArg.holds_alternative<EXACT_SEQUENCE("all")>())
+        {
+            uint32 claimed = 0;
+
+            auto claimSlot = [&](Item* bagItem)
+            {
+                if (bagItem && TryClaimItem(player, bagItem) == ClaimResult::Claimed)
+                    ++claimed;
+            };
+
+            for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+                claimSlot(player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot));
+
+            for (uint8 bag = INVENTORY_SLOT_BAG_START; bag < INVENTORY_SLOT_BAG_END; ++bag)
+            {
+                Bag* pBag = player->GetBagByPos(bag);
+                if (!pBag)
+                    continue;
+                for (uint32 slot = 0; slot < pBag->GetBagSize(); ++slot)
+                    claimSlot(player->GetItemByPos(bag, slot));
+            }
+
+            if (claimed)
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_ALL_RESULT, claimed);
+            }
+            else
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_ALL_NONE);
+                handler->SetSentErrorMessage(true);
+            }
+            return true;
+        }
+
+        // Otherwise resolve a single item, either from a shift-clicked link or a bag/slot position.
+        Item* item = nullptr;
+
+        if (claimArg.holds_alternative<Hyperlink<Acore::Hyperlinks::LinkTags::item>>())
+        {
+            // Item-link form: claim the first instance of this item held in the player's bags.
+            uint32 itemId = claimArg.get<Hyperlink<Acore::Hyperlinks::LinkTags::item>>()->Item->ItemId;
+
+            // Backpack
+            for (uint8 slot = INVENTORY_SLOT_ITEM_START; !item && slot < INVENTORY_SLOT_ITEM_END; ++slot)
+                if (Item* bagItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                    if (bagItem->GetEntry() == itemId)
+                        item = bagItem;
+
+            // Equipped bags
+            for (uint8 bag = INVENTORY_SLOT_BAG_START; !item && bag < INVENTORY_SLOT_BAG_END; ++bag)
+            {
+                Bag* pBag = player->GetBagByPos(bag);
+                if (!pBag)
+                    continue;
+                for (uint32 slot = 0; !item && slot < pBag->GetBagSize(); ++slot)
+                    if (Item* bagItem = player->GetItemByPos(bag, slot))
+                        if (bagItem->GetEntry() == itemId)
+                            item = bagItem;
+            }
+
+            if (!item)
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_NOT_IN_BAGS);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+        }
+        else
+        {
+            // Bag/slot form: WoW client numbering (bag 0 = backpack, 1-4 = equipped bags; 1-based slot).
+            uint8 bag = claimArg.get<uint8>();
+            if (!slotArg)
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_USAGE);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+
+            uint8 wowSlot = *slotArg;
+            if (bag > 4 || wowSlot == 0)
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_INVALID_SLOT);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+
+            if (bag == 0)
+            {
+                // Backpack: WoW slot 1 maps to INVENTORY_SLOT_ITEM_START.
+                if (wowSlot <= INVENTORY_SLOT_ITEM_END - INVENTORY_SLOT_ITEM_START)
+                    item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START + wowSlot - 1);
+            }
+            else
+            {
+                // Equipped bag: WoW bag 1-4 maps to INVENTORY_SLOT_BAG_START + (bag - 1).
+                uint8 bagPos = INVENTORY_SLOT_BAG_START + (bag - 1);
+                if (Bag* pBag = player->GetBagByPos(bagPos))
+                    if (wowSlot <= pBag->GetBagSize())
+                        item = player->GetItemByPos(bagPos, wowSlot - 1);
+            }
+
+            if (!item)
+            {
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_EMPTY_SLOT);
+                handler->SetSentErrorMessage(true);
+                return true;
+            }
+        }
+
+        switch (TryClaimItem(player, item))
+        {
+            case ClaimResult::Unsuitable:
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_ADD_UNSUITABLE);
+                handler->SetSentErrorMessage(true);
+                break;
+            case ClaimResult::AlreadyOwned:
+                handler->PSendModuleSysMessage("mod-transmog", LANG_TRANSMOG_CMD_CLAIM_ALREADY);
+                handler->SetSentErrorMessage(true);
+                break;
+            case ClaimResult::Claimed:
+                break; // AddToDatabase already announced the new appearance.
+        }
+        return true;
+    }
 
     static bool HandleInterfaceOption(ChatHandler* handler, bool enable)
     {

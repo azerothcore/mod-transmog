@@ -702,30 +702,7 @@ private:
 
     void AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
     {
-        if (!sT->GetTrackUnusableItems() && !sT->SuitableForTransmogrification(player, itemTemplate))
-            return;
-        if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
-            return;
-        uint32 itemId = itemTemplate->ItemId;
-        WorldSession* session = player->GetSession();
-        uint32 accountId = session->GetAccountId();
-        std::string itemName = itemTemplate->Name1;
-
-        int loc_idex = session->GetSessionDbLocaleIndex();
-        if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
-            ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
-
-        std::stringstream tempStream;
-        tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
-        std::string itemQuality = tempStream.str();
-        bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value) && !sT->CanNeverTransmog(itemTemplate);
-        if (sT->AddCollectedAppearance(accountId, itemId))
-        {
-            if (showChatMessage)
-                ChatHandler(session).PSendSysMessage(R"(|c{}|Hitem:{}:0:0:0:0:0:0:0:0|h[{}]|h|r {})", itemQuality, itemId, itemName, Tstr(session, LANG_TRANSMOG_ADDED_APPEARANCE));
-
-            CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
-        }
+        sT->AddToDatabase(player, itemTemplate);
     }
 
     void CheckRetroActiveInventoryAppearances(Player* player)

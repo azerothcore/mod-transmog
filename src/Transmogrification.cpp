@@ -1,8 +1,9 @@
-#include "Transmogrification.h"
-#include "ItemTemplate.h"
 #include "DatabaseEnv.h"
+#include "ItemTemplate.h"
 #include "SpellMgr.h"
 #include "Tokenize.h"
+#include "Transmogrification.h"
+#include "WorldSession.h"
 #include "WorldSessionMgr.h"
 
 Transmogrification* Transmogrification::instance()
@@ -474,6 +475,34 @@ bool Transmogrification::AddCollectedAppearance(uint32 accountId, uint32 itemId)
     auto res = collectionCache[accountId].insert(itemId);
     bool inserted = res.second;
     return inserted;
+}
+
+void Transmogrification::AddToDatabase(Player* player, ItemTemplate const* itemTemplate)
+{
+    if (!GetTrackUnusableItems() && !SuitableForTransmogrification(player, itemTemplate))
+        return;
+    if (itemTemplate->Class != ITEM_CLASS_ARMOR && itemTemplate->Class != ITEM_CLASS_WEAPON)
+        return;
+    uint32 itemId = itemTemplate->ItemId;
+    WorldSession* session = player->GetSession();
+    uint32 accountId = session->GetAccountId();
+    std::string itemName = itemTemplate->Name1;
+
+    int loc_idex = session->GetSessionDbLocaleIndex();
+    if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
+        ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
+
+    std::stringstream tempStream;
+    tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
+    std::string itemQuality = tempStream.str();
+    bool showChatMessage = !(player->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value) && !CanNeverTransmog(itemTemplate);
+    if (AddCollectedAppearance(accountId, itemId))
+    {
+        if (showChatMessage)
+            ChatHandler(session).PSendSysMessage(R"(|c{}|Hitem:{}:0:0:0:0:0:0:0:0|h[{}]|h|r {})", itemQuality, itemId, itemName, *session->GetModuleString("mod-transmog", LANG_TRANSMOG_ADDED_APPEARANCE));
+
+        CharacterDatabase.Execute("INSERT INTO custom_unlocked_appearances (account_id, item_template_id) VALUES ({}, {})", accountId, itemId);
+    }
 }
 
 TransmogStrings Transmogrification::Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost) {

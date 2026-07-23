@@ -137,6 +137,15 @@ enum TransmogStrings : uint32
     LANG_TRANSMOG_CHECK_COLL_NOT_FOUND         = 79,
     // Check command: section pass message (shared by all sections)
     LANG_TRANSMOG_CHECK_SECTION_OK             = 80,
+    // Claim command strings
+    LANG_TRANSMOG_CMD_CLAIM_DISABLED           = 81,
+    LANG_TRANSMOG_CMD_CLAIM_NOT_IN_BAGS        = 82,
+    LANG_TRANSMOG_CMD_CLAIM_USAGE              = 83,
+    LANG_TRANSMOG_CMD_CLAIM_INVALID_SLOT       = 84,
+    LANG_TRANSMOG_CMD_CLAIM_EMPTY_SLOT         = 85,
+    LANG_TRANSMOG_CMD_CLAIM_ALL_RESULT         = 86,
+    LANG_TRANSMOG_CMD_CLAIM_ALL_NONE           = 87,
+    LANG_TRANSMOG_CMD_CLAIM_ALREADY            = 88,
 };
 
 enum ArmorClassSpellIDs
@@ -295,6 +304,10 @@ public:
     void DeleteFakeEntry(Player* player, uint8 slot, Item* itemTransmogrified, CharacterDatabaseTransaction* trans = nullptr);
     void SetFakeEntry(Player* player, uint32 newEntry, uint8 slot, Item* itemTransmogrified);
     bool AddCollectedAppearance(uint32 accountId, uint32 itemId);
+    // Adds the item's appearance to the player's account collection and, if newly unlocked,
+    // notifies the player (LANG_TRANSMOG_ADDED_APPEARANCE). Shared by the auto-collect player
+    // script and the `.transmog claim` command.
+    void AddToDatabase(Player* player, ItemTemplate const* itemTemplate);
 
     TransmogStrings Transmogrify(Player* player, ObjectGuid itemGUID, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
     TransmogStrings Transmogrify(Player* player, uint32 itemEntry, uint8 slot, /*uint32 newEntry, */bool no_cost = false);
