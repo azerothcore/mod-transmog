@@ -488,9 +488,9 @@ void Transmogrification::AddToDatabase(Player* player, ItemTemplate const* itemT
     uint32 accountId = session->GetAccountId();
     std::string itemName = itemTemplate->Name1;
 
-    int loc_idex = session->GetSessionDbLocaleIndex();
+    int locIndex = session->GetSessionDbLocaleIndex();
     if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
-        ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
+        ObjectMgr::GetLocaleString(il->Name, locIndex, itemName);
 
     std::stringstream tempStream;
     tempStream << std::hex << ItemQualityColors[itemTemplate->Quality];
