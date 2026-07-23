@@ -145,9 +145,9 @@ public:
 
         if (target) {
             // get locale item name
-            int loc_idex = target->GetSession()->GetSessionDbLocaleIndex();
+            int locIndex = target->GetSession()->GetSessionDbLocaleIndex();
             if (ItemLocale const* il = sObjectMgr->GetItemLocale(itemId))
-                ObjectMgr::GetLocaleString(il->Name, loc_idex, itemName);
+                ObjectMgr::GetLocaleString(il->Name, locIndex, itemName);
         }
 
         std::string playerName = player->GetName();
