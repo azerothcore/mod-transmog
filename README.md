@@ -44,7 +44,7 @@ or you can manually [download the module](https://github.com/azerothcore/mod-tra
 
 ### 2) Import the SQL to the right Database (auth, world or characters)
 
-Import the SQL manually to the right Database (auth, world or characters) or with the `db_assembler.sh` (if `include.sh` provided).
+The worldserver applies the module's SQL from `data/sql/` automatically on startup (see `Updates.EnableDatabases` in `worldserver.conf`). If database updates are disabled, import the SQL manually to the right Database (auth, world or characters).
 
 ### 3) Re-run cmake and launch a clean build of AzerothCore
 
