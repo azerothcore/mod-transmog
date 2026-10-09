@@ -690,6 +690,9 @@ public:
 class PS_Transmogrification : public PlayerScript
 {
 private:
+    // Set while a vendor purchase stores its item: core marks it refundable only after StoreNewItem.
+    static inline thread_local ObjectGuid _purchasingPlayer;
+
     void AddToDatabase(Player* player, Item* item)
     {
         if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) && !sTransmogrification->GetAllowTradeable())
@@ -774,8 +777,9 @@ private:
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify", {
         PLAYERHOOK_ON_EQUIP,
-        PLAYERHOOK_ON_LOOT_ITEM,
+        PLAYERHOOK_ON_STORE_NEW_ITEM,
         PLAYERHOOK_ON_CREATE_ITEM,
+        PLAYERHOOK_ON_BEFORE_STORE_OR_EQUIP_NEW_ITEM,
         PLAYERHOOK_ON_AFTER_STORE_OR_EQUIP_NEW_ITEM,
         PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
         PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
@@ -792,11 +796,14 @@ public:
         AddToDatabase(player, it);
     }
 
-    void OnPlayerLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
+    // Loot is collected here, not in OnPlayerLootItem: a script that runs before ours there may destroy the item.
+    void OnPlayerStoreNewItem(Player* player, Item* item, uint32 /*count*/) override
     {
-        if (!sT->GetUseCollectionSystem() || !item || typeid(*item) != typeid(Item))
+        if (!sT->GetUseCollectionSystem() || !item || player->GetGUID() == _purchasingPlayer)
             return;
-        if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())
+        ItemTemplate const* itemTemplate = item->GetTemplate();
+        if (itemTemplate->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound() ||
+            (itemTemplate->Quality == ITEM_QUALITY_POOR && sT->GetCollectPoorItemsOnPickup()))
         {
             AddToDatabase(player, item);
         }
@@ -812,8 +819,14 @@ public:
         }
     }
 
+    void OnPlayerBeforeStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
+    {
+        _purchasingPlayer = player->GetGUID();
+    }
+
     void OnPlayerAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
     {
+        _purchasingPlayer.Clear();
         if (!sT->GetUseCollectionSystem())
             return;
         if (item->GetTemplate()->Bonding == ItemBondingType::BIND_WHEN_PICKED_UP || item->IsSoulBound())

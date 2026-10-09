@@ -47,6 +47,14 @@
 #                     This allows these appearances to be used later if the configuration is changed.
 #        Default:     1
 #
+#    Transmogrification.CollectPoorItemsOnPickup
+#        Description: If enabled, poor (grey) items are collected when they are looted or otherwise created in the bags,
+#                     even if they do not bind (not when they arrive by mail, trade or from a vendor).
+#                     If disabled, they are collected like other items: when they bind or when they are equipped.
+#                     Enable it with a module that sells grey loot on pickup (e.g. mod-junk-to-gold), which would otherwise
+#                     remove the item before it can be collected.
+#        Default:     0
+#
 #    Transmogrification.RetroActiveAppearances
 #        Description: Enables/Disables checking all completed quests for uncollected appearances.
 #                     Occurs only once per player.
@@ -91,6 +99,7 @@ Transmogrification.UseVendorInterface = 0
 Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.HiddenTransmogIsFree = 1
 Transmogrification.TrackUnusableItems = 1
+Transmogrification.CollectPoorItemsOnPickup = 0
 Transmogrification.RetroActiveAppearances = 1
 Transmogrification.ResetRetroActiveAppearancesFlag = 0
 
