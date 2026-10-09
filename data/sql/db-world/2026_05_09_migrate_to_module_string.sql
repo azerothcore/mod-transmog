@@ -1,5 +1,6 @@
 -- Migrate transmog strings from acore_string (global IDs 11100-11121) to module_string.
 -- Also migrates hardcoded gossip strings from C++ to module_string.
+
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 11100 AND 11121;
 
 DELETE FROM `module_string` WHERE `module` = 'mod-transmog';

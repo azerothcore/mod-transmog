@@ -1,4 +1,5 @@
 -- Strings for the `.transmog claim` command, sent via PSendModuleSysMessage.
+
 DELETE FROM `module_string` WHERE `module` = 'mod-transmog' AND `id` BETWEEN 81 AND 88;
 INSERT INTO `module_string` (`module`, `id`, `string`) VALUES
 -- Claim command strings
