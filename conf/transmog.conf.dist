@@ -47,6 +47,12 @@
 #                     This allows these appearances to be used later if the configuration is changed.
 #        Default:     1
 #
+#    Transmogrification.CollectOnVendorSell
+#        Description: Enables/Disables collecting the appearance of an uncollected item when it is sold to a vendor.
+#                     If enabled, the sold item is soulbound so it cannot be bought back and traded to unlock it again.
+#                     If disabled, selling an item neither collects its appearance nor binds it.
+#        Default:     1
+#
 #    Transmogrification.RetroActiveAppearances
 #        Description: Enables/Disables checking all completed quests for uncollected appearances.
 #                     Occurs only once per player.
@@ -91,6 +97,7 @@ Transmogrification.UseVendorInterface = 0
 Transmogrification.AllowHiddenTransmog = 1
 Transmogrification.HiddenTransmogIsFree = 1
 Transmogrification.TrackUnusableItems = 1
+Transmogrification.CollectOnVendorSell = 1
 Transmogrification.RetroActiveAppearances = 1
 Transmogrification.ResetRetroActiveAppearancesFlag = 0
 
