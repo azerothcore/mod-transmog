@@ -879,7 +879,7 @@ public:
 
     bool OnPlayerCanSellItem(Player* player, Item* item, Creature* /*creature*/) override
     {
-        if (!sT->GetUseCollectionSystem() || !item)
+        if (!sT->GetUseCollectionSystem() || !sT->GetCollectOnVendorSell() || !item)
             return true;
 
         ItemTemplate const* itemTemplate = item->GetTemplate();
